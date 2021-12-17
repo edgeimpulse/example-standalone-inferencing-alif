@@ -1,9 +1,13 @@
 #include "hal.h"
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
-#include "features.h"
 
 #include <cstdio>
+
+static const float raw_features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE] = {
+    // copy raw features here (for example from the 'Live classification' page)
+    // see TBD
+};
 
 int main()
 {
