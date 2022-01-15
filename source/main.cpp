@@ -1,3 +1,21 @@
+// You can toggle these on / off in case devices don't have enough flash to hold all of them in one go
+// just concat the output afterwards
+
+// doing static gets better memory placement, but you can't run multiple
+// don't do static for MFCC
+// #define EI_CLASSIFIER_ALLOCATION_STATIC 1
+
+#define GESTURES_F32           0
+#define GESTURES_I8            0
+#define MOBILENET_32_32_F32    0
+#define MOBILENET_32_32_I8     0
+#define MOBILENET_96_96_F32    0
+#define MOBILENET_96_96_I8     0
+#define MOBILENET_320_320_F32  0
+#define KEYWORDS_F32           0
+#define KEYWORDS_I8            0
+#define MFCC                   1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <map>
@@ -27,7 +45,12 @@ namespace fs = std::filesystem;
 static tflite::MicroErrorReporter micro_error_reporter;
 static tflite::ErrorReporter* error_reporter = &micro_error_reporter;
 
+#if MOBILENET_96_96_I8
+#define EI_CLASSIFIER_TFLITE_ARENA_SIZE     300000
+#else
 #define EI_CLASSIFIER_TFLITE_ARENA_SIZE     (80 * 1024)
+#endif
+
 #define ITERATION_COUNT         10
 #define ITERATION_COUNT_SSD     1
 
@@ -59,71 +82,21 @@ static tflite::ErrorReporter* error_reporter = &micro_error_reporter;
 #include "benchmark-nn/keywords-2d-f32/tflite-trained.h"
 #include "benchmark-nn/keywords-2d-i8/tflite-trained.h"
 
-// You can toggle these on / off in case devices don't have enough flash to hold all of them in one go
-// just concat the output afterwards
-#define GESTURES_F32           1
-#define GESTURES_I8            1
-#define MOBILENET_32_32_F32    0
-#define MOBILENET_32_32_I8     0
-#define MOBILENET_96_96_F32    0
-#define MOBILENET_96_96_I8     0
-#define MOBILENET_320_320_F32  0
-#define KEYWORDS_F32           0
-#define KEYWORDS_I8            0
-#define MFCC                   0
+#if defined(EI_CLASSIFIER_ALLOCATION_STATIC)
+// no op free for static arena
+#define ei_aligned_free(x)
+#endif
 
-#if EI_CLASSIFIER_USE_FULL_TFLITE
+extern "C" void __stack_chk_fail(void) { while (1) {} } // trap stack overflow
+void* __stack_chk_guard = (void*)0xaeaeaeae; 
+
 int run_model_tflite_full(const unsigned char *trained_tflite, size_t trained_tflite_len, int iterations, uint64_t *time_us) {
-    std::unique_ptr<tflite::FlatBufferModel> model = nullptr;
-    std::unique_ptr<tflite::Interpreter> interpreter = nullptr;
-    if (!model) {
-        model = tflite::FlatBufferModel::BuildFromBuffer((const char*)trained_tflite, trained_tflite_len);
-        if (!model) {
-            ei_printf("Failed to build TFLite model from buffer\n");
-            return EI_IMPULSE_TFLITE_ERROR;
-        }
-
-        tflite::ops::builtin::BuiltinOpResolver resolver;
-        tflite::InterpreterBuilder builder(*model, resolver);
-        builder(&interpreter);
-
-        if (!interpreter) {
-            ei_printf("Failed to construct interpreter\n");
-            return EI_IMPULSE_TFLITE_ERROR;
-        }
-
-        if (interpreter->AllocateTensors() != kTfLiteOk) {
-            ei_printf("AllocateTensors failed\n");
-            return EI_IMPULSE_TFLITE_ERROR;
-        }
-
-        int hw_thread_count = (int)std::thread::hardware_concurrency();
-        hw_thread_count -= 1; // leave one thread free for the other application
-        if (hw_thread_count < 1) {
-            hw_thread_count = 1;
-        }
-
-        if (interpreter->SetNumThreads(hw_thread_count) != kTfLiteOk) {
-            ei_printf("SetNumThreads failed\n");
-            return EI_IMPULSE_TFLITE_ERROR;
-        }
-    }
-
-    auto start_us = ei_read_timer_us();
-
-    for (int ix = 0; ix < iterations; ix++) {
-        interpreter->Invoke();
-    }
-
-    auto end_us = ei_read_timer_us();
-
-    *time_us = end_us - start_us;
-
-    return 0;
-}
-#else // TensorFlow Lite Micro
-int run_model_tflite_full(const unsigned char *trained_tflite, size_t trained_tflite_len, int iterations, uint64_t *time_us) {
+#if defined(EI_CLASSIFIER_ALLOCATION_STATIC)
+    static uint8_t tensor_arena[EI_CLASSIFIER_TFLITE_ARENA_SIZE] ALIGN(16);
+#else
     uint8_t *tensor_arena = (uint8_t*)ei_aligned_calloc(16, EI_CLASSIFIER_TFLITE_ARENA_SIZE);
+#endif 
+    
     if (tensor_arena == NULL) {
         ei_printf("Failed to allocate TFLite arena (%d bytes)\n", EI_CLASSIFIER_TFLITE_ARENA_SIZE);
         return EI_IMPULSE_TFLITE_ARENA_ALLOC_FAILED;
@@ -172,7 +145,6 @@ int run_model_tflite_full(const unsigned char *trained_tflite, size_t trained_tf
 
     return 0;
 }
-#endif
 
 int main(int argc, char **argv) {
     std::map<std::string, int> res;
