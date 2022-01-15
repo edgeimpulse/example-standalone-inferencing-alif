@@ -9,6 +9,14 @@ static const float raw_features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE] = {
     // see TBD
 };
 
+#if !NDEBUG
+extern "C" void __stack_chk_fail(void) { 
+    ei_printf("Stack overflow caught\n");
+    while (1) {} 
+} // trap stack overflow
+void* __stack_chk_guard = (void*)0xaeaeaeae;
+#endif
+
 int main()
 {
     // System init takes place in Reset function, see irqs.c

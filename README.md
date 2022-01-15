@@ -34,3 +34,9 @@ If you are using the Alif Dev kit, see Alif `AN0002` for instructions on flashin
 
 Once programmed, the firmware will run inference and print the results over the serial port.
 
+## Known issues
+
+With debugger attached, my device boots up directly into Bus_Fault (or possibly another fault)
+
+- Power cycle your board and reload your program
+
