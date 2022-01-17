@@ -95,7 +95,6 @@ add_link_options(
     --callgraph
     --load_addr_map_info
     --xref
-    --datacompressor off
     "$<$<CONFIG:RELEASE>:--no_debug>")
 
 # Function to add a map file output for the linker to dump diagnostic information to.
