@@ -70,6 +70,10 @@ add_compile_options(
     -mlittle-endian
     -MD)
 
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    add_compile_options(-fstack-protector-strong)
+endif()
+
 # Compile definitions:
 add_compile_definitions(
     PLATFORM_HAL=${PLATFORM_HAL}
@@ -91,6 +95,7 @@ add_link_options(
     --callgraph
     --load_addr_map_info
     --xref
+    --datacompressor off
     "$<$<CONFIG:RELEASE>:--no_debug>")
 
 # Function to add a map file output for the linker to dump diagnostic information to.

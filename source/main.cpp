@@ -87,8 +87,13 @@ static tflite::ErrorReporter* error_reporter = &micro_error_reporter;
 #define ei_aligned_free(x)
 #endif
 
-extern "C" void __stack_chk_fail(void) { while (1) {} } // trap stack overflow
-void* __stack_chk_guard = (void*)0xaeaeaeae; 
+#if !NDEBUG
+extern "C" void __stack_chk_fail(void) { 
+    ei_printf("Stack overflow caught\n");
+    while (1) {} 
+} // trap stack overflow
+void* __stack_chk_guard = (void*)0xaeaeaeae;
+#endif
 
 int run_model_tflite_full(const unsigned char *trained_tflite, size_t trained_tflite_len, int iterations, uint64_t *time_us) {
 #if defined(EI_CLASSIFIER_ALLOCATION_STATIC)
