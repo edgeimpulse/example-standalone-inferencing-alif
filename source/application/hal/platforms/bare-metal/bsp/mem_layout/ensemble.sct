@@ -39,8 +39,8 @@ LOAD_REGION_SRAM    0x02000000                  0x00400000
     sram0.bin       0x02000000 ALIGN 16         0x00400000
     {
         ; Uncomment these to place model in SRAM, in case of a large model (image, etc)
-        ; main.o(*trained_tflite)
-        ; TODO: EON
+        ; trained_model_compiled.o(*tensor_data2) ; use this for EON
+        ; main.o(*trained_tflite) ; use this when not using EON Compiler
         .ANY1 (+RO-DATA)
         .ANY1 (+RW +ZI)
     }
