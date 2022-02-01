@@ -34,6 +34,13 @@ If you are using the Alif Dev kit, see Alif `AN0002` for instructions on flashin
 
 Once programmed, the firmware will run inference and print the results over the serial port.
 
+## Memory placement
+
+Alif M55 processors have a private fast DTCM, and also access to a larger, but slower, chip global SRAM.
+The linker file attempts to place as much as possible in DTCM, and overflows into SRAM if needed.
+When your entire program can't fit into DTCM, sometimes customizing placement of objects can improve performance.
+See [ensemble.sct](ensemble.sct) for example placement commands (currently commentted out)
+
 ## Known issues
 
 With debugger attached, my device boots up directly into Bus_Fault (or possibly another fault)

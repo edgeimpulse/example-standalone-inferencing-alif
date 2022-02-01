@@ -54,7 +54,7 @@ set(CMAKE_TOOLCHAIN_DIR ${CMAKE_SCRIPTS_DIR}/toolchains)
 set(EI_FOLDER source)
 set(EI_SDK_FOLDER ${EI_FOLDER}/edge-impulse-sdk)
 add_compile_options(-fdata-sections)
-add_compile_definitions(EI_ETHOS=1)
+add_compile_definitions(EI_ETHOS=1 EI_CLASSIFIER_ALLOCATION_STATIC=1)
 
 include(${CMAKE_SCRIPTS_DIR}/util_functions.cmake)
 

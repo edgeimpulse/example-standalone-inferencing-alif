@@ -96,6 +96,19 @@ enum ethosu_error_codes ethosu_get_config(struct ethosu_device *dev, struct etho
     return ETHOSU_SUCCESS;
 }
 
+// Added by Edge Impulse
+// Test for memory in DTCM.  If so, use global address
+uint64_t alias_memory_if_needed(uint64_t addr) {
+    if ((addr & 0xFF000000) == 0x20000000) {
+#if EI_CONFIG_ETHOS_U55_128 // means HE core
+        addr = 0x60800000 | ( addr & 0x007FFFFF );
+#else // assume HP core
+        addr = 0x50800000 | ( addr & 0x007FFFFF );
+#endif
+    }
+    return addr;
+}
+
 enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
                                                   const uint8_t *cmd_stream_ptr,
                                                   uint32_t cms_length,
@@ -108,6 +121,11 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
     assert(num_base_addr <= ETHOSU_DRIVER_BASEP_INDEXES);
 
     uint64_t qbase = (uintptr_t)cmd_stream_ptr + BASE_POINTER_OFFSET;
+
+    // Added by Edge Impulse
+    // Test for memory in DTCM.  If so, use global address
+    qbase = alias_memory_if_needed(qbase);
+
     assert(qbase <= ADDRESS_MASK);
     LOG_DEBUG("QBASE=0x%016llx, QSIZE=%u, base_pointer_offset=0x%08x\n", qbase, cms_length, BASE_POINTER_OFFSET);
     ethosu_write_reg(dev, NPU_REG_QBASE0, qbase & 0xffffffff);
@@ -119,6 +137,11 @@ enum ethosu_error_codes ethosu_run_command_stream(struct ethosu_device *dev,
         uint64_t addr = base_addr[i] + BASE_POINTER_OFFSET;
         assert(addr <= ADDRESS_MASK);
         LOG_DEBUG("BASEP%d=0x%016llx\n", i, addr);
+
+        // Added by Edge Impulse
+        // Test for memory in DTCM.  If so, use global address
+        addr = alias_memory_if_needed(addr);
+
         ethosu_write_reg(dev, NPU_REG_BASEP0 + (2 * i) * BASEP_OFFSET, addr & 0xffffffff);
         ethosu_write_reg(dev, NPU_REG_BASEP0 + (2 * i + 1) * BASEP_OFFSET, addr >> 32);
     }

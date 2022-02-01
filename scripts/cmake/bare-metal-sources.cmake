@@ -28,7 +28,7 @@ set(MEM_PROFILE_TEMPLATE    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/templates/
 set(IRQ_PROFILE_TEMPLATE    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/templates/peripheral_irqs.h.template)
 set(MEM_REGIONS_TEMPLATE    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/templates/mem_regions.h.template)
 set(TA_SETTINGS_TEMPLATE    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/templates/timing_adapter_settings.template)
-set(LINKER_SCRIPT_DIR       "${PLAT_HAL}/bsp/mem_layout")
+set(LINKER_SCRIPT_DIR       ${CMAKE_SOURCE_DIR})
 set(ETHOS_U_NPU_FLAG                           "-DARM_NPU=1")
 
 if (ETHOS_U_NPU_ENABLED)
