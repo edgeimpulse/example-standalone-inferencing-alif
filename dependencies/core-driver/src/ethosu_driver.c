@@ -748,6 +748,7 @@ static int handle_optimizer_config(struct ethosu_driver *drv, struct opt_cfg_s *
                     cfg.custom_dma,
                     opt_cfg_p->custom_dma);
         }
+        LOG_ERR("Did you choose the correct target core? This model was compiled for a different Ethos configuration\n");
         return_code = -1;
     }
 
