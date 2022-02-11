@@ -29,7 +29,11 @@
 #include "cmsis.h"
 
 #ifndef EI_CORE_CLOCK_HZ
-#define EI_CORE_CLOCK_HZ 400000000 //default to M55_0 core
+    #ifdef EI_CONFIG_ETHOS_U55_256
+        #define EI_CORE_CLOCK_HZ 400000000 //default to M55_0 core
+    #else
+        #define EI_CORE_CLOCK_HZ 160000000
+    #endif
 #endif
 
 __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled()

@@ -21,25 +21,35 @@ For pre-configured example code with features and edge-impulse libraries already
 
 ## Build the firmware
 1. Extract the zip file downloaded from edge impulse into the `source` directory of this repository
-2. run cmake & make to build to app.axf
+2a. run cmake .. -DCORE=HP to target Cortex M55 core 0 (high performance) OR
+2b. run cmake .. -DCORE=HE to target Cortex M55 core 1 (high efficiency) 
+3. run make to build to app.axf
 ```
 mkdir build
 cd build
-cmake ..
+cmake .. -DCORE=HP
 make -j8
 ```
 
 ## Flash your device
-If you are using the Alif Dev kit, see Alif `AN0002` for instructions on flashing your alif development kit with `build/bin/app.axf`
+If you are using the Alif Dev kit, see Alif `AN0002` for instructions on flashing your Alif development kit with `build/bin/app.axf`
 
 Once programmed, the firmware will run inference and print the results over the serial port.
+
+# Other details
+
+## Timing
+
+Timing calculations are performed in [ei_classifier_porting.cpp](source/ei_classifier_porting.cpp) and make use of an interrupt attached to SysTick.
+- An RTOS may take over this interrupt handler, in which case you should reimplement ei_read_timer_us and _ms.
+- The default calculation is based on the default clock rates of the Alif dev kit (400 MHz for HP core, 160 MHz for HE core).  If you change this, redefine EI_CORE_CLOCK_HZ.
 
 ## Memory placement
 
 Alif M55 processors have a private fast DTCM, and also access to a larger, but slower, chip global SRAM.
 The linker file attempts to place as much as possible in DTCM, and overflows into SRAM if needed.
 When your entire program can't fit into DTCM, sometimes customizing placement of objects can improve performance.
-See [ensemble.sct](ensemble.sct) for example placement commands (currently commentted out)
+See [ensemble.sct](ensemble.sct) for example placement commands (currently commented out)
 
 ## Known issues
 

@@ -54,7 +54,7 @@ set(CMAKE_TOOLCHAIN_DIR ${CMAKE_SCRIPTS_DIR}/toolchains)
 set(EI_FOLDER source)
 set(EI_SDK_FOLDER ${EI_FOLDER}/edge-impulse-sdk)
 add_compile_options(-fdata-sections)
-add_compile_definitions(EI_ETHOS=1 EI_CLASSIFIER_ALLOCATION_STATIC=1)
+add_compile_definitions(EI_CLASSIFIER_ALLOCATION_STATIC=1)
 
 include(${CMAKE_SCRIPTS_DIR}/util_functions.cmake)
 
@@ -84,6 +84,11 @@ USER_OPTION(ETHOS_U_NPU_ENABLED "Select if Ethos-U55 is available for the platfo
     ON
     BOOL)
 
+USER_OPTION(CORE 
+    "Choose target, 'HP' (for M55 Core 0, High Performance), or 'HE' (for M55 Core 1, High Effiency)"
+    "None"
+    STRING)
+
 USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. Should be used only for MPS3 board."
     OFF
     BOOL)
@@ -102,6 +107,17 @@ project(edge_impulse_alif
         DESCRIPTION "Example program for Edge Impulse running on Alif hardware")
 
 enforce_compiler_version()
+
+if (ETHOS_U_NPU_ENABLED)
+    add_compile_definitions(EI_ETHOS=1)
+    if (CORE STREQUAL "HP")
+        add_compile_definitions(EI_CONFIG_ETHOS_U55_256=1)
+    elseif(CORE STREQUAL "HE")
+        add_compile_definitions(EI_CONFIG_ETHOS_U55_128=1)
+    else()
+        message(FATAL_ERROR "Please choose either HP or HE target care (ex: cmake -DCORE=HP)")
+    endif()
+endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
