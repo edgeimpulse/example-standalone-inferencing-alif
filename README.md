@@ -37,6 +37,12 @@ If you are using the Alif Dev kit, see Alif `AN0002` for instructions on flashin
 
 Once programmed, the firmware will run inference and print the results over the serial port.
 
+## Serial out is on UART2, which is connected to pins P3_16,P3_17 (on connector J413)
+
+- Baud 115200
+- "8,N,1" (the typical settings for everything else, 8 bit, no parity, 1 stop bit)
+- 1.8 Vcc
+
 # Other details
 
 ## Timing
