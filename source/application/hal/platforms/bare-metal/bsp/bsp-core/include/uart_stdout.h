@@ -19,6 +19,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief       Initialised the UART block.
  **/
@@ -53,5 +57,9 @@ extern bool GetLine(char *lp, unsigned int len);
  * @param[in]   code Terminating code displayed on the UART before the end of the simulation.
  **/
 extern void UartEndSimulation(int code);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* UART_STDOUT_H */

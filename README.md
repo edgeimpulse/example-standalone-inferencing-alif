@@ -54,7 +54,7 @@ See [ensemble.sct](ensemble.sct) for example placement commands (currently comme
 
 ## Known issues
 
-With debugger attached, my device boots up directly into Bus_Fault (or possibly another fault)
+With debugger attached, my device boots up directly into Bus_Fault (or possibly another fault).  This can especially happen when you entered Hard Fault before your last reset.
 
 - Power cycle your board and reload your program
 

@@ -185,6 +185,24 @@ uint64_t Get_SysTick_Cycle_Count(void)
     return cpu_cycle_count + (SysTick->LOAD - systick_val);
 }
 
+/*----------------------------------------------------------------------------
+  Default Handler for Exceptions / Interrupts
+ *----------------------------------------------------------------------------*/
+void Default_Handler(void)
+{
+  while(1);
+}
+
+// weak UART stubs
+void UART0_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void UART1_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void UART2_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void UART3_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void UART4_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void UART5_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void UART6_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void UART7_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+
 /**
  * Interrupt vector table.
  */
@@ -215,7 +233,15 @@ irq_vec_type __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /*  64 -  80 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /*  80 -  96 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /*  96 -  112 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 112 -  128 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 112 -  125 */
+    UART0_IRQHandler,                         /*   126 Interrupt 126 */
+    UART1_IRQHandler,                         /*   127 Interrupt 127 */
+    UART2_IRQHandler,                         /*   128 Interrupt 128 */
+    UART3_IRQHandler,                         /*   129 Interrupt 129 */
+    UART4_IRQHandler,                         /*   130 Interrupt 130 */
+    UART5_IRQHandler,                         /*   131 Interrupt 131 */
+    UART6_IRQHandler,                         /*   132 Interrupt 132 */
+    UART7_IRQHandler                          /*   133 Interrupt 133 */
 };
 
 /**

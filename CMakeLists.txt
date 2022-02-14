@@ -96,6 +96,14 @@ USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. S
     message(STATUS "Platform: Ensemble platform with minimal peripherals")
     set(DEFAULT_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_DIR}/bare-metal-armclang.cmake)
 
+if (CORE STREQUAL "HP")
+    add_compile_definitions(EI_CONFIG_ALIF_HP=1)
+elseif(CORE STREQUAL "HE")
+    add_compile_definitions(EI_CONFIG_ALIF_HE=1)
+else()
+    message(FATAL_ERROR "Please choose either HP or HE target care (ex: cmake -DCORE=HP)")
+endif()
+
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE ${DEFAULT_TOOLCHAIN_FILE}
         CACHE FILEPATH "Toolchain file")
@@ -172,12 +180,7 @@ add_executable(${TARGET_NAME})
 # If we need NPU libraries:
 if (ETHOS_U_NPU_ENABLED)
 
-    message(STATUS "Using ARM Ethos-U55 - adding core-driver and timing-adapter-driver includes and libraries")
-    USER_OPTION(ETHOS_U_NPU_TIMING_ADAPTER_SRC_PATH
-        "Path to Ethos-U55 timing adapter sources"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/core-software/drivers/timing_adapter"
-        PATH
-        )
+    message(STATUS "Using ARM Ethos-U55 - adding core-driver includes and libraries")
 
     USER_OPTION(ETHOS_U_NPU_DRIVER_SRC_PATH
         "Path to Ethos-U55 core driver sources"
@@ -185,19 +188,11 @@ if (ETHOS_U_NPU_ENABLED)
         PATH
         )
 
-    include_directories("${ETHOS_U_NPU_TIMING_ADAPTER_SRC_PATH}/include/"
-                        "${EI_FOLDER}/edge-impulse-sdk/CMSIS/Core/Include")
+    include_directories("${EI_FOLDER}/edge-impulse-sdk/CMSIS/Core/Include")
 
-    add_subdirectory("${ETHOS_U_NPU_TIMING_ADAPTER_SRC_PATH}" ${CMAKE_BINARY_DIR}/timing-adapter)
     add_subdirectory("${ETHOS_U_NPU_DRIVER_SRC_PATH}" ${CMAKE_BINARY_DIR}/ethos-driver)
 
-    set(ETHOSU_INCLUDES ${ETHOS_U_NPU_TIMING_ADAPTER_SRC_PATH}/include
-                        ${ETHOS_U_NPU_DRIVER_SRC_PATH}/include)
-
-    list(APPEND ETHOS_U_NPU_LIBS 
-        ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libtiming_adapter.a
-        
-    )
+    set(ETHOSU_INCLUDES ${ETHOS_U_NPU_DRIVER_SRC_PATH}/include)
 endif ()
 
 set(DEP_INCLUDE_DIRS
@@ -215,12 +210,8 @@ set(HAL_DIR ${SRC_PATH}/application/hal)
 
 # HAL API sources
 file(GLOB_RECURSE SRC_HAL
-    "${HAL_DIR}/hal.c"
+    "${HAL_DIR}/*.c"
     )
-
-# Set platform specific HAL sources; these should be provided
-# by each platform's cmake include file
-list(APPEND SRC_HAL ${SRC_PLAT_HAL})
 
 # Include directories:
 set(APPLICATION_INCLUDE_DIRS
@@ -265,8 +256,6 @@ set_source_files_properties(${SRC_MAIN}
 if (${CMAKE_CROSSCOMPILING})
     # If we are building timing adapter, set the dependency:
     if (ETHOS_U_NPU_ENABLED)
-        message(STATUS "Adding timing_adapter as a dependency to ${TARGET_NAME}")
-        add_dependencies(${TARGET_NAME} timing_adapter)
         target_link_libraries(${TARGET_NAME} PUBLIC ethosu_core_driver)
     endif()
 
