@@ -39,6 +39,11 @@
   -----------------------------------------------------------------------------*/
 __ROM_BASE = 0x00000000;
 __ROM_SIZE = 0x00040000;
+/* Can swap above region for below to switch instruction to SRAM.  Much slower, but larger space */
+/*
+__ROM_BASE = 0x02000000;
+__ROM_SIZE = 0x00400000;
+*/
 
 /*--------------------- Embedded RAM Configuration ----------------------------
   <h> RAM Configuration
