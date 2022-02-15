@@ -206,7 +206,7 @@ set(DEP_RUNTIME_INCLUDE_DIRS
     ${DEP_FLATBUF_INCLUDE}
     )
 
-set(HAL_DIR ${SRC_PATH}/application/hal)
+set(HAL_DIR ${SRC_PATH}/hal)
 
 # HAL API sources
 file(GLOB_RECURSE SRC_HAL

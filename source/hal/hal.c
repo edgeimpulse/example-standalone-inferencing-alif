@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 #include "hal.h"            /* API */
-
-#include "hal_config.h"     /* HAL configuration */
-#include "system_init.h"
+#include "RTE_Components.h"
+#include CMSIS_device_header
+#include "peripheral_memmap.h"      /* peripheral memory map definitions */
+#include "peripheral_irqs.h"
+#include "bsp_core_log.h"
 
 #include <stdio.h>
 #include <assert.h>

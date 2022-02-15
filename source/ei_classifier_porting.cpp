@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "cmsis.h"
+#include "hal/cmsis.h"
 
 #ifndef EI_CORE_CLOCK_HZ
     #ifdef EI_CONFIG_ETHOS_U55_256

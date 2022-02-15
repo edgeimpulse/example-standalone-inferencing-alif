@@ -15,7 +15,7 @@
 #  limitations under the License.
 #----------------------------------------------------------------------------
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build_baremetal)
-set(PLAT_HAL ${CMAKE_CURRENT_SOURCE_DIR}/source/application/hal/platforms/bare-metal)
+set(PLAT_HAL ${CMAKE_CURRENT_SOURCE_DIR}/source/hal)
 
 message(STATUS "target platform ${TARGET_PLATFORM}")
 
@@ -129,4 +129,4 @@ file(GLOB_RECURSE SRC_PLAT_HAL
 
 # Special retarget source to direct stdin, stdout and stderr streams to the
 # UART block.
-set(PLAT_RETARGET_SOURCE "${PLAT_HAL}/bsp/bsp-core/retarget.c")
+set(PLAT_RETARGET_SOURCE "${PLAT_HAL}/retarget.c")

@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-#include "hal.h"
-#include "uart_stdout.h"
+#include "hal/hal.h"
+#include "hal/uart_stdout.h"
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
 
