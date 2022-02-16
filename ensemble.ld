@@ -168,6 +168,7 @@ SECTIONS
   {
     . = ALIGN(4);
     __copy_table_start__ = .;
+    __copy_table_end__ = .; /* WORKAROUND: copy table causing problems.*/
     LONG (__etext)
     LONG (__data_start__)
     LONG (__data_end__ - __data_start__)
@@ -177,7 +178,7 @@ SECTIONS
     LONG (__data2_start__)
     LONG (__data2_end__ - __data2_start__)
 */
-    __copy_table_end__ = .;
+    /*__copy_table_end__ = .;*/
   } > FLASH
 
   .zero.table :
