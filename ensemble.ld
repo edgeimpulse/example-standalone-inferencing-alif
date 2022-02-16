@@ -39,11 +39,7 @@
   -----------------------------------------------------------------------------*/
 __ROM_BASE = 0x00000000;
 __ROM_SIZE = 0x00040000;
-/* Can swap above region for below to switch instruction to SRAM.  Much slower, but larger space */
-/*
-__ROM_BASE = 0x02000000;
-__ROM_SIZE = 0x00400000;
-*/
+
 
 /*--------------------- Embedded RAM Configuration ----------------------------
   <h> RAM Configuration
@@ -54,6 +50,8 @@ __ROM_SIZE = 0x00400000;
 __RAM_BASE = 0x20000000;
 __RAM_SIZE = 0x00040000;
 
+__SRAM_BASE = 0x02000000;
+__SRAM_SIZE = 0x00400000;
 /*--------------------- Stack / Heap Configuration ----------------------------
   <h> Stack / Heap Configuration
     <o0> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
@@ -71,6 +69,7 @@ MEMORY
 {
   FLASH (rx)  : ORIGIN = __ROM_BASE, LENGTH = __ROM_SIZE
   RAM   (rwx) : ORIGIN = __RAM_BASE, LENGTH = __RAM_SIZE
+  SRAM   (rwx) : ORIGIN = __SRAM_BASE, LENGTH = __SRAM_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -107,6 +106,12 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
+  .sram :
+  {
+    /* Put models in SRAM b/c U55 can't use TCM, and M55 doesn't touch it (it's RO) */
+    *(*trained_tflite)
+  } > SRAM  
+  
   .text :
   {
     KEEP(*(.vectors))
