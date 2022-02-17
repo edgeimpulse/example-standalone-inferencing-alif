@@ -54,7 +54,9 @@ Timing calculations are performed in [ei_classifier_porting.cpp](source/ei_class
 ## Memory placement
 
 Alif M55 processors have a private fast DTCM, and also access to a larger, but slower, chip global SRAM.
-The linker file attempts to place as much as possible in DTCM, and overflows into SRAM if needed.
+- For armclang the linker file attempts to place as much as possible in DTCM, and overflows into SRAM if needed.
+- For gcc, the linker is unable to auto place based on size.  If you get an error during link, see [ensemble.ld](ensemble.ld) and uncomment the line that places the model in SRAM (instead of DTCM).  This will only slow down DSP, as the U55 has to use the SRAM bus to access the model regardless of placement.
+
 When your entire program can't fit into DTCM, sometimes customizing placement of objects can improve performance.
 See [ensemble.sct](ensemble.sct) for example placement commands (currently commented out)
 
