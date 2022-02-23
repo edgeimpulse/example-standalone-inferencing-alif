@@ -29,14 +29,14 @@
 #include "hal/cmsis.h"
 
 #ifndef EI_CORE_CLOCK_HZ
-    #ifdef EI_CONFIG_ETHOS_U55_256
-        #define EI_CORE_CLOCK_HZ 400000000 //default to M55_0 core
-    #else
-        #define EI_CORE_CLOCK_HZ 160000000
-    #endif
+#ifdef EI_CONFIG_ETHOS_U55_256
+#define EI_CORE_CLOCK_HZ 400000000 //default to M55_0 core
+#else
+#define EI_CORE_CLOCK_HZ 160000000
+#endif
 #endif
 
-__attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
+EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
 {
     return EI_IMPULSE_OK;
 }
@@ -44,22 +44,22 @@ __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
 /**
  * Cancelable sleep, can be triggered with signal from other thread
  */
-__attribute__((weak)) EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
+EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
 {
     return EI_IMPULSE_OK;
 }
 
 uint64_t ei_read_timer_us()
 {
-    return Get_SysTick_Cycle_Count() / ( EI_CORE_CLOCK_HZ / 1000000 );
+    return Get_SysTick_Cycle_Count() / (EI_CORE_CLOCK_HZ / 1000000);
 }
 
 uint64_t ei_read_timer_ms()
 {
-    return ei_read_timer_us()/1000; 
+    return ei_read_timer_us() / 1000;
 }
 
-__attribute__((weak)) void ei_printf(const char *format, ...)
+void ei_printf(const char *format, ...)
 {
     va_list myargs;
     va_start(myargs, format);
@@ -67,22 +67,24 @@ __attribute__((weak)) void ei_printf(const char *format, ...)
     va_end(myargs);
 }
 
-__attribute__((weak)) void ei_printf_float(float f)
+void ei_printf_float(float f)
 {
     ei_printf("%f", f);
 }
 
-__attribute__((weak)) void *ei_malloc(size_t size)
+void ei_putchar(char c) { putchar(c); }
+
+void *ei_malloc(size_t size)
 {
     return malloc(size);
 }
 
-__attribute__((weak)) void *ei_calloc(size_t nitems, size_t size)
+void *ei_calloc(size_t nitems, size_t size)
 {
     return calloc(nitems, size);
 }
 
-__attribute__((weak)) void ei_free(void *ptr)
+void ei_free(void *ptr)
 {
     free(ptr);
 }
@@ -90,7 +92,7 @@ __attribute__((weak)) void ei_free(void *ptr)
 #if defined(__cplusplus) && EI_C_LINKAGE == 1
 extern "C"
 #endif
-    __attribute__((weak)) void
+    void
     DebugLog(const char *s)
 {
     ei_printf("%s", s);

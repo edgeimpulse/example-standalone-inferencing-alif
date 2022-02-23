@@ -22,15 +22,11 @@
 
 #include "hal/hal.h"
 #include "hal/uart_stdout.h"
-#include "edge-impulse-sdk/classifier/ei_run_classifier.h"
-#include "edge-impulse-sdk/dsp/ei_utils.h"
+#include "firmware-sdk/ei_device_info_lib.h"
+#include "firmware-sdk/at-server/ei_at_server.h"
+#include "firmware-sdk/ei_at_handlers_lib.h"
 
 #include <cstdio>
-
-static const float raw_features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE] = {
-    // copy raw features here (for example from the 'Live classification' page)
-    // see TBD
-};
 
 #if !NDEBUG
 extern "C" void __stack_chk_fail(void) { 
@@ -39,6 +35,12 @@ extern "C" void __stack_chk_fail(void) {
 } // trap stack overflow
 void* __stack_chk_guard = (void*)0xaeaeaeae;
 #endif
+
+
+EiDeviceInfo* EiDeviceInfo::get_device() {
+    static EiDeviceInfo dev;
+    return &dev;
+}
 
 int main()
 {
@@ -53,46 +55,37 @@ int main()
 
     #endif /* ARM_NPU */
 
-    UartStdOutInit();
-
-    ei_impulse_result_t result;
-
-    signal_t signal;
-    numpy::signal_from_buffer(&raw_features[0], ARRAY_LENGTH(raw_features), &signal);
-
-    EI_IMPULSE_ERROR res = run_classifier(&signal, &result, false);
-    ei_printf("run_classifier returned: %d (DSP %lld us., Classification %lld us., Anomaly %d ms.)\n", res,
-        result.timing.dsp_us, result.timing.classification_us, result.timing.anomaly);
-
-    ei_printf("Begin output\n");
-
-#if EI_CLASSIFIER_OBJECT_DETECTION == 1
-    for (size_t ix = 0; ix < EI_CLASSIFIER_OBJECT_DETECTION_COUNT; ix++) {
-        auto bb = result.bounding_boxes[ix]; 
-        if (bb.value == 0) {
-            continue;
-        }
-
-        ei_printf("%s (%f) [ x: %u, y: %u, width: %u, height: %u ]\n", bb.label, bb.value, bb.x, bb.y, bb.width, bb.height);
+    if(UartStdOutInit())
+    {
+        // non zero return on uart init
+        while(1);
     }
-#else
-    // print the predictions
-    ei_printf("[");
-    for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-        ei_printf("%.5f", result.classification[ix].value);
-#if EI_CLASSIFIER_HAS_ANOMALY == 1
-        ei_printf(", ");
-#else
-        if (ix != EI_CLASSIFIER_LABEL_COUNT - 1) {
-            ei_printf(", ");
-        }
-#endif
-    }
-#if EI_CLASSIFIER_HAS_ANOMALY == 1
-    ei_printf("%.3f", result.anomaly);
-#endif
-    ei_printf("]\n");
-#endif
 
-    ei_printf("End output\n");
+    auto at = ATServer::get_instance();
+
+    at->register_command(AT_CONFIG, AT_CONFIG_HELP_TEXT, nullptr, at_get_config, nullptr, nullptr);
+    // at->register_command(AT_SAMPLESTART, AT_SAMPLESTART_HELP_TEXT, nullptr, nullptr, at_sample_start, AT_SAMPLESTART_ARGS);
+    // at->register_command(AT_READBUFFER, AT_READBUFFER_HELP_TEXT, nullptr, nullptr, at_read_buffer, AT_READBUFFER_ARGS);
+    // at->register_command(AT_READFILE, AT_READFILE_HELP_TEXT, nullptr, nullptr, at_read_file, AT_READFILE_ARGS);
+    at->register_command(AT_MGMTSETTINGS, AT_MGMTSETTINGS_HELP_TEXT, nullptr, at_get_mgmt_url, at_set_mgmt_url, AT_MGMTSETTINGS_ARGS);
+    at->register_command(AT_CLEARCONFIG, AT_CLEARCONFIG_HELP_TEXT, at_clear_config, nullptr, nullptr, nullptr);
+    at->register_command(AT_DEVICEID, AT_DEVICEID_HELP_TEXT, nullptr, at_get_device_id, at_set_device_id, AT_DEVICEID_ARGS);
+    at->register_command(AT_SAMPLESETTINGS, AT_SAMPLESETTINGS_HELP_TEXT, nullptr, at_get_sample_settings, at_set_sample_settings, AT_SAMPLESETTINGS_ARGS);
+    at->register_command(AT_UPLOADSETTINGS, AT_UPLOADSETTINGS_HELP_TEXT, nullptr, at_get_upload_settings, at_set_upload_settings, AT_UPLOADSETTINGS_ARGS);
+    at->register_command(AT_UPLOADHOST, AT_UPLOADHOST_HELP_TEXT, nullptr, at_get_upload_host, at_set_upload_host, AT_UPLOADHOST_ARGS);
+    // at->register_command(AT_UNLINKFILE, AT_UNLINKFILE_HELP_TEXT, nullptr, nullptr, at_unlink_file, AT_UNLINKFILE_ARGS);
+    // at->register_command(AT_RUNIMPULSE, AT_RUNIMPULSE_HELP_TEXT, at_run_impulse, nullptr, nullptr, nullptr);
+    // at->register_command(AT_RUNIMPULSEDEBUG, AT_RUNIMPULSEDEBUG_HELP_TEXT, at_run_impulse_debug, nullptr, nullptr, nullptr);
+    // at->register_command(AT_RUNIMPULSECONT, AT_RUNIMPULSECONT_HELP_TEXT, at_run_impulse_cont, nullptr, nullptr, nullptr);
+
+    while(1) {
+        // blocking call
+        char data = UartGetc();
+        if(data != 0xFF) {
+            at->handle(data);
+        } else {
+            ei_printf("UART read error\n");
+            break;
+        }
+    }
 }

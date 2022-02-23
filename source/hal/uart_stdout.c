@@ -243,24 +243,27 @@ void usart_callback(uint32_t event)
 	}
 }
 
-void UartStdOutInit(void)
+int32_t UartStdOutInit(void)
 {
   int32_t status;
 
   status = usart_pinmux_init();
 
-  status = ptrUSART->Initialize(usart_callback);
+  status += ptrUSART->Initialize(usart_callback);
 
-  status = ptrUSART->PowerControl(ARM_POWER_FULL);
+  status += ptrUSART->PowerControl(ARM_POWER_FULL);
 
-  status = ptrUSART->Control(ARM_USART_MODE_ASYNCHRONOUS |
+  status += ptrUSART->Control(ARM_USART_MODE_ASYNCHRONOUS |
                              ARM_USART_DATA_BITS_8       |
                              ARM_USART_PARITY_NONE       |
                              ARM_USART_STOP_BITS_1       |
                              ARM_USART_FLOW_CONTROL_NONE,
                              USART_BAUDRATE);
 
-  status = ptrUSART->Control(ARM_USART_CONTROL_TX, 1);
+  status += ptrUSART->Control(ARM_USART_CONTROL_TX, 1);
+  status += ptrUSART->Control(ARM_USART_CONTROL_RX, 1);
+
+  return status;
 }
 
 unsigned char UartPutc(unsigned char ch)
@@ -286,16 +289,15 @@ unsigned char UartPutc(unsigned char ch)
 
 unsigned char UartGetc(void)
 {
-    //unsigned char c;
-    //while (UART0_FR & FR_RX_FIFO_EMPTY)
-   //     ;
-   // c = UART0_DR;
-  //  if (c == '\r') {
-  //      c = '\n';
-  //  }
+	uint8_t buf[1];
 
-   // return c;
-  return 0;
+	if (ptrUSART->Receive(buf, 1) != ARM_DRIVER_OK)
+	{
+		return (-1);
+	}
+	while (ptrUSART->GetRxCount() != 1)
+		;
+	return (buf[0]);
 }
 
 bool GetLine (char *lp, unsigned int len)

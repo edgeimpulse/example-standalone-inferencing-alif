@@ -206,21 +206,28 @@ set(DEP_RUNTIME_INCLUDE_DIRS
     ${DEP_FLATBUF_INCLUDE}
     )
 
+# Edge Impulse
 set(HAL_DIR ${SRC_PATH}/hal)
 
 # HAL API sources
 file(GLOB_RECURSE SRC_HAL
     "${HAL_DIR}/*.c"
+    "${EI_FOLDER}/firmware-copies/*.cpp"
+    "${EI_FOLDER}/QCBOR/*.c"
+    "${EI_FOLDER}/mbedtls_hmac_sha256_sw/mbedtls/src/*.c"
     )
 
 # Include directories:
 set(APPLICATION_INCLUDE_DIRS
     ${HAL_DIR}/include
     ${PLAT_INCLUDE_DIRS}
+    "${EI_FOLDER}/firmware-copies"
+    "${EI_FOLDER}/QCBOR/inc"
+    "${EI_FOLDER}/mbedtls_hmac_sha256_sw" 
     )
 
-# Edge Impulse
 add_subdirectory("${EI_FOLDER}")
+add_subdirectory("${EI_FOLDER}/firmware-sdk")
 set(SRC_MAIN "${SRC_PATH}/main.cpp")
 
 # Exclude DSP b/c we build it in a lib above, b/c it needs the O3 flag per ARM

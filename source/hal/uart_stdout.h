@@ -18,6 +18,7 @@
 #define UART_STDOUT_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +27,7 @@ extern "C" {
 /**
  * @brief       Initialised the UART block.
  **/
-extern void UartStdOutInit(void);
+extern int32_t UartStdOutInit(void);
 
 /**
  * @brief       Transmits a character over UART (blocking call).
