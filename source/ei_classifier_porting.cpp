@@ -46,6 +46,12 @@ EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
  */
 EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
 {
+    if(time_ms<0) { return EI_IMPULSE_OK; }
+
+    uint64_t time = ei_read_timer_ms();
+    // cast so that we get correct wrap around behavior
+    while( ei_read_timer_ms() - time < (uint64_t) time_ms )
+        ;
     return EI_IMPULSE_OK;
 }
 
@@ -65,6 +71,7 @@ void ei_printf(const char *format, ...)
     va_start(myargs, format);
     vprintf(format, myargs);
     va_end(myargs);
+    fflush(stdout);
 }
 
 void ei_printf_float(float f)
@@ -72,7 +79,11 @@ void ei_printf_float(float f)
     ei_printf("%f", f);
 }
 
-void ei_putchar(char c) { putchar(c); }
+void ei_putchar(char c) 
+{ 
+    putchar(c); 
+    fflush(stdout);
+}
 
 void *ei_malloc(size_t size)
 {

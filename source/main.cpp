@@ -23,49 +23,84 @@
 #include "hal/hal.h"
 #include "hal/uart_stdout.h"
 #include "firmware-sdk/ei_device_info_lib.h"
+#include "firmware-sdk/ei_device_memory.h"
 #include "firmware-sdk/at-server/ei_at_server.h"
 #include "firmware-sdk/ei_at_handlers_lib.h"
+#include "edge-impulse-sdk/dsp/ei_utils.h"
+#include "ei_microphone.h"
 
 #include <cstdio>
 
 #if !NDEBUG
-extern "C" void __stack_chk_fail(void) { 
+extern "C" void __stack_chk_fail(void)
+{
     ei_printf("Stack overflow caught\n");
-    while (1) {} 
+    while (1)
+    {
+    }
 } // trap stack overflow
-void* __stack_chk_guard = (void*)0xaeaeaeae;
+void *__stack_chk_guard = (void *)0xaeaeaeae;
 #endif
 
+ei_device_sensor_t sensor_list[] = {
+    { 
+        .name = "Microphone",
+        .frequencies = { 16000.0 },
+        .max_sample_length_s = 2,
+        .start_sampling_cb = ei_microphone_sample_start
+    }
+};
 
-EiDeviceInfo* EiDeviceInfo::get_device() {
-    static EiDeviceInfo dev;
+class EiDeviceAlif : public EiDeviceInfo
+{
+public:
+
+    bool get_sensor_list(const ei_device_sensor_t **p_sensor_list, size_t *sensor_list_size) override
+    {
+        *p_sensor_list = sensor_list;
+        *sensor_list_size = ARRAY_LENGTH(sensor_list);
+        return true;
+    }
+};
+
+EiDeviceInfo *EiDeviceInfo::get_device()
+{
+    static EiDeviceAlif dev;
     return &dev;
+}
+
+EiDeviceMemory *EiDeviceMemory::get_instance()
+{
+    static EiDeviceRAM<> mem(sizeof(EiConfig));
+    return &mem;
 }
 
 int main()
 {
     // System init takes place in Reset function, see irqs.c
 
-    #if defined(ARM_NPU)
+#if defined(ARM_NPU)
 
     /* If Arm Ethos-U NPU is to be used, we initialise it here */
-    if (0 != arm_npu_init()) {
+    if (0 != arm_npu_init())
+    {
         ei_printf("Failed to initialize NPU");
     }
 
-    #endif /* ARM_NPU */
+#endif /* ARM_NPU */
 
-    if(UartStdOutInit())
+    if (UartStdOutInit())
     {
         // non zero return on uart init
-        while(1);
+        while (1)
+            ;
     }
-
+    //setvbuf(stdout, NULL, _IONBF, 0);
     auto at = ATServer::get_instance();
 
     at->register_command(AT_CONFIG, AT_CONFIG_HELP_TEXT, nullptr, at_get_config, nullptr, nullptr);
-    // at->register_command(AT_SAMPLESTART, AT_SAMPLESTART_HELP_TEXT, nullptr, nullptr, at_sample_start, AT_SAMPLESTART_ARGS);
-    // at->register_command(AT_READBUFFER, AT_READBUFFER_HELP_TEXT, nullptr, nullptr, at_read_buffer, AT_READBUFFER_ARGS);
+    at->register_command(AT_SAMPLESTART, AT_SAMPLESTART_HELP_TEXT, nullptr, nullptr, at_sample_start, AT_SAMPLESTART_ARGS);
+    at->register_command(AT_READBUFFER, AT_READBUFFER_HELP_TEXT, nullptr, nullptr, at_read_buffer, AT_READBUFFER_ARGS);
     // at->register_command(AT_READFILE, AT_READFILE_HELP_TEXT, nullptr, nullptr, at_read_file, AT_READFILE_ARGS);
     at->register_command(AT_MGMTSETTINGS, AT_MGMTSETTINGS_HELP_TEXT, nullptr, at_get_mgmt_url, at_set_mgmt_url, AT_MGMTSETTINGS_ARGS);
     at->register_command(AT_CLEARCONFIG, AT_CLEARCONFIG_HELP_TEXT, at_clear_config, nullptr, nullptr, nullptr);
@@ -78,12 +113,16 @@ int main()
     // at->register_command(AT_RUNIMPULSEDEBUG, AT_RUNIMPULSEDEBUG_HELP_TEXT, at_run_impulse_debug, nullptr, nullptr, nullptr);
     // at->register_command(AT_RUNIMPULSECONT, AT_RUNIMPULSECONT_HELP_TEXT, at_run_impulse_cont, nullptr, nullptr, nullptr);
 
-    while(1) {
+    while (1)
+    {
         // blocking call
         char data = UartGetc();
-        if(data != 0xFF) {
+        if (data != 0xFF)
+        {
             at->handle(data);
-        } else {
+        }
+        else
+        {
             ei_printf("UART read error\n");
             break;
         }

@@ -229,13 +229,14 @@ set(APPLICATION_INCLUDE_DIRS
 add_subdirectory("${EI_FOLDER}")
 add_subdirectory("${EI_FOLDER}/firmware-sdk")
 set(SRC_MAIN "${SRC_PATH}/main.cpp")
+list(APPEND SRC_MAIN "${SRC_PATH}/ei_classifier_porting.cpp")
+list(APPEND SRC_MAIN "${SRC_PATH}/ei_microphone.cpp")
 
 # Exclude DSP b/c we build it in a lib above, b/c it needs the O3 flag per ARM
 get_target_property(C_FILES app SOURCES)
 list(FILTER C_FILES EXCLUDE REGEX "CMSIS/DSP")
 set_target_properties(app PROPERTIES SOURCES "${C_FILES}")
 
-list(APPEND SRC_MAIN "${SRC_PATH}/ei_classifier_porting.cpp")
 
 target_sources(${TARGET_NAME} PUBLIC 
     ${SRC_MAIN} 
