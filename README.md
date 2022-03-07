@@ -4,7 +4,16 @@ This builds and runs an exported impulse locally on your machine.
 
 ## Prerequisites
 1. Create an edge impulse account at [edgeimpulse.com](https://www.edgeimpulse.com/)
-2. Install the [ARM clang compiler](https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6) and ensure it is added to your path:
+2. Install either arm gcc or arm clang:
+
+### gcc
+Tested with:
+```
+gcc version 10.2.1 20201103 (release) (GNU Arm Embedded Toolchain 10-2020-q4-major)
+```
+
+### clang
+[ARM clang compiler](https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6) and ensure it is added to your path:
 ```
 which armclang
 ```
@@ -23,12 +32,15 @@ For pre-configured example code with features and edge-impulse libraries already
 1. Extract the zip file downloaded from edge impulse into the `source` directory of this repository
 2. Choose one of the following:
     1. run cmake .. -DCORE=HP to target Cortex M55 core 0 (high performance) OR
-    2. run cmake .. -DCORE=HE to target Cortex M55 core 1 (high efficiency) 
-3. run make to build to app.axf
+    2. run cmake .. -DCORE=HE to target Cortex M55 core 1 (high efficiency)
+3. If you wish to use gcc, add the cmake flag: -DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-gcc.cmake
+4. armclang is the default toolchain file (-DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-armclang.cmake)
+5. run make to build to app.axf
+6. Example:
 ```
 mkdir build
 cd build
-cmake .. -DCORE=HP
+cmake .. -DCORE=HP -DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-gcc.cmake
 make -j8
 ```
 
