@@ -26,7 +26,6 @@
 #include "firmware-sdk/ei_device_memory.h"
 #include "firmware-sdk/at-server/ei_at_server.h"
 #include "firmware-sdk/ei_at_handlers_lib.h"
-#include "edge-impulse-sdk/dsp/ei_utils.h"
 #include "ei_microphone.h"
 
 #include <cstdio>
@@ -41,39 +40,6 @@ extern "C" void __stack_chk_fail(void)
 } // trap stack overflow
 void *__stack_chk_guard = (void *)0xaeaeaeae;
 #endif
-
-ei_device_sensor_t sensor_list[] = {
-    { 
-        .name = "Microphone",
-        .frequencies = { 16000.0 },
-        .max_sample_length_s = 2,
-        .start_sampling_cb = ei_microphone_sample_start
-    }
-};
-
-class EiDeviceAlif : public EiDeviceInfo
-{
-public:
-
-    bool get_sensor_list(const ei_device_sensor_t **p_sensor_list, size_t *sensor_list_size) override
-    {
-        *p_sensor_list = sensor_list;
-        *sensor_list_size = ARRAY_LENGTH(sensor_list);
-        return true;
-    }
-};
-
-EiDeviceInfo *EiDeviceInfo::get_device()
-{
-    static EiDeviceAlif dev;
-    return &dev;
-}
-
-EiDeviceMemory *EiDeviceMemory::get_instance()
-{
-    static EiDeviceRAM<> mem(sizeof(EiConfig));
-    return &mem;
-}
 
 int main()
 {

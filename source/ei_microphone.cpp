@@ -22,15 +22,16 @@
 
 #include "ei_microphone.h"
 
-#include "firmware-sdk/ei_microphone_lib.h"
 #include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/support_functions.h"
+#include "edge-impulse-sdk/dsp/memory.hpp"
+#include "firmware-sdk/ei_microphone_lib.h"
+#include "edge-impulse-sdk/dsp/ei_utils.h"
 
 //TODO: use multiply of memory block size
 #define MIC_SAMPLE_SIZE 2048
 
 /** Status and control struct for inferencing struct */
-typedef struct
-{
+typedef struct {
     int16_t *buffers[2];
     uint8_t buf_select;
     uint8_t buf_ready;
@@ -39,23 +40,68 @@ typedef struct
 } inference_t;
 
 static inference_t inference;
-//TODO malloc
-microphone_sample_t sample_buffer[MIC_SAMPLE_SIZE * 2];
-microphone_sample_t sample_buffer_processed[MIC_SAMPLE_SIZE];
 
-extern bool ei_microphone_sample_start(void)
+static EiMicrophoneDummy mic;
+static microphone_sample_t* sample_buffer = nullptr;
+
+
+static ei_device_sensor_t sensor_list[] = {
+    { 
+        .name = "Microphone",
+        .frequencies = { 16000.0 },
+        .max_sample_length_s = 2,
+        .start_sampling_cb = ei_microphone_sample_record
+    }
+};
+
+
+class EiDeviceAlif : public EiDeviceInfo
 {
-    return ei_microphone_sample_start_lib([] { return 0; },
-                                   [] { return dummy_mic_start(sample_buffer, MIC_SAMPLE_SIZE); },
-                                   [] { return 0; });
+public:
+    bool get_sensor_list(const ei_device_sensor_t **p_sensor_list, size_t *sensor_list_size) override
+    {
+        *p_sensor_list = sensor_list;
+        *sensor_list_size = ARRAY_LENGTH(sensor_list);
+        return true;
+    }
+
+    bool read_encode_send_sample_buffer(size_t address, size_t length)
+    {
+        if(sample_buffer) {
+            base64_encode((char *)sample_buffer+address, length, ei_putchar);
+            return true;
+        } else {
+            return false;
+        }
+    }
+};
+
+EiDeviceInfo *EiDeviceInfo::get_device()
+{
+    static EiDeviceAlif dev;
+    return &dev;
+}
+
+extern bool ei_microphone_sample_record(void)
+{
+    auto size = ei_microphone_get_buffer_size();
+    if(sample_buffer) {
+        ei_free(sample_buffer);
+    }
+    sample_buffer = (microphone_sample_t*)ei_malloc(size);
+    if (!sample_buffer) {
+        ei_printf("Failed to allocate memory for audio sampling");
+        return false;
+    }
+    EiDeviceRAM ram;
+    ram.assign_memory((uint32_t*)sample_buffer, size);
+    return ei_microphone_sample_record_lib(&mic, &ram);
 }
 
 static void inference_samples_callback(const int16_t *buffer, uint32_t sample_count)
 {
-    for (uint32_t i = 0; i < sample_count; i++)
-    {
-        if (inference.buf_count >= inference.n_samples)
-        {
+    for (uint32_t i = 0; i < sample_count; i++) {
+        if (inference.buf_count >= inference.n_samples) {
             inference.buf_select ^= 1;
             inference.buf_count = 0;
             inference.buf_ready = 1;
@@ -65,15 +111,19 @@ static void inference_samples_callback(const int16_t *buffer, uint32_t sample_co
 
 bool ei_microphone_inference_start(uint32_t n_samples, float interval_ms)
 {
+    // free up the sampling buffer
+    if(sample_buffer) {
+        ei_free(sample_buffer);
+        sample_buffer = nullptr;
+    }
+
     inference.buffers[0] = (int16_t *)ei_malloc(n_samples * sizeof(microphone_sample_t));
-    if (inference.buffers[0] == NULL)
-    {
+    if (inference.buffers[0] == NULL) {
         return false;
     }
 
     inference.buffers[1] = (int16_t *)ei_malloc(n_samples * sizeof(microphone_sample_t));
-    if (inference.buffers[1] == NULL)
-    {
+    if (inference.buffers[1] == NULL) {
         delete inference.buffers[0];
         return false;
     }
@@ -86,7 +136,6 @@ bool ei_microphone_inference_start(uint32_t n_samples, float interval_ms)
     //TODO
     //sl_mic_init((uint32_t)(1000.0f / dev->get_sample_interval_ms()), 1);
     //sl_mic_start_streaming(sample_buffer, MIC_SAMPLE_SIZE, (sl_mic_buffer_ready_callback_t) inference_samples_callback);
-    dummy_mic_start(sample_buffer, MIC_SAMPLE_SIZE);
 
     return true;
 }
