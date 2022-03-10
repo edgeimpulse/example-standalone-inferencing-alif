@@ -184,14 +184,14 @@ if (ETHOS_U_NPU_ENABLED)
 
     USER_OPTION(ETHOS_U_NPU_DRIVER_SRC_PATH
         "Path to Ethos-U55 core driver sources"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/core-driver"
+        "${EI_FOLDER}/edge-impulse-sdk/third_party/ethos-core-driver"
         PATH
         )
 
     include_directories("${EI_FOLDER}/edge-impulse-sdk/CMSIS/Core/Include")
 
     add_subdirectory("${ETHOS_U_NPU_DRIVER_SRC_PATH}" ${CMAKE_BINARY_DIR}/ethos-driver)
-
+    
     set(ETHOSU_INCLUDES ${ETHOS_U_NPU_DRIVER_SRC_PATH}/include)
 endif ()
 
