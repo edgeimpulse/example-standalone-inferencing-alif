@@ -117,7 +117,7 @@ project(edge_impulse_alif
 enforce_compiler_version()
 
 if (ETHOS_U_NPU_ENABLED)
-    add_compile_definitions(EI_ETHOS=1)
+    add_compile_definitions(EI_ETHOS=1 EI_ALIF_ADDR_TRANSLATION=1)
     if (CORE STREQUAL "HP")
         add_compile_definitions(EI_CONFIG_ETHOS_U55_256=1)
     elseif(CORE STREQUAL "HE")
