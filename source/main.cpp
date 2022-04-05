@@ -97,3 +97,14 @@ int main()
         }
     }
 }
+
+// remove unneeded bloat
+
+namespace __gnu_cxx
+{
+    void __verbose_terminate_handler()
+    {
+        for (;;)
+            ;
+    }
+}
