@@ -96,3 +96,14 @@ int main()
 
     ei_printf("End output\n");
 }
+
+// remove unneeded bloat
+
+namespace __gnu_cxx
+{
+    void __verbose_terminate_handler()
+    {
+        for (;;)
+            ;
+    }
+}
