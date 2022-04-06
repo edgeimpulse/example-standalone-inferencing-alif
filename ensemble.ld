@@ -117,7 +117,7 @@ SECTIONS
     *(*twiddle*)
 
     /* Uncomment below if model doesn't fit */
-    /* *(*tensor_arena*) */
+    *(*tensor_arena*) */
 
   } > SRAM  
   
