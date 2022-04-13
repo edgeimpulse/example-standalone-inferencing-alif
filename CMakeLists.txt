@@ -211,11 +211,15 @@ set(HAL_DIR ${SRC_PATH}/hal)
 # HAL API sources
 file(GLOB_RECURSE SRC_HAL
     "${HAL_DIR}/*.c"
+    "${HAL_DIR}/image_processing/*.c"
+    "${HAL_DIR}/image_capture/*.c"
     )
 
 # Include directories:
 set(APPLICATION_INCLUDE_DIRS
-    ${HAL_DIR}/include
+    ${HAL_DIR}
+    ${HAL_DIR}/image_capture
+    ${HAL_DIR}/image_processing
     ${PLAT_INCLUDE_DIRS}
     )
 

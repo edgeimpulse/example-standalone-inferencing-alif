@@ -38,7 +38,7 @@
 #ifndef __DRIVER_PINMUX_AND_PINPAD_H__
 #define __DRIVER_PINMUX_AND_PINPAD_H__
 
-#include<stdint.h>
+#include <stdint.h>
 
 #define PORT_NUMBER_1                                       (0)
 #define PORT_NUMBER_2                                       (1)
@@ -101,9 +101,17 @@
 #define PAD_FUNCTION_DRIVER_PUSH_PULL                       (0x80)
 #define PAD_FUNCTION_DISABLE                                (0x00)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int32_t PINMUX_Config (uint8_t port, uint8_t pin_no, uint8_t AF_number);
 int32_t PINMUX_read   (uint8_t port, uint8_t pin_no, uint32_t *AF_number);
 int32_t PINPAD_Config (uint8_t port, uint8_t pin_no, uint8_t function);
 int32_t PINPAD_read   (uint8_t port, uint8_t pin_no, uint32_t *function);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DRIVER_PINMUX_AND_PINPAD_H__ */
