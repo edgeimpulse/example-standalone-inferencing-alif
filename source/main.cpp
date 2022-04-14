@@ -25,7 +25,9 @@
 #include "firmware-sdk/ei_device_info_lib.h"
 #include "firmware-sdk/ei_device_memory.h"
 #include "firmware-sdk/at-server/ei_at_server.h"
+#include "firmware-sdk/at-server/ei_at_command_set.h"
 #include "firmware-sdk/ei_at_handlers_lib.h"
+#include "firmware-sdk/ei_image_lib.h"
 #include "ei_microphone.h"
 
 #include <cstdio>
@@ -78,6 +80,8 @@ int main()
     // at->register_command(AT_RUNIMPULSE, AT_RUNIMPULSE_HELP_TEXT, at_run_impulse, nullptr, nullptr, nullptr);
     // at->register_command(AT_RUNIMPULSEDEBUG, AT_RUNIMPULSEDEBUG_HELP_TEXT, at_run_impulse_debug, nullptr, nullptr, nullptr);
     // at->register_command(AT_RUNIMPULSECONT, AT_RUNIMPULSECONT_HELP_TEXT, at_run_impulse_cont, nullptr, nullptr, nullptr);
+
+    ei_camera_register_at_snapshot_cmds(at);
 
     while (1)
     {

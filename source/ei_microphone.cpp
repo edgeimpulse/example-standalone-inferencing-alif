@@ -26,6 +26,7 @@
 #include "edge-impulse-sdk/dsp/memory.hpp"
 #include "firmware-sdk/ei_microphone_lib.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
+#include "firmware-sdk/at_base64_lib.h"
 
 //TODO: use multiply of memory block size
 #define MIC_SAMPLE_SIZE 2048
@@ -54,6 +55,45 @@ static ei_device_sensor_t sensor_list[] = {
     }
 };
 
+class EiCameraAlif : public EiCamera
+{
+    virtual bool ei_camera_capture_rgb888_packed_big_endian(
+        uint8_t *image,
+        uint32_t image_size) override { return true; }
+
+    /**
+     * @brief Get the list of supported resolutions, ie. not requiring
+     * any software processing like crop or resize
+     * 
+     * @param res pointer to store the list of resolutions
+     * @param res_num pointer to a variable that will contain size of the res list
+     */
+    virtual void get_resolutions(const ei_device_snapshot_resolutions_t **res, uint8_t *res_num) override
+    {
+
+        static ei_device_snapshot_resolutions_t snapshot_resolutions[] =
+            { { 320,240 } };
+
+        *res = snapshot_resolutions;
+        *res_num = ARRAY_LENGTH(snapshot_resolutions);
+    }
+
+    virtual ei_device_snapshot_resolutions_t get_min_resolution(void)
+    {
+        return { 320,240 };
+    }
+
+    virtual bool set_resolution(const ei_device_snapshot_resolutions_t res) override
+    {
+        return true;
+    }
+};
+
+EiCamera* EiCamera::get_camera()
+{
+    static EiCameraAlif cam;
+    return &cam;
+}
 
 class EiDeviceAlif : public EiDeviceInfo
 {
@@ -65,7 +105,7 @@ public:
         return true;
     }
 
-    bool read_encode_send_sample_buffer(size_t address, size_t length)
+    bool read_encode_send_sample_buffer(size_t address, size_t length) override
     {
         if(sample_buffer) {
             base64_encode((char *)sample_buffer+address, length, ei_putchar);
@@ -73,6 +113,21 @@ public:
         } else {
             return false;
         }
+    }
+
+    bool get_snapshot_list(
+        const ei_device_snapshot_resolutions_t **snapshot_list,
+        size_t *snapshot_list_size,
+        const char **color_depth) override
+    {
+        auto cam = EiCamera::get_camera();
+        uint8_t size;
+        cam->get_resolutions(snapshot_list, &size);
+        *snapshot_list_size = size;
+        static const char color[] = "RGB";
+        static const char* p_color = color;
+        *color_depth = p_color;
+        return false;
     }
 };
 
