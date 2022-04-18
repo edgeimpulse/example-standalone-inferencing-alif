@@ -18,6 +18,7 @@
 /* AlifSemiconductor::CMSIS Driver:SOC Peripherals:PINCONF:1.0.0 */
 #define RTE_Drivers_PINCONF   1           /* Driver PinPAD and PinMux */
 #define RTE_UART2 1
+#define RTE_Drivers_SAI
 
 
 #endif /* RTE_COMPONENTS_H */

@@ -79,6 +79,8 @@ int main()
     // at->register_command(AT_RUNIMPULSEDEBUG, AT_RUNIMPULSEDEBUG_HELP_TEXT, at_run_impulse_debug, nullptr, nullptr, nullptr);
     // at->register_command(AT_RUNIMPULSECONT, AT_RUNIMPULSECONT_HELP_TEXT, at_run_impulse_cont, nullptr, nullptr, nullptr);
 
+    ei_microphone_init(0);
+
     while (1)
     {
         // blocking call
