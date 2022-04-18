@@ -43,6 +43,12 @@ extern unsigned char UartPutc(unsigned char my_ch);
 extern unsigned char UartGetc(void);
 
 /**
+ * @brief       Receives a character from the UART block (NON blocking call).
+ * @return      Character received, or 0xFF if no character
+ **/
+extern unsigned char UartGetcNoBlock(void);
+
+/**
  * @brief       Reads characters from the UART block until a line feed or
  *              carriage return terminates the function. NULL character
  *              also terminates the function, error is returned.

@@ -300,6 +300,29 @@ unsigned char UartGetc(void)
 	return (buf[0]);
 }
 
+unsigned char UartGetcNoBlock(void)
+{
+	static uint8_t buf[1];
+	static bool buffer_queued = false;
+
+	if (!buffer_queued)
+	{
+		if (ptrUSART->Receive(buf, 1) != ARM_DRIVER_OK)
+		{
+			return (-1);
+		} else {
+			buffer_queued = true;
+		}
+	}
+	if (ptrUSART->GetRxCount() == 0) {
+		return -1;
+	} else {
+		buffer_queued = false;
+		return (buf[0]);
+	}
+}
+
+
 bool GetLine (char *lp, unsigned int len)
 {
    unsigned int cnt = 0;

@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include "hal/cmsis.h"
+#include "hal/uart_stdout.h"
 
 #ifndef EI_CORE_CLOCK_HZ
 #ifdef EI_CONFIG_ETHOS_U55_256
@@ -83,6 +84,13 @@ void ei_putchar(char c)
 { 
     putchar(c); 
     fflush(stdout);
+}
+
+char ei_getchar(void)
+{
+    auto c = UartGetcNoBlock();
+    if (c == 0xFF ) { return 0; } //weird ei convention
+    else { return c; }
 }
 
 void *ei_malloc(size_t size)
