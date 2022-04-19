@@ -59,7 +59,13 @@ class EiCameraAlif : public EiCamera
 {
     virtual bool ei_camera_capture_rgb888_packed_big_endian(
         uint8_t *image,
-        uint32_t image_size) override { return true; }
+        uint32_t image_size) override
+    {
+        camera_start(CAMERA_MODE_SNAPSHOT);
+        camera_wait(100);
+        // RGB conversion and frame resize
+        bayer_to_RGB(raw_image + 0x460, image);
+    }
 
     /**
      * @brief Get the list of supported resolutions, ie. not requiring
@@ -72,7 +78,8 @@ class EiCameraAlif : public EiCamera
     {
 
         static ei_device_snapshot_resolutions_t snapshot_resolutions[] =
-            { { 320,240 } };
+            { { 320,240 },
+              { 32,32 } };
 
         *res = snapshot_resolutions;
         *res_num = ARRAY_LENGTH(snapshot_resolutions);
@@ -80,7 +87,7 @@ class EiCameraAlif : public EiCamera
 
     virtual ei_device_snapshot_resolutions_t get_min_resolution(void)
     {
-        return { 320,240 };
+        return { 32,32 };
     }
 
     virtual bool set_resolution(const ei_device_snapshot_resolutions_t res) override
