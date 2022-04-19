@@ -111,6 +111,8 @@ SECTIONS
     /* Put models in SRAM b/c U55 can't use TCM, and M55 doesn't touch it (it's RO) */
     *(*trained_tflite)
     *(*tensor_data*)
+    *(*mbedtls*)
+    *(*twiddle*)
 
     /* Uncomment below if model doesn't fit */
     /* *(*tensor_arena*) */
