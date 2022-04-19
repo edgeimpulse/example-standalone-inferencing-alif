@@ -223,7 +223,8 @@ set(APPLICATION_INCLUDE_DIRS
     ${PLAT_INCLUDE_DIRS}
     "${EI_FOLDER}/firmware-copies"
     "${EI_FOLDER}/QCBOR/inc"
-    "${EI_FOLDER}/mbedtls_hmac_sha256_sw" 
+    "${EI_FOLDER}/mbedtls_hmac_sha256_sw"
+    "${EI_FOLDER}/model-parameters"
     )
 
 add_subdirectory("${EI_FOLDER}")
@@ -231,6 +232,7 @@ add_subdirectory("${EI_FOLDER}/firmware-sdk")
 set(SRC_MAIN "${SRC_PATH}/main.cpp")
 list(APPEND SRC_MAIN "${SRC_PATH}/ei_classifier_porting.cpp")
 list(APPEND SRC_MAIN "${SRC_PATH}/ei_microphone.cpp")
+list(APPEND SRC_MAIN "${SRC_PATH}/ei_run_impulse.cpp")
 
 # Exclude DSP b/c we build it in a lib above, b/c it needs the O3 flag per ARM
 get_target_property(C_FILES app SOURCES)

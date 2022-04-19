@@ -251,9 +251,15 @@ bool ei_microphone_inference_start(uint32_t n_samples, float interval_ms)
     inference.n_samples = n_samples;
     inference.buf_ready = 0;
 
-    //TODO
-    //sl_mic_init((uint32_t)(1000.0f / dev->get_sample_interval_ms()), 1);
-    //sl_mic_start_streaming(sample_buffer, MIC_SAMPLE_SIZE, (sl_mic_buffer_ready_callback_t) inference_samples_callback);
+    int32_t status = 0;
+
+    /* Enable Receiver */
+    status = i2s_drv->Control(ARM_SAI_CONTROL_RX, 1, 0);
+    if (status)
+    {
+        ei_printf("I2S Control RX start status = %d\n", status);
+        return -1;
+    }
 
     return true;
 }
@@ -271,11 +277,28 @@ void ei_microphone_inference_reset_buffers(void)
 
 bool ei_microphone_inference_end(void)
 {
-    //TODO
-    // sl_mic_stop();
+    int32_t status;
+
+    /* Stop the RX */
+    status = i2s_drv->Control(ARM_SAI_CONTROL_RX, 0, 0);
+    if (status)
+    {
+        ei_printf("I2S Control RX stop status = %d\n", status);
+        return -1;
+    }
 
     ei_free(inference.buffers[0]);
     ei_free(inference.buffers[1]);
 
     return true;
+}
+
+/**
+ * Get raw audio signal data
+ */
+int ei_microphone_audio_signal_get_data(size_t offset, size_t length, float *out_ptr)
+{
+    arm_q15_to_float(&inference.buffers[inference.buf_select ^ 1][offset], out_ptr, length);
+
+    return 0;
 }
