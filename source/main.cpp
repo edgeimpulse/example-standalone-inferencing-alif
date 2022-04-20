@@ -96,9 +96,13 @@ int main()
     // RGB conversion and frame resize
     bayer_to_RGB(raw_image+0x460, rgb_image);
 
-    for( auto val : rgb_image ) {
-        ei_printf("%hi,",val);
+    for( int i=0; i<999; i++ ) {
+        ei_printf("%hi,",rgb_image[i]);
     }
+
+    ei_printf("\n\nEnd of stream");
+
+    while(1);
 
 //     ei_impulse_result_t result;
 
