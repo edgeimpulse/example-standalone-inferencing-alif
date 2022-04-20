@@ -202,6 +202,7 @@ void UART4_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler"
 void UART5_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
 void UART6_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
 void UART7_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
+void I2S2_IRQHandler       (void) __attribute__ ((weak, alias("Default_Handler")));
 
 /**
  * Interrupt vector table.
@@ -241,7 +242,9 @@ irq_vec_type __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     UART4_IRQHandler,                         /*   130 Interrupt 130 */
     UART5_IRQHandler,                         /*   131 Interrupt 131 */
     UART6_IRQHandler,                         /*   132 Interrupt 132 */
-    UART7_IRQHandler                          /*   133 Interrupt 133 */
+    UART7_IRQHandler,                          /*   133 Interrupt 133 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,          /*   134 - 144 */
+    I2S2_IRQHandler,
 };
 
 /**
