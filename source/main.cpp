@@ -22,12 +22,12 @@
 
 #include "hal/hal.h"
 #include "hal/uart_stdout.h"
-#include "firmware-sdk/ei_device_info_lib.h"
-#include "firmware-sdk/ei_device_memory.h"
-#include "firmware-sdk/at-server/ei_at_server.h"
-#include "firmware-sdk/at-server/ei_at_command_set.h"
-#include "firmware-sdk/ei_at_handlers_lib.h"
-#include "firmware-sdk/ei_image_lib.h"
+#include "firmware-sdk-alif/ei_device_info_lib.h"
+#include "firmware-sdk-alif/ei_device_memory.h"
+#include "firmware-sdk-alif/at-server/ei_at_server.h"
+#include "firmware-sdk-alif/at-server/ei_at_command_set.h"
+#include "firmware-sdk-alif/ei_at_handlers_lib.h"
+#include "firmware-sdk-alif/ei_image_lib.h"
 #include "ei_microphone.h"
 
 #include <cstdio>

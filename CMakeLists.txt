@@ -117,7 +117,7 @@ project(edge_impulse_alif
 enforce_compiler_version()
 
 if (ETHOS_U_NPU_ENABLED)
-    add_compile_definitions(EI_ETHOS=1)
+    add_compile_definitions(EI_ETHOS=1 EI_ALIF_ADDR_TRANSLATION=1)
     if (CORE STREQUAL "HP")
         add_compile_definitions(EI_CONFIG_ETHOS_U55_256=1)
     elseif(CORE STREQUAL "HE")
@@ -184,7 +184,7 @@ if (ETHOS_U_NPU_ENABLED)
 
     USER_OPTION(ETHOS_U_NPU_DRIVER_SRC_PATH
         "Path to Ethos-U55 core driver sources"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/core-driver"
+        "${EI_FOLDER}/edge-impulse-sdk/third_party/ethos-core-driver"
         PATH
         )
 
@@ -215,11 +215,16 @@ file(GLOB_RECURSE SRC_HAL
     "${EI_FOLDER}/firmware-copies/*.cpp"
     "${EI_FOLDER}/QCBOR/*.c"
     "${EI_FOLDER}/mbedtls_hmac_sha256_sw/mbedtls/src/*.c"
+    "${HAL_DIR}/image_processing/*.c"
+    "${HAL_DIR}/image_capture/*.c"
     )
 
 # Include directories:
 set(APPLICATION_INCLUDE_DIRS
+    ${HAL_DIR}
     ${HAL_DIR}/include
+    ${HAL_DIR}/image_capture
+    ${HAL_DIR}/image_processing
     ${PLAT_INCLUDE_DIRS}
     "${EI_FOLDER}/firmware-copies"
     "${EI_FOLDER}/QCBOR/inc"
@@ -227,7 +232,7 @@ set(APPLICATION_INCLUDE_DIRS
     )
 
 add_subdirectory("${EI_FOLDER}")
-add_subdirectory("${EI_FOLDER}/firmware-sdk")
+add_subdirectory("${EI_FOLDER}/firmware-sdk-alif")
 set(SRC_MAIN "${SRC_PATH}/main.cpp")
 list(APPEND SRC_MAIN "${SRC_PATH}/ei_classifier_porting.cpp")
 list(APPEND SRC_MAIN "${SRC_PATH}/ei_microphone.cpp")

@@ -24,9 +24,9 @@
 
 #include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/support_functions.h"
 #include "edge-impulse-sdk/dsp/memory.hpp"
-#include "firmware-sdk/ei_microphone_lib.h"
+#include "firmware-sdk-alif/ei_microphone_lib.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
-#include "firmware-sdk/at_base64_lib.h"
+#include "firmware-sdk-alif/at_base64_lib.h"
 
 //TODO: use multiply of memory block size
 #define MIC_SAMPLE_SIZE 2048
@@ -61,10 +61,11 @@ class EiCameraAlif : public EiCamera
         uint8_t *image,
         uint32_t image_size) override
     {
-        camera_start(CAMERA_MODE_SNAPSHOT);
-        camera_wait(100);
-        // RGB conversion and frame resize
-        bayer_to_RGB(raw_image + 0x460, image);
+        // camera_start(CAMERA_MODE_SNAPSHOT);
+        // camera_wait(100);
+        // // RGB conversion and frame resize
+        // bayer_to_RGB(raw_image + 0x460, image);
+        return true;
     }
 
     /**
