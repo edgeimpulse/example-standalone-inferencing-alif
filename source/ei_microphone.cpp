@@ -132,17 +132,36 @@ public:
     int async_start(microphone_sample_t *buffer, uint32_t size) override
     {
         this->size = size;
-        // for (uint32_t i = 0; i < size; i++) {
-        //     buffer[i] = i;
-        // }
+
+        i2s_callback_flag = false;
+
+        // int status = i2s_drv->Receive(&audio0[0], 64000);
+        int status = i2s_drv->Receive(buffer, size);
+        if (status)
+        {
+            ei_printf("I2S Receive status = %d\n", status);
+            return -1;
+        }
         return 0;
     }
 
     uint32_t await_samples()
     {
+        int status;
+
+        /* Wait for the completion event */
+        while(1) {
+            /*TODO: Add timeout */
+            if (i2s_callback_flag) {
+                break;
+            }
+        }
+
         return size;
     }
 };
+
+static EiMicrophoneAlif micAlif;
 
 int ei_microphone_init(int idx)
 {
@@ -218,12 +237,6 @@ int ei_microphone_init(int idx)
         ei_printf("I2S Control RX start status = %d\n", status);
         return -1;
     }
-    status = i2s_drv->Receive(&audio0[0], 64000);
-    if (status)
-    {
-        ei_printf("I2S Receive status = %d\n", status);
-        return -1;
-    }
 
     return 0;
 
@@ -248,7 +261,8 @@ bool ei_microphone_sample_record(void)
     }
     EiDeviceRAM ram;
     ram.assign_memory((uint32_t*)sample_buffer, size);
-    return ei_microphone_sample_record_lib(&mic, &ram);
+    // return ei_microphone_sample_record_lib(&mic, &ram);
+    return ei_microphone_sample_record_lib(&micAlif, &ram);
 }
 
 static void inference_samples_callback(const int16_t *buffer, uint32_t sample_count)
