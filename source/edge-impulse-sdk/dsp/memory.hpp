@@ -39,6 +39,15 @@ extern size_t ei_memory_peak_use;
 #endif
 
 typedef std::unique_ptr<void, void(*)(void*)> ei_unique_ptr_t;
+#define EI_ALLOCATE_AUTO_POINTER(ptr, size) \
+    ptr = static_cast<decltype(ptr)>(ei_calloc(size,sizeof(*ptr))); \
+    ei_unique_ptr_t __ptr__(ptr,ei_free);
+
+#define EI_ERR_AND_RETURN_ON_NULL(ptr,code) \
+    if( ! (ptr) ) { \
+        ei_printf("Null check failed\n"); \
+        return code; \
+    }
 
 namespace ei {
 
