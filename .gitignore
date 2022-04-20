@@ -8,6 +8,7 @@ source/firmware-sdk
 # IDE related
 .vscode
 .idea
+.DS_Store
 
 # Downloaded files
 resources_downloaded
