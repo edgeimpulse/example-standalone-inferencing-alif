@@ -100,7 +100,7 @@ int main()
         ei_printf("%hi,",rgb_image[i]);
     }
 
-    ei_printf("\n\nEnd of stream");
+    ei_printf("\n\nEnd of stream\n");
 
     while(1);
 
