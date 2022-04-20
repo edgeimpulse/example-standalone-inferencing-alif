@@ -80,6 +80,7 @@ void i2s_callback(uint32_t event)
     {
         /* Receive Success */
         i2s_callback_flag = 1;
+        // ei_printf("i2s\r\n");
     }
     if (event & ARM_SAI_EVENT_RX_OVERFLOW)
     {
@@ -123,6 +124,25 @@ EiDeviceInfo *EiDeviceInfo::get_device()
     static EiDeviceAlif dev;
     return &dev;
 }
+
+class EiMicrophoneAlif : public EiMicrophone {
+    uint32_t size;
+
+public:
+    int async_start(microphone_sample_t *buffer, uint32_t size) override
+    {
+        this->size = size;
+        // for (uint32_t i = 0; i < size; i++) {
+        //     buffer[i] = i;
+        // }
+        return 0;
+    }
+
+    uint32_t await_samples()
+    {
+        return size;
+    }
+};
 
 int ei_microphone_init(int idx)
 {
@@ -188,6 +208,21 @@ int ei_microphone_init(int idx)
     {
         ei_printf("I2S Control status = %d\n", status);
         goto error_i2s_control;
+    }
+
+    /* Enable Receiver */
+    ei_printf("Starting microphone\r\n");
+    status = i2s_drv->Control(ARM_SAI_CONTROL_RX, 1, 0);
+    if (status)
+    {
+        ei_printf("I2S Control RX start status = %d\n", status);
+        return -1;
+    }
+    status = i2s_drv->Receive(&audio0[0], 64000);
+    if (status)
+    {
+        ei_printf("I2S Receive status = %d\n", status);
+        return -1;
     }
 
     return 0;
