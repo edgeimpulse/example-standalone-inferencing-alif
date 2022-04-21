@@ -3,6 +3,7 @@
 #include "edge-impulse-sdk/porting/ei_classifier_porting.h"
 // #include "ei_run_impulse.h"
 #include "at-server/ei_at_command_set.h"
+#include "model-parameters/model_metadata.h"
 #include <string>
 
 using namespace std;
@@ -346,6 +347,16 @@ bool at_get_config(void)
     ei_printf("\n");
     ei_printf("===== Snapshot ======\n");
     at_get_snapshot();
+    ei_printf("===== Inference ======\n");
+    ei_printf("Sensor:           %d\r\n", EI_CLASSIFIER_SENSOR);
+#if EI_CLASSIFIER_OBJECT_DETECTION_CONSTRAINED == 1
+    const char *model_type = "constrained_object_detection";
+#elif EI_CLASSIFIER_OBJECT_DETECTION
+    const char *model_type = "object_detection";
+#else
+    const char *model_type = "classification";
+#endif
+    ei_printf("Model type:       %s\r\n", model_type);
 
     return true;
 }

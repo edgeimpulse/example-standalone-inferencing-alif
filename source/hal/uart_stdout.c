@@ -277,7 +277,7 @@ unsigned char UartPutc(unsigned char ch)
   while (ptrUSART->GetTxCount() != 1);
 
   if (buf[0] == '\n') {
-	  buf[0] = '\r';
+	//   buf[0] = '\r';
 	  if (ptrUSART->Send(buf, 1) != ARM_DRIVER_OK) {
 		return (-1);
 	  }

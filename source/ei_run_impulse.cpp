@@ -51,7 +51,7 @@ void run_nn(bool debug) {
         EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE,
         EI_CLASSIFIER_LABEL_COUNT);
 
-    imageNN.run_nn(debug, 1000, false);
+    imageNN.run_nn(debug, debug? 0:1000, false);
 }
 
 
@@ -67,7 +67,7 @@ bool run_nn_normal(void) {
     return true;
 }
 
-bool run_nn_debug(void) {
+bool run_nn_debug(const char**, int) {
     run_nn(true);
     return true;
 }

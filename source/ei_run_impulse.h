@@ -25,7 +25,7 @@
 
 /* Prototypes -------------------------------------------------------------- */
 bool run_nn_normal(void);
-bool run_nn_debug(void);
+bool run_nn_debug(const char**, int);
 bool run_nn_continuous_normal(void);
 
 #endif
