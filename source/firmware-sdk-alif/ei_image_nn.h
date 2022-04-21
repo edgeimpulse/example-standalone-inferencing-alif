@@ -28,6 +28,7 @@
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 #include "firmware-sdk-alif/at_base64_lib.h"
 #include "firmware-sdk-alif/jpeg/encode_as_jpg.h"
+#include "firmware-sdk-alif/ei_device_info_lib.h"
 
 static void respond_and_change_to_max_baud()
 {
@@ -172,7 +173,7 @@ void EiImageNN::run_nn(bool debug, int delay_ms, bool use_max_baudrate)
             }
 
             ei_printf("Framebuffer: ");
-            base64_encode((char*)jpeg_buffer, out_size, ei_putc);
+            base64_encode((char*)jpeg_buffer, out_size, ei_putchar);
             ei_printf("\r\n");
 
             if (jpeg_buffer) {
