@@ -127,11 +127,13 @@ EiDeviceInfo *EiDeviceInfo::get_device()
 
 class EiMicrophoneAlif : public EiMicrophone {
     uint32_t size;
+    microphone_sample_t *dst_buffer;
 
 public:
     int async_start(microphone_sample_t *buffer, uint32_t size) override
     {
         this->size = size;
+        this->dst_buffer = buffer;
 
         i2s_callback_flag = false;
 
@@ -155,6 +157,9 @@ public:
             if (i2s_callback_flag) {
                 break;
             }
+        }
+        for(int i = 0; i < this->size; i++) {
+            this->dst_buffer[i] <<= 3;
         }
 
         return size;
@@ -237,6 +242,21 @@ int ei_microphone_init(int idx)
         ei_printf("I2S Control RX start status = %d\n", status);
         return -1;
     }
+
+    status = i2s_drv->Receive(&audio0[0], 64000);
+    if (status)
+    {
+        ei_printf("I2S Receive status = %d\n", status);
+        return -1;
+    }
+    /* Wait for the completion event */
+    while(1) {
+        /*TODO: Add timeout */
+        if (i2s_callback_flag) {
+            break;
+        }
+    }
+    i2s_callback_flag = false;
 
     return 0;
 
