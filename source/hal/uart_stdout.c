@@ -296,8 +296,12 @@ unsigned char UartGetcNoWait(void)
 	{
 		return (-1);
 	}
-	while (ptrUSART->GetRxCount() != 1 && --timeout)
+	while (--timeout != 0 && ptrUSART->GetRxCount() != 1)
 		;
+
+	if(timeout == 0) {
+		ptrUSART->Control(ARM_USART_ABORT_RECEIVE, 0);
+	}
 	return (buf);
 }
 
