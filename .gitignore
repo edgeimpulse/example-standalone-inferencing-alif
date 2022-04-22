@@ -1,6 +1,6 @@
 #comment if you want to commit your model
-source/edge-impulse-sdk
-source/firmware-sdk
+# source/edge-impulse-sdk
+# source/firmware-sdk
 # source/model-parameters/*
 # source/tflite-model/*
 # source/CMakeLists.txt
