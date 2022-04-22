@@ -96,7 +96,6 @@ void run_nn(bool debug) {
             //     break;
             // }
         };
-        // spresense_pauseAudio(false);
     }
 
     ei_microphone_inference_end();
@@ -109,67 +108,67 @@ void run_nn_continuous(bool debug)
         return;
     }
 
-//     bool stop_inferencing = false;
-//     int print_results = -(EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW);
-//     // summary of inferencing settings (from model_metadata.h)
-//     ei_printf("Inferencing settings:\n");
-//     ei_printf("\tInterval: ");
-//     ei_printf_float((float)EI_CLASSIFIER_INTERVAL_MS);
-//     ei_printf("ms.\n");
-//     ei_printf("\tFrame size: %d\n", EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE);
-//     ei_printf("\tSample length: %d ms.\n", EI_CLASSIFIER_RAW_SAMPLE_COUNT / 16);
-//     ei_printf("\tNo. of classes: %d\n", sizeof(ei_classifier_inferencing_categories) /
-//                                             sizeof(ei_classifier_inferencing_categories[0]));
+    bool stop_inferencing = false;
+    int print_results = -(EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW);
+    // summary of inferencing settings (from model_metadata.h)
+    ei_printf("Inferencing settings:\n");
+    ei_printf("\tInterval: ");
+    ei_printf_float((float)EI_CLASSIFIER_INTERVAL_MS);
+    ei_printf("ms.\n");
+    ei_printf("\tFrame size: %d\n", EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE);
+    ei_printf("\tSample length: %d ms.\n", EI_CLASSIFIER_RAW_SAMPLE_COUNT / 16);
+    ei_printf("\tNo. of classes: %d\n", sizeof(ei_classifier_inferencing_categories) /
+                                            sizeof(ei_classifier_inferencing_categories[0]));
 
-//     ei_printf("Starting inferencing, press 'b' to break\n");
+    ei_printf("Starting inferencing, press 'b' to break\n");
 
-//     run_classifier_init();
-//     ei_microphone_inference_start(EI_CLASSIFIER_SLICE_SIZE);
+    run_classifier_init();
+    ei_microphone_inference_start(EI_CLASSIFIER_SLICE_SIZE, (float)EI_CLASSIFIER_INTERVAL_MS);
 
-//     while (stop_inferencing == false) {
+    while (stop_inferencing == false) {
 
-//         bool m = ei_microphone_inference_record();
-//         if (!m) {
-//             ei_printf("ERR: Failed to record audio...\n");
-//             break;
-//         }
+        bool m = ei_microphone_inference_record();
+        if (!m) {
+            ei_printf("ERR: Failed to record audio...\n");
+            break;
+        }
 
-//         signal_t signal;
-//         signal.total_length = EI_CLASSIFIER_SLICE_SIZE;
-//         signal.get_data = &ei_microphone_audio_signal_get_data;
-//         ei_impulse_result_t result = {0};
+        signal_t signal;
+        signal.total_length = EI_CLASSIFIER_SLICE_SIZE;
+        signal.get_data = &ei_microphone_audio_signal_get_data;
+        ei_impulse_result_t result = {0};
 
-//         EI_IMPULSE_ERROR r = run_classifier_continuous(&signal, &result, debug);
-//         if (r != EI_IMPULSE_OK) {
-//             ei_printf("ERR: Failed to run classifier (%d)\n", r);
-//             break;
-//         }
+        EI_IMPULSE_ERROR r = run_classifier_continuous(&signal, &result, debug);
+        if (r != EI_IMPULSE_OK) {
+            ei_printf("ERR: Failed to run classifier (%d)\n", r);
+            break;
+        }
 
-//         if (++print_results >= (EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW >> 1)) {
-//             // print the predictions
-//             ei_printf("Predictions (DSP: %d ms., Classification: %d ms., Anomaly: %d ms.): \n",
-//                 result.timing.dsp, result.timing.classification, result.timing.anomaly);
-//             for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-//                 ei_printf("    %s: \t", result.classification[ix].label);
-//                 ei_printf_float(result.classification[ix].value);
-//                 ei_printf("\r\n");
-//             }
-// #if EI_CLASSIFIER_HAS_ANOMALY == 1
-//             ei_printf("    anomaly score: ");
-//             ei_printf_float(result.anomaly);
-//             ei_printf("\r\n");
-// #endif
+        if (++print_results >= (EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW >> 1)) {
+            // print the predictions
+            ei_printf("Predictions (DSP: %d ms., Classification: %d ms., Anomaly: %d ms.): \n",
+                result.timing.dsp, result.timing.classification, result.timing.anomaly);
+            for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
+                ei_printf("    %s: \t", result.classification[ix].label);
+                ei_printf_float(result.classification[ix].value);
+                ei_printf("\r\n");
+            }
+#if EI_CLASSIFIER_HAS_ANOMALY == 1
+            ei_printf("    anomaly score: ");
+            ei_printf_float(result.anomaly);
+            ei_printf("\r\n");
+#endif
 
-//             print_results = 0;
-//         }
+            print_results = 0;
+        }
 
-//         if(ei_user_invoke_stop_lib()) {
-//             ei_printf("Inferencing stopped by user\r\n");
-//             break;
-//         }
-//     }
+        // if(ei_user_invoke_stop_lib()) {
+        //     ei_printf("Inferencing stopped by user\r\n");
+        //     break;
+        // }
+    }
 
-//     ei_microphone_inference_end();
+    ei_microphone_inference_end();
 }
 
 #else
