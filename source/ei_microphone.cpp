@@ -66,6 +66,8 @@ ARM_SAI_CAPABILITIES cap;
 uint32_t wlen = 16;
 uint32_t sampling_rate = 16000;
 
+int16_t negative_offset_cancel_value = 1800; /* Fixed value for now */
+
 int16_t audio0[64000];
 
 uint32_t volatile i2s_callback_flag = 0;
@@ -137,11 +139,9 @@ public:
 
         i2s_callback_flag = false;
 
-        // int status = i2s_drv->Receive(&audio0[0], 64000);
         int status = i2s_drv->Receive(buffer, size);
         if (status)
         {
-            ei_printf("I2S Receive status = %d\n", status);
             return -1;
         }
         return 0;
@@ -157,6 +157,7 @@ public:
             }
         }
         for(int i = 0; i < this->size; i++) {
+            this->dst_buffer[i] += negative_offset_cancel_value;
             this->dst_buffer[i] <<= 3;
         }
 
@@ -169,6 +170,7 @@ static EiMicrophoneAlif micAlif;
 int ei_microphone_init(int idx)
 {
     int32_t status = 0;
+    int16_t *startup_buffer;
 
     /* Configure the adc pins */
     /* Configure P2_1.I2S2_SDI_A */
@@ -241,20 +243,14 @@ int ei_microphone_init(int idx)
         return -1;
     }
 
-    status = i2s_drv->Receive(&audio0[0], 64000);
-    if (status)
-    {
-        ei_printf("I2S Receive status = %d\n", status);
-        return -1;
+    startup_buffer = (int16_t *)ei_malloc(64000 * sizeof(microphone_sample_t));
+
+    if(startup_buffer != NULL) {
+        micAlif.async_start(startup_buffer, 64000);
+        micAlif.await_samples();
+
+        ei_free(startup_buffer);
     }
-    /* Wait for the completion event */
-    while(1) {
-        /*TODO: Add timeout */
-        if (i2s_callback_flag) {
-            break;
-        }
-    }
-    i2s_callback_flag = false;
 
     return 0;
 
@@ -318,7 +314,22 @@ bool ei_microphone_inference_start(uint32_t n_samples, float interval_ms)
     inference.n_samples = n_samples;
     inference.buf_ready = 0;
 
-    int32_t status = 0;
+    micAlif.async_start(inference.buffers[inference.buf_select], inference.n_samples);
+
+    return true;
+}
+
+bool ei_microphone_inference_record_continuous(void)
+{
+    inference.buf_ready = 0;
+    inference.buf_count = 0;
+
+    micAlif.await_samples();
+
+    inference.buf_select ^= 1;
+    inference.buf_ready = 0;
+
+    micAlif.async_start(inference.buffers[inference.buf_select], inference.n_samples);
 
     return true;
 }
@@ -328,25 +339,8 @@ bool ei_microphone_inference_record(void)
     inference.buf_ready = 0;
     inference.buf_count = 0;
 
-    i2s_callback_flag = false;
-
-    int status = i2s_drv->Receive(inference.buffers[inference.buf_select], inference.n_samples);
-    if (status)
-    {
-        ei_printf("I2S Receive status = %d\n", status);
-        return 0;
-    }
-
-    /* Wait for the completion event */
-    while(1) {
-        /*TODO: Add timeout */
-        if (i2s_callback_flag) {
-            break;
-        }
-    }
-    for(int i = 0; i < inference.n_samples; i++) {
-        inference.buffers[inference.buf_select][i] <<= 3;
-    }
+    micAlif.async_start(inference.buffers[inference.buf_select], inference.n_samples);
+    micAlif.await_samples();
 
     // record_ready = false;
     inference.buf_select ^= 1;

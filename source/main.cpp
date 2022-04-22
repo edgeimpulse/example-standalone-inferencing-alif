@@ -78,7 +78,7 @@ int main()
     // at->register_command(AT_UNLINKFILE, AT_UNLINKFILE_HELP_TEXT, nullptr, nullptr, at_unlink_file, AT_UNLINKFILE_ARGS);
     at->register_command(AT_RUNIMPULSE, AT_RUNIMPULSE_HELP_TEXT, run_nn_normal, nullptr, nullptr, nullptr);
     // at->register_command(AT_RUNIMPULSEDEBUG, AT_RUNIMPULSEDEBUG_HELP_TEXT, at_run_impulse_debug, nullptr, nullptr, nullptr);
-    // at->register_command(AT_RUNIMPULSECONT, AT_RUNIMPULSECONT_HELP_TEXT, at_run_impulse_cont, nullptr, nullptr, nullptr);
+    at->register_command(AT_RUNIMPULSECONT, AT_RUNIMPULSECONT_HELP_TEXT, run_nn_continuous_normal, nullptr, nullptr, nullptr);
 
     ei_microphone_init(0);
 
