@@ -36,6 +36,8 @@ extern int32_t UartStdOutInit(void);
  **/
 extern unsigned char UartPutc(unsigned char my_ch);
 
+extern unsigned char UartGetcNoWait(void);
+
 /**
  * @brief       Receives a character from the UART block (blocking call).
  * @return      Character received.

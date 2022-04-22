@@ -287,6 +287,20 @@ unsigned char UartPutc(unsigned char ch)
   return (ch);
 }
 
+unsigned char UartGetcNoWait(void)
+{
+	uint8_t buf = 0;
+	uint32_t timeout = 100;
+
+	if (ptrUSART->Receive(&buf, 1) != ARM_DRIVER_OK)
+	{
+		return (-1);
+	}
+	while (ptrUSART->GetRxCount() != 1 && --timeout)
+		;
+	return (buf);
+}
+
 unsigned char UartGetc(void)
 {
 	uint8_t buf[1];

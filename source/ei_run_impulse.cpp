@@ -87,15 +87,15 @@ void run_nn(bool debug) {
         ei_printf("Starting inferencing in 2 seconds...\n");
 
         // instead of wait_ms, we'll wait on the signal, this allows threads to cancel us...
-        uint64_t end_ms = ei_read_timer_ms() + 2000;
-        while(end_ms > ei_read_timer_ms()){
-            // if(ei_user_invoke_stop_lib()) {
-            //     ei_printf("Inferencing stopped by user\r\n");
-            //     // EiDevice.set_state(eiStateIdle);
-            //     stop_inferencing = true;
-            //     break;
-            // }
-        };
+        // uint64_t end_ms = ei_read_timer_ms() + 2000;
+        // while(end_ms > ei_read_timer_ms()){
+        //     if(ei_user_invoke_stop_lib()) {
+        //         ei_printf("Inferencing stopped by user\r\n");
+        //         // EiDevice.set_state(eiStateIdle);
+        //         stop_inferencing = true;
+        //         break;
+        //     }
+        // };
     }
 
     ei_microphone_inference_end();
