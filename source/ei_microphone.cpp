@@ -68,7 +68,7 @@ uint32_t sampling_rate = 16000;
 
 int16_t audio0[64000];
 
-uint32_t volatile i2s_callback_flag;
+uint32_t volatile i2s_callback_flag = 0;
 /**
 \fn          void i2s_callback(uint32_t event)
 \brief       Callback routine from the i2s driver
@@ -149,8 +149,6 @@ public:
 
     uint32_t await_samples()
     {
-        int status;
-
         /* Wait for the completion event */
         while(1) {
             /*TODO: Add timeout */
@@ -322,13 +320,37 @@ bool ei_microphone_inference_start(uint32_t n_samples, float interval_ms)
 
     int32_t status = 0;
 
-    /* Enable Receiver */
-    status = i2s_drv->Control(ARM_SAI_CONTROL_RX, 1, 0);
+    return true;
+}
+
+bool ei_microphone_inference_record(void)
+{
+    inference.buf_ready = 0;
+    inference.buf_count = 0;
+
+    i2s_callback_flag = false;
+
+    int status = i2s_drv->Receive(inference.buffers[inference.buf_select], inference.n_samples);
     if (status)
     {
-        ei_printf("I2S Control RX start status = %d\n", status);
-        return -1;
+        ei_printf("I2S Receive status = %d\n", status);
+        return 0;
     }
+
+    /* Wait for the completion event */
+    while(1) {
+        /*TODO: Add timeout */
+        if (i2s_callback_flag) {
+            break;
+        }
+    }
+    for(int i = 0; i < inference.n_samples; i++) {
+        inference.buffers[inference.buf_select][i] <<= 3;
+    }
+
+    // record_ready = false;
+    inference.buf_select ^= 1;
+    inference.buf_ready = 0;
 
     return true;
 }
@@ -347,14 +369,6 @@ void ei_microphone_inference_reset_buffers(void)
 bool ei_microphone_inference_end(void)
 {
     int32_t status;
-
-    /* Stop the RX */
-    status = i2s_drv->Control(ARM_SAI_CONTROL_RX, 0, 0);
-    if (status)
-    {
-        ei_printf("I2S Control RX stop status = %d\n", status);
-        return -1;
-    }
 
     ei_free(inference.buffers[0]);
     ei_free(inference.buffers[1]);

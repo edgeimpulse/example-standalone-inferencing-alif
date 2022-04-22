@@ -55,13 +55,12 @@ void run_nn(bool debug) {
         ei_printf("Recording...\n");
 
         ei_microphone_inference_reset_buffers();
-        bool m = ei_microphone_sample_record();//ei_microphone_inference_record();
+        bool m = ei_microphone_inference_record();
         if (!m) {
             ei_printf("ERR: Failed to record audio...\n");
             break;
         }
 
-        // spresense_pauseAudio(true);
         ei_printf("Recording done\n");
 
         signal_t signal;
