@@ -46,6 +46,8 @@ __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
  */
 __attribute__((weak)) EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
 {
+    auto start = ei_read_timer_ms();
+    while(ei_read_timer_ms() - start < time_ms);
     return EI_IMPULSE_OK;
 }
 
