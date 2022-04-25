@@ -19,8 +19,9 @@
  *
  * $Date:        2. Feburary 2021
  * $Revision:    V1.0.0
+ * Author:       Sudhir Sreedharan
  *
- * Project:      RTE Device Configuration for ALIF M55_HP
+ * Project:      RTE Device Configuration for ALIF M55_HE
  * -------------------------------------------------------------------------- */
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
@@ -30,7 +31,7 @@
 
 // <e> CAMERA0 (Camera) [Driver_CAMERA0]
 // <i> Configuration settings for Driver_CAMERA0 in component ::Drivers:CAMERA
-#define RTE_CAMERA0   1
+#define RTE_CAMERA0   0
 #if RTE_CAMERA0
 #define RTE_CAMERA0_IRQ_PRI                    0
 #define RTE_MT9M114_CAMERA_SENSOR_ENABLE       1
@@ -62,69 +63,13 @@
 #endif
 // </e> I3C0 (Improved Inter-Integrated Circuit) [Driver_I3C0]
 
-// <e> SPI0 (Serial Peripheral Interface 0) [Driver_SPI]
-// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
-#define RTE_SPI0 1
-#ifdef RTE_SPI0
-#define RTE_SPI0_IRQ_PRIORITY                   0
-#define RTE_SPI0_SPI_FRAME_FORMAT               0
-#define RTE_SPI0_TX_FIFO_LEVEL_TO_START_TRANSFER 0
-#define RTE_SPI0_TX_LOAD_DUMMY_TO_START_LEVEL   0
-#define RTE_SPI0_TX_FIFO_THRESHOLD              0
-#define RTE_SPI0_RX_FIFO_THRESHOLD              0
-#define RTE_SPI0_CHIP_SELECTION_PIN             0
-#endif
-// </e> SPI0 (Serial Peripheral Interface 0) [Driver_SPI]
-
-// <e> SPI1 (Serial Peripheral Interface 1) [Driver_SPI]
-// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
-#define RTE_SPI1 1
-#ifdef RTE_SPI1
-#define RTE_SPI1_IRQ_PRIORITY                   0
-#define RTE_SPI1_SPI_FRAME_FORMAT               0
-#define RTE_SPI1_TX_FIFO_LEVEL_TO_START_TRANSFER 0
-#define RTE_SPI1_TX_LOAD_DUMMY_TO_START_LEVEL   0
-#define RTE_SPI1_TX_FIFO_THRESHOLD              0
-#define RTE_SPI1_RX_FIFO_THRESHOLD              0
-#define RTE_SPI1_CHIP_SELECTION_PIN             0
-#endif
-// </e> SPI1 (Serial Peripheral Interface 1) [Driver_SPI]
-
-// <e> SPI2 (Serial Peripheral Interface 2) [Driver_SPI]
-// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
-#define RTE_SPI2 1
-#ifdef RTE_SPI2
-#define RTE_SPI2_IRQ_PRIORITY                   0
-#define RTE_SPI2_SPI_FRAME_FORMAT               0
-#define RTE_SPI2_TX_FIFO_LEVEL_TO_START_TRANSFER 0
-#define RTE_SPI2_TX_LOAD_DUMMY_TO_START_LEVEL   0
-#define RTE_SPI2_TX_FIFO_THRESHOLD              0
-#define RTE_SPI2_RX_FIFO_THRESHOLD              0
-#define RTE_SPI2_CHIP_SELECTION_PIN             0
-#endif
-// </e> SPI2 (Serial Peripheral Interface 2) [Driver_SPI]
-
-// <e> SPI3 (Serial Peripheral Interface 3) [Driver_SPI]
-// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
-#define RTE_SPI3 1
-#ifdef RTE_SPI3
-#define RTE_SPI3_IRQ_PRIORITY                   0
-#define RTE_SPI3_SPI_FRAME_FORMAT               0
-#define RTE_SPI3_TX_FIFO_LEVEL_TO_START_TRANSFER 0
-#define RTE_SPI3_TX_LOAD_DUMMY_TO_START_LEVEL   0
-#define RTE_SPI3_TX_FIFO_THRESHOLD              0
-#define RTE_SPI3_RX_FIFO_THRESHOLD              0
-#define RTE_SPI3_CHIP_SELECTION_PIN             1
-#endif
-// </e> SPI3 (Serial Peripheral Interface 3) [Driver_SPI]
-
 // <e> I2S0 (Integrated Interchip Sound 0) [Driver_SAI0]
 // <i> Configuration settings for Driver_SAI0 in component ::Drivers:SAI
 #define RTE_I2S0 1
 #ifdef RTE_I2S0
 #define RTE_I2S0_WSS_CLOCK_CYCLES 2
 #define RTE_I2S0_SCLKG_CLOCK_CYCLES 0
-#define RTE_I2S0_RX_TRIG_LVL 0
+#define RTE_I2S0_RX_TRIG_LVL 8 
 #define RTE_I2S0_TX_TRIG_LVL 10
 #define RTE_I2S0_IRQ_PRI     0
 #define RTE_I2S0_CLK_SOURCE  1
@@ -137,8 +82,8 @@
 #ifdef RTE_I2S1
 #define RTE_I2S1_WSS_CLOCK_CYCLES 2
 #define RTE_I2S1_SCLKG_CLOCK_CYCLES 0
-#define RTE_I2S1_RX_TRIG_LVL 0
-#define RTE_I2S1_TX_TRIG_LVL 0
+#define RTE_I2S1_RX_TRIG_LVL 8
+#define RTE_I2S1_TX_TRIG_LVL 10
 #define RTE_I2S1_IRQ_PRI     0
 #define RTE_I2S1_CLK_SOURCE  1
 #endif
@@ -151,7 +96,7 @@
 #define RTE_I2S2_WSS_CLOCK_CYCLES 2
 #define RTE_I2S2_SCLKG_CLOCK_CYCLES 0
 #define RTE_I2S2_RX_TRIG_LVL 8
-#define RTE_I2S2_TX_TRIG_LVL 0
+#define RTE_I2S2_TX_TRIG_LVL 10
 #define RTE_I2S2_IRQ_PRI     10
 #define RTE_I2S2_CLK_SOURCE  1
 #endif
@@ -163,8 +108,8 @@
 #ifdef RTE_I2S3
 #define RTE_I2S3_WSS_CLOCK_CYCLES 2
 #define RTE_I2S3_SCLKG_CLOCK_CYCLES 0
-#define RTE_I2S3_RX_TRIG_LVL 0
-#define RTE_I2S3_TX_TRIG_LVL 0
+#define RTE_I2S3_RX_TRIG_LVL 8
+#define RTE_I2S3_TX_TRIG_LVL 10
 #define RTE_I2S3_IRQ_PRI     0
 #define RTE_I2S3_CLK_SOURCE  1
 #endif
@@ -302,6 +247,63 @@
 #endif
 // </e> UART7 (Universal asynchronous receiver transmitter) [Driver_USART7]
 
+// <e> SPI0 (Serial Peripheral Interface 0) [Driver_SPI]
+// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
+#define RTE_SPI0 1
+#ifdef RTE_SPI0
+#define RTE_SPI0_IRQ_PRIORITY                   0
+#define RTE_SPI0_SPI_FRAME_FORMAT               0
+#define RTE_SPI0_TX_FIFO_LEVEL_TO_START_TRANSFER 0
+#define RTE_SPI0_TX_LOAD_DUMMY_TO_START_LEVEL   0
+#define RTE_SPI0_TX_FIFO_THRESHOLD              0
+#define RTE_SPI0_RX_FIFO_THRESHOLD              0
+#define RTE_SPI0_CHIP_SELECTION_PIN             0
+#endif
+// </e> SPI0 (Serial Peripheral Interface 0) [Driver_SPI]
+
+// <e> SPI1 (Serial Peripheral Interface 1) [Driver_SPI]
+// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
+#define RTE_SPI1 1
+#ifdef RTE_SPI1
+#define RTE_SPI1_IRQ_PRIORITY                   0
+#define RTE_SPI1_SPI_FRAME_FORMAT               0
+#define RTE_SPI1_TX_FIFO_LEVEL_TO_START_TRANSFER 0
+#define RTE_SPI1_TX_LOAD_DUMMY_TO_START_LEVEL   0
+#define RTE_SPI1_TX_FIFO_THRESHOLD              0
+#define RTE_SPI1_RX_FIFO_THRESHOLD              0
+#define RTE_SPI1_CHIP_SELECTION_PIN             0
+#endif
+// </e> SPI1 (Serial Peripheral Interface 1) [Driver_SPI]
+
+// <e> SPI2 (Serial Peripheral Interface 2) [Driver_SPI]
+// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
+#define RTE_SPI2 1
+#ifdef RTE_SPI2
+#define RTE_SPI2_IRQ_PRIORITY                   0
+#define RTE_SPI2_SPI_FRAME_FORMAT               0
+#define RTE_SPI2_TX_FIFO_LEVEL_TO_START_TRANSFER 0
+#define RTE_SPI2_TX_LOAD_DUMMY_TO_START_LEVEL   0
+#define RTE_SPI2_TX_FIFO_THRESHOLD              0
+#define RTE_SPI2_RX_FIFO_THRESHOLD              0
+#define RTE_SPI2_CHIP_SELECTION_PIN             0
+#endif
+// </e> SPI2 (Serial Peripheral Interface 2) [Driver_SPI]
+
+// <e> SPI3 (Serial Peripheral Interface 3) [Driver_SPI]
+// <i> Configuration settings for Driver_SPI in component ::Drivers:SPI
+#define RTE_SPI3 1
+#ifdef RTE_SPI3
+#define RTE_SPI3_IRQ_PRIORITY                   0
+#define RTE_SPI3_SPI_FRAME_FORMAT               0
+#define RTE_SPI3_TX_FIFO_LEVEL_TO_START_TRANSFER 0
+#define RTE_SPI3_TX_LOAD_DUMMY_TO_START_LEVEL   0
+#define RTE_SPI3_TX_FIFO_THRESHOLD              0
+#define RTE_SPI3_RX_FIFO_THRESHOLD              0
+#define RTE_SPI3_CHIP_SELECTION_PIN             1
+#endif
+// </e> SPI3 (Serial Peripheral Interface 3) [Driver_SPI]
+
+
 // <e> GPIO1 (General purpose input or output) [Driver_GPIO1]
 // <i> Configuration settings for Driver_GPIO1 in component ::Drivers:GPIO
 #define RTE_GPIO1   1
@@ -411,9 +413,24 @@
 #endif /* RTE_GPIO3 */
 // </e> GPIO3 (General purpose input or output) [Driver_GPIO3]
 
+// <e> GPIO4 (General purpose input or output) [Driver_GPIO4]
+// <i> Configuration settings for Driver_GPIO3 in component ::Drivers:GPIO
+#define RTE_GPIO4   1
+#if RTE_GPIO4
+#define RTE_GPIO4_PIN0_IRQ_PRIORITY     (0)
+#define RTE_GPIO4_PIN1_IRQ_PRIORITY     (0)
+#define RTE_GPIO4_PIN2_IRQ_PRIORITY     (0)
+#define RTE_GPIO4_PIN3_IRQ_PRIORITY     (0)
+#define RTE_GPIO4_PIN4_IRQ_PRIORITY     (0)
+#define RTE_GPIO4_PIN5_IRQ_PRIORITY     (0)
+#define RTE_GPIO4_PIN6_IRQ_PRIORITY     (0)
+#define RTE_GPIO4_PIN7_IRQ_PRIORITY     (0)
+#endif /* RTE_GPIO4 */
+// </e> GPIO4 (General purpose input or output) [Driver_GPIO4]
+
 // <e> LPTIMER (Low power timer) [Driver_LPTIMER]
 // <i> Configuration settings for Driver_LPTIMER in component ::Drivers:LPTIMER
-#define RTE_LPTIMER			    1
+#define RTE_LPTIMER             1
 #if RTE_LPTIMER
 
 #define RTE_LPTIMER_CHANNEL0_IRQ_PRIORITY   (0)

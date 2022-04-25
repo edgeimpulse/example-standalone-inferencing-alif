@@ -56,9 +56,8 @@ uint8_t raw_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES + 0x460] = {0};
 uint8_t rgb_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES] = {0};
 extern ARM_DRIVER_GPIO Driver_GPIO1;
 
-int init_data_acq_img_class(int idx)
+int init_data_acq_img_class()
 {
-	(void)(idx);
 	int cinit = camera_init(raw_image);
 	if (cinit != 0) {
 		while(1) {
@@ -73,6 +72,26 @@ int init_data_acq_img_class(int idx)
 
     return 0;
 }
+
+void SetupLEDs()
+{
+	// Green LED
+	Driver_GPIO1.Initialize(PIN_NUMBER_15,NULL);
+	Driver_GPIO1.PowerControl(PIN_NUMBER_15,  ARM_POWER_FULL);
+	Driver_GPIO1.SetDirection(PIN_NUMBER_15, GPIO_PIN_DIRECTION_OUTPUT);
+	PINMUX_Config (PORT_NUMBER_1, PIN_NUMBER_15, PINMUX_ALTERNATE_FUNCTION_0);
+	PINPAD_Config (PORT_NUMBER_1, PIN_NUMBER_15, (0x09 | PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_04_MILI_AMPS));
+	Driver_GPIO1.SetValue(PIN_NUMBER_15, GPIO_PIN_OUTPUT_STATE_LOW);
+
+	// Red LED
+	Driver_GPIO1.Initialize(PIN_NUMBER_14,NULL);
+	Driver_GPIO1.PowerControl(PIN_NUMBER_14,  ARM_POWER_FULL);
+	Driver_GPIO1.SetDirection(PIN_NUMBER_14, GPIO_PIN_DIRECTION_OUTPUT);
+	PINMUX_Config (PORT_NUMBER_1, PIN_NUMBER_14, PINMUX_ALTERNATE_FUNCTION_0);
+	PINPAD_Config (PORT_NUMBER_1, PIN_NUMBER_14, (0x09 | PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_04_MILI_AMPS));
+	Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
+}
+
 
 extern "C" void ei_sleep_c(int32_t time_ms) { ei_sleep( time_ms ); }
 
@@ -89,7 +108,10 @@ int main()
 
     #endif /* ARM_NPU */
 
+    SetupLEDs();
     UartStdOutInit();
+
+    init_data_acq_img_class();
 
     camera_start(CAMERA_MODE_SNAPSHOT);
     camera_wait(100);

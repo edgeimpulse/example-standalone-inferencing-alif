@@ -38,7 +38,7 @@
 
 #include "GPIO_ll_drv.h"
 
-#if !(RTE_GPIO1 || RTE_GPIO2 || RTE_GPIO3)
+#if !(RTE_GPIO1 || RTE_GPIO2 || RTE_GPIO3 || RTE_GPIO4)
 #error "GPIO is not enabled in the RTE_Device.h"
 #endif
 
@@ -52,6 +52,10 @@
 
 #if (defined(RTE_Drivers_GPIO3) && !RTE_GPIO3)
 #error "GPIO3 not configured in RTE_Device.h!"
+#endif
+
+#if (defined(RTE_Drivers_GPIO4) && !RTE_GPIO4)
+#error "GPIO4 not configured in RTE_Device.h!"
 #endif
 
 int32_t GPIO_Initialize (GPIO_resources_t *GPIO, ARM_GPIO_SignalEvent_t cb_event, uint8_t pin_no)
@@ -491,4 +495,78 @@ ARM_DRIVER_GPIO Driver_GPIO3 = {
     ARM_GPIO3_GetValue,
     ARM_GPIO3_Control,
     ARM_GPIO3_Uninitialize
+};
+
+/**<GPIO Instance 3>*/
+
+GPIO_resources_t GPIO4 = {
+    .reg_base = (uint32_t*) GPIO4_BASE,
+    .IRQ_base_num = GPIO4_PIN0_IRQ,
+    .IRQ_priority = {
+            RTE_GPIO4_PIN0_IRQ_PRIORITY,
+            RTE_GPIO4_PIN1_IRQ_PRIORITY,
+            RTE_GPIO4_PIN2_IRQ_PRIORITY,
+            RTE_GPIO4_PIN3_IRQ_PRIORITY,
+            RTE_GPIO4_PIN4_IRQ_PRIORITY,
+            RTE_GPIO4_PIN5_IRQ_PRIORITY,
+            RTE_GPIO4_PIN6_IRQ_PRIORITY,
+            RTE_GPIO4_PIN7_IRQ_PRIORITY,
+    }
+};
+
+void GPIO4_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 0);    }
+
+int32_t ARM_GPIO4_Initialize (uint8_t pin_no, ARM_GPIO_SignalEvent_t cb_event)
+{
+    return GPIO_Initialize (&GPIO4, cb_event, pin_no);
+}
+
+int32_t ARM_GPIO4_PowerControl (uint8_t pin_no, ARM_POWER_STATE state)
+{
+    return GPIO_PowerControl (&GPIO4, pin_no, state);
+}
+
+int32_t ARM_GPIO4_SetDirection (uint8_t pin_no, uint32_t dir)
+{
+	dir = dir == GPIO_PIN_DIRECTION_INPUT ? GPIO_PIN_DIRECTION_OUTPUT : GPIO_PIN_DIRECTION_INPUT;
+    return GPIO_SetDirection (&GPIO4, pin_no, dir);
+}
+
+int32_t ARM_GPIO4_GetDirection (uint8_t pin_no, uint32_t *dir)
+{
+    int32_t ret = GPIO_GetDirection (&GPIO4, pin_no, dir);
+	*dir = *dir == GPIO_PIN_DIRECTION_INPUT ? GPIO_PIN_DIRECTION_OUTPUT : GPIO_PIN_DIRECTION_INPUT;
+	return ret;
+}
+
+int32_t ARM_GPIO4_SetValue (uint8_t pin_no, uint32_t value)
+{
+    return GPIO_SetValue (&GPIO4, pin_no, value);
+}
+
+int32_t ARM_GPIO4_GetValue (uint8_t pin_no, uint32_t *value)
+{
+    return GPIO_GetValue (&GPIO4, pin_no, value);
+}
+
+int32_t ARM_GPIO4_Control (uint8_t pin_no, GPIO_OPERATION control_code, uint32_t *arg)
+{
+    return GPIO_Control (&GPIO4, pin_no, control_code, arg);
+}
+
+int32_t ARM_GPIO4_Uninitialize (uint8_t pin_no)
+{
+    return GPIO_Uninitialize (&GPIO4, pin_no);
+}
+
+extern ARM_DRIVER_GPIO Driver_GPIO4;
+ARM_DRIVER_GPIO Driver_GPIO4 = {
+    ARM_GPIO4_Initialize,
+    ARM_GPIO4_PowerControl,
+    ARM_GPIO4_SetDirection,
+    ARM_GPIO4_GetDirection,
+    ARM_GPIO4_SetValue,
+    ARM_GPIO4_GetValue,
+    ARM_GPIO4_Control,
+    ARM_GPIO4_Uninitialize
 };

@@ -17,7 +17,7 @@
  *
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * $Date:        25. Feburary 2021
+ * $Date:        26. April 2021
  * $Revision:    V1.0.0
  * Author:       Sudhir Sreedharan
  * Project:      Global Memory Map of SOC
@@ -87,6 +87,7 @@
 #define GPIO1_BASE                  (EXPMST0_APB_A_BASE)
 #define GPIO2_BASE                  (EXPMST0_APB_A_BASE + 0x00001000)
 #define GPIO3_BASE                  (EXPMST0_APB_A_BASE + 0x00002000)
+#define GPIO4_BASE                  (LP_PERIPHERAL_BASE)
 #define UART0_BASE                  (EXPMST0_APB_A_BASE + 0x00008000)
 #define UART1_BASE                  (EXPMST0_APB_A_BASE + 0x00009000)
 #define UART2_BASE                  (EXPMST0_APB_A_BASE + 0x0000A000)
@@ -112,6 +113,7 @@
 #define CDC200_BASE               (EXPMST0_APB_D_BASE + 0x00001000)
 #define CFGSLV1_BASE              (EXPMST0_APB_D_BASE + 0x0000F000)
 
+
 /* APB-E Peripherals */
 
 /* VBAT Global Address Map */
@@ -124,6 +126,7 @@
 #define PINMUX_BASE               (LPAON_BASE + 0x00006000)
 #define LPAON_VBAT_REGS_BASE      (LPAON_BASE + 0x00007000)
 #define PADCTRL_BASE              (LPAON_VBAT_REGS_BASE)
+#define LPPADCTRL_BASE            (LP_PERIPHERAL_BASE + 0x00070000 - 0x20)
 
 /* Ethernet 50MHz clock mux register */
 #define ETH_50M_CLK_MUX_REG       (LPAON_VBAT_REGS_BASE + 0x00000408)
