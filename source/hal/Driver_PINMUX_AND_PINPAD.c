@@ -48,13 +48,32 @@
  */
 
 int32_t PINMUX_Config (uint8_t port, uint8_t pin_no, uint8_t AF_number) {
-
-    if (port > PORT_NUMBER_3)                       { return DRIVER_ERROR; }
-    if (pin_no > PIN_NUMBER_31)                     { return DRIVER_ERROR; }
-    if (AF_number > PINMUX_ALTERNATE_FUNCTION_7)    { return DRIVER_ERROR; }
-
+   
     uint32_t *ptr;
     uint32_t value = 0;
+
+    if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (AF_number > PINMUX_ALTERNATE_FUNCTION_7)    { return ARM_DRIVER_ERROR_PARAMETER; }
+	
+    if (port == PORT_NUMBER_4)
+	{
+	     	if (pin_no > PIN_NUMBER_7)                  { return ARM_DRIVER_ERROR_PARAMETER; }
+
+	           /* Configure GPIO_SWPORTA_CTL register - select AUX or Data Register signal */
+	        ptr = (uint32_t*) (GPIO4_BASE + 0x08);
+	        if (AF_number == PINMUX_ALTERNATE_FUNCTION_0)
+	        {
+	               /* 0 indicates software mode - GPIO pin is driven by Data Register value set by software */
+	          *ptr &= ~(1 << pin_no);
+	        }
+	        else if (AF_number == PINMUX_ALTERNATE_FUNCTION_1)
+	        {
+	               /* 1 indicates hardware mode - GPIO pin is driven by Auxiliary signal - connected to LPTIMER input or output */
+	                  *ptr |= (1 << pin_no);
+	        }
+	        return ARM_DRIVER_OK;
+	 }
 
     port = (port *16) + 16;
 
@@ -82,7 +101,7 @@ int32_t PINMUX_Config (uint8_t port, uint8_t pin_no, uint8_t AF_number) {
     value *= 4;
     *ptr &= ~(0xF << value);
     *ptr |= (AF_number << value);
-    return DRIVER_OK;
+    return ARM_DRIVER_OK;
 }
 
 /**
@@ -96,12 +115,25 @@ int32_t PINMUX_Config (uint8_t port, uint8_t pin_no, uint8_t AF_number) {
 
 int32_t PINMUX_read (uint8_t port, uint8_t pin_no, uint32_t *AF_number) {
 
-    if (port > PORT_NUMBER_3)                       { return DRIVER_ERROR; }
-    if (pin_no > PIN_NUMBER_31)                     { return DRIVER_ERROR; }
-    if (AF_number == 0)                             { return DRIVER_ERROR; }
-
-    uint32_t value = 0;
     uint32_t *ptr;
+    uint32_t value = 0;
+
+    if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (AF_number == 0)                             { return ARM_DRIVER_ERROR_PARAMETER; }
+	      
+    if (port == PORT_NUMBER_4)
+	{
+		if (pin_no > PIN_NUMBER_7)                  { return ARM_DRIVER_ERROR_PARAMETER; }
+
+	        ptr = (uint32_t*) (GPIO4_BASE + 0x08);
+	        *AF_number = (*ptr & (1 << pin_no)) ? PINMUX_ALTERNATE_FUNCTION_1 : PINMUX_ALTERNATE_FUNCTION_0;
+	        return ARM_DRIVER_OK;
+	}
+
+    if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (AF_number == 0)                             { return ARM_DRIVER_ERROR_PARAMETER; }
 
     port = (port *16) + 16;
 
@@ -130,7 +162,7 @@ int32_t PINMUX_read (uint8_t port, uint8_t pin_no, uint32_t *AF_number) {
 
     *AF_number = (((*ptr) >> value) & 0xF);
 
-    return DRIVER_OK;
+    return ARM_DRIVER_OK;
 }
 
 /**
@@ -145,8 +177,8 @@ int32_t PINPAD_Config (uint8_t port, uint8_t pin_no, uint8_t function) {
 
     Pad_RegInfo *reg_ptr = (Pad_RegInfo*)(PADCTRL_BASE);
 
-    if (port > PORT_NUMBER_4)                       { return DRIVER_ERROR; }
-    if (pin_no > PIN_NUMBER_31)                     { return DRIVER_ERROR; }
+    if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
 
     switch (port)
     {
@@ -164,7 +196,7 @@ int32_t PINPAD_Config (uint8_t port, uint8_t pin_no, uint8_t function) {
         {
             if (pin_no >= PORT3_MAX_PIN_NUMBER)
             {
-                return DRIVER_ERROR;   // Port-3 have 0 to 23 pins, throwing error for other pin index
+                return ARM_DRIVER_ERROR_PARAMETER;   // Port-3 have 0 to 23 pins, throwing error for other pin index
             }
             reg_ptr->port_3[pin_no].pad = function;
             break;
@@ -173,13 +205,14 @@ int32_t PINPAD_Config (uint8_t port, uint8_t pin_no, uint8_t function) {
         {
             if (pin_no >= PORT4_MAX_PIN_NUMBER)
             {
-                return DRIVER_ERROR;    // Port-4 have 0 to 7 pins, throwing error for other pin index
+                return ARM_DRIVER_ERROR_PARAMETER;    // Port-4 have 0 to 7 pins, throwing error for other pin index
             }
+            reg_ptr = (Pad_RegInfo*)(LP_PADCTRL_BASE);
             reg_ptr->port_4[pin_no].pad = function;
             break;
         }
     }
-    return DRIVER_OK;
+    return ARM_DRIVER_OK;
 }
 
 /**
@@ -194,9 +227,9 @@ int32_t PINPAD_read (uint8_t port, uint8_t pin_no, uint32_t *function) {
 
     Pad_RegInfo *reg_ptr = (Pad_RegInfo*)(PADCTRL_BASE);
 
-    if (port > PORT_NUMBER_4)                       { return DRIVER_ERROR; }
-    if (pin_no > PIN_NUMBER_31)                     { return DRIVER_ERROR; }
-    if (function == 0)                              { return DRIVER_ERROR; }
+    if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
+    if (function == 0)                              { return ARM_DRIVER_ERROR_PARAMETER; }
 
     switch (port)
     {
@@ -214,7 +247,7 @@ int32_t PINPAD_read (uint8_t port, uint8_t pin_no, uint32_t *function) {
         {
             if (pin_no >= PORT3_MAX_PIN_NUMBER)
             {
-                return DRIVER_ERROR;   // Port-3 have 0 to 23 pins, throwing error for other pin index
+                return ARM_DRIVER_ERROR_PARAMETER;   // Port-3 have 0 to 23 pins, throwing error for other pin index
             }
             *function = reg_ptr->port_3[pin_no].pad;
             break;
@@ -223,11 +256,12 @@ int32_t PINPAD_read (uint8_t port, uint8_t pin_no, uint32_t *function) {
         {
             if (pin_no >= PORT4_MAX_PIN_NUMBER)
             {
-                return DRIVER_ERROR;    // Port-4 have 0 to 7 pins, throwing error for other pin index
+                return ARM_DRIVER_ERROR_PARAMETER;    // Port-4 have 0 to 7 pins, throwing error for other pin index
             }
+            reg_ptr = (Pad_RegInfo*)(LP_PADCTRL_BASE);
             *function = reg_ptr->port_4[pin_no].pad;
             break;
         }
     }
-    return DRIVER_OK;
+    return ARM_DRIVER_OK;
 }

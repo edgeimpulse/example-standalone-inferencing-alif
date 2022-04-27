@@ -58,6 +58,10 @@
 #error "GPIO4 not configured in RTE_Device.h!"
 #endif
 
+#ifndef RTE_SILICON_REV_A
+#define RTE_SILICON_REV_A 1
+#endif
+
 int32_t GPIO_Initialize (GPIO_resources_t *GPIO, ARM_GPIO_SignalEvent_t cb_event, uint8_t pin_no)
 {
     GPIO->cb_event[pin_no] = cb_event;
@@ -514,7 +518,14 @@ GPIO_resources_t GPIO4 = {
     }
 };
 
-void GPIO4_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 0);    }
+void GPIO4_PIN0_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 0);    }
+void GPIO4_PIN1_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 1);    }
+void GPIO4_PIN2_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 2);    }
+void GPIO4_PIN3_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 3);    }
+void GPIO4_PIN4_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 4);    }
+void GPIO4_PIN5_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 5);    }
+void GPIO4_PIN6_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 6);    }
+void GPIO4_PIN7_IRQHandler  (void) {   GPIO_ll_IRQ_Handler (&GPIO4, 7);    }
 
 int32_t ARM_GPIO4_Initialize (uint8_t pin_no, ARM_GPIO_SignalEvent_t cb_event)
 {
@@ -528,15 +539,21 @@ int32_t ARM_GPIO4_PowerControl (uint8_t pin_no, ARM_POWER_STATE state)
 
 int32_t ARM_GPIO4_SetDirection (uint8_t pin_no, uint32_t dir)
 {
-	dir = dir == GPIO_PIN_DIRECTION_INPUT ? GPIO_PIN_DIRECTION_OUTPUT : GPIO_PIN_DIRECTION_INPUT;
+    if (RTE_SILICON_REV_A)
+    {
+    	dir = dir ? GPIO_PIN_DIRECTION_INPUT : GPIO_PIN_DIRECTION_OUTPUT;
+    }
     return GPIO_SetDirection (&GPIO4, pin_no, dir);
 }
 
 int32_t ARM_GPIO4_GetDirection (uint8_t pin_no, uint32_t *dir)
 {
-    int32_t ret = GPIO_GetDirection (&GPIO4, pin_no, dir);
-	*dir = *dir == GPIO_PIN_DIRECTION_INPUT ? GPIO_PIN_DIRECTION_OUTPUT : GPIO_PIN_DIRECTION_INPUT;
-	return ret;
+    int32_t ret =  GPIO_GetDirection (&GPIO4, pin_no, dir);
+    if (RTE_SILICON_REV_A)
+    {
+    	*dir = *dir ? GPIO_PIN_DIRECTION_INPUT : GPIO_PIN_DIRECTION_OUTPUT;
+    }
+    return ret;
 }
 
 int32_t ARM_GPIO4_SetValue (uint8_t pin_no, uint32_t value)

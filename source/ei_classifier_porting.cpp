@@ -26,7 +26,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "hal/cmsis.h"
+
+#include "hal/system_M55_HP.h"
 
 #ifndef EI_CORE_CLOCK_HZ
     #ifdef EI_CONFIG_ETHOS_U55_256

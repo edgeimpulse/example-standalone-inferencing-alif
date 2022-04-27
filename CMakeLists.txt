@@ -98,8 +98,10 @@ USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. S
 
 if (CORE STREQUAL "HP")
     add_compile_definitions(EI_CONFIG_ALIF_HP=1)
+	add_compile_options(-DM55_HP)
 elseif(CORE STREQUAL "HE")
     add_compile_definitions(EI_CONFIG_ALIF_HE=1)
+	add_compile_options(-DM55_HE)
 else()
     message(FATAL_ERROR "Please choose either HP or HE target care (ex: cmake -DCORE=HP)")
 endif()
