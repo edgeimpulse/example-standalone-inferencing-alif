@@ -78,3 +78,5 @@ With debugger attached, my device boots up directly into Bus_Fault (or possibly 
 
 - Power cycle your board and reload your program
 
+Device hangs when using LOG_LEVEL_* (anything not ERROR)
+- The ethos IRQ handler from ARM has logging statements.  The default logging calls into the UART driver, which cannot be called from an interrupt. (I suspect there is a deadlock issue). Either comment out these logging statements, set LOG_LEVEL_ERROR (the default), or redirect the logging statements to something interrupt safe.
