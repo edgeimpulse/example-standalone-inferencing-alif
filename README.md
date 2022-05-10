@@ -31,8 +31,8 @@ For pre-configured example code with features and edge-impulse libraries already
 ## Build the firmware
 1. Extract the zip file downloaded from edge impulse into the `source` directory of this repository
 2. Choose one of the following:
-    1. run cmake .. -DCORE=HP to target Cortex M55 core 0 (high performance) OR
-    2. run cmake .. -DCORE=HE to target Cortex M55 core 1 (high efficiency)
+    1. run cmake .. -DTARGET_SUBSYSTEM=HP to target Cortex M55 core 0 (high performance) OR
+    2. run cmake .. -DTARGET_SUBSYSTEM=HE to target Cortex M55 core 1 (high efficiency)
 3. If you wish to use gcc, add the cmake flag: -DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-gcc.cmake
 4. armclang is the default toolchain file (-DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-armclang.cmake)
 5. run make to build to app.axf

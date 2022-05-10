@@ -53,6 +53,8 @@ set(CMAKE_TOOLCHAIN_DIR ${CMAKE_SCRIPTS_DIR}/toolchains)
 
 set(EI_FOLDER source)
 set(EI_SDK_FOLDER ${EI_FOLDER}/edge-impulse-sdk)
+set(ALIF_SDK_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/alif-cmsis-pack)
+
 add_compile_options(-fdata-sections)
 add_compile_definitions(EI_CLASSIFIER_ALLOCATION_STATIC=1)
 
@@ -78,33 +80,46 @@ USER_OPTION(LOG_LEVEL "Log level for the application"
     STRING)
 
 set(TARGET_PLATFORM ensemble)
-set(TARGET_SUBSYSTEM none)
 
 USER_OPTION(ETHOS_U_NPU_ENABLED "Select if Ethos-U55 is available for the platform and subsystem"
     ON
     BOOL)
 
-USER_OPTION(CORE 
+USER_OPTION(TARGET_SUBSYSTEM 
     "Choose target, 'HP' (for M55 Core 0, High Performance), or 'HE' (for M55 Core 1, High Effiency)"
-    "None"
+    "HE"
     STRING)
 
 USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. Should be used only for MPS3 board."
     OFF
     BOOL)
 
-    message(STATUS "Platform: Ensemble platform with minimal peripherals")
-    set(DEFAULT_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_DIR}/bare-metal-armclang.cmake)
+message(STATUS "Platform: Ensemble platform with minimal peripherals")
+set(DEFAULT_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_DIR}/bare-metal-armclang.cmake)
 
-if (CORE STREQUAL "HP")
+if (TARGET_SUBSYSTEM STREQUAL "HP")
     add_compile_definitions(EI_CONFIG_ALIF_HP=1)
 	add_compile_options(-DM55_HP)
-elseif(CORE STREQUAL "HE")
+    set(DEVICE_HEADERS
+        ${ALIF_SDK_FOLDER}/Device/M55_HP
+        ${ALIF_SDK_FOLDER}/Device/M55_HP/Config
+        ${ALIF_SDK_FOLDER}/Device/M55_HP/Include)
+    set(DEVICE_STARTUP
+        ${ALIF_SDK_FOLDER}/Device/M55_HP/Source)
+elseif(TARGET_SUBSYSTEM STREQUAL "HE")
     add_compile_definitions(EI_CONFIG_ALIF_HE=1)
 	add_compile_options(-DM55_HE)
+    set(DEVICE_HEADERS
+        ${ALIF_SDK_FOLDER}/Device/M55_HE
+        ${ALIF_SDK_FOLDER}/Device/M55_HE/Config
+        ${ALIF_SDK_FOLDER}/Device/M55_HE/Include)
+    set(DEVICE_STARTUP
+        ${ALIF_SDK_FOLDER}/Device/M55_HE/Source)
 else()
-    message(FATAL_ERROR "Please choose either HP or HE target care (ex: cmake -DCORE=HP)")
+    message(FATAL_ERROR "Please choose either HP or HE target subsystem (ex: cmake -DTARGET_SUBSYSTEM=HP)")
 endif()
+
+#        ${ALIF_SDK_FOLDER}/CMSIS/Driver/Src 
 
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE ${DEFAULT_TOOLCHAIN_FILE}
@@ -113,19 +128,17 @@ endif()
 message(STATUS "Using CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 project(edge_impulse_alif
-        VERSION     21.05
+        VERSION     21.06
         DESCRIPTION "Example program for Edge Impulse running on Alif hardware")
 
 enforce_compiler_version()
 
 if (ETHOS_U_NPU_ENABLED)
     add_compile_definitions(EI_ETHOS=1 EI_ALIF_ADDR_TRANSLATION=1)
-    if (CORE STREQUAL "HP")
+    if (TARGET_SUBSYSTEM STREQUAL "HP")
         add_compile_definitions(EI_CONFIG_ETHOS_U55_256=1)
-    elseif(CORE STREQUAL "HE")
-        add_compile_definitions(EI_CONFIG_ETHOS_U55_128=1)
     else()
-        message(FATAL_ERROR "Please choose either HP or HE target care (ex: cmake -DCORE=HP)")
+        add_compile_definitions(EI_CONFIG_ETHOS_U55_128=1)
     endif()
 endif()
 
@@ -138,25 +151,31 @@ if (CPU_PROFILE_ENABLED)
     set(PROFILING_OPT "${PROFILING_OPT} -DCPU_PROFILE_ENABLED")
 endif()
 
-    set(PLATFORM_SOURCES_CMAKE_FILE ${CMAKE_SCRIPTS_DIR}/bare-metal-sources.cmake)
+set(PLATFORM_SOURCES_CMAKE_FILE ${CMAKE_SCRIPTS_DIR}/bare-metal-sources.cmake)
 
-    USER_OPTION(CMSIS_SRC_PATH
-        "Path to CMSIS-5 sources"
-        "${EI_SDK_FOLDER}"
-        PATH
+USER_OPTION(CMSIS_SRC_PATH
+    "Path to CMSIS-5 sources"
+    "${EI_SDK_FOLDER}"
+    PATH
+    )
+
+USER_OPTION(ALIF_CMSIS_SRC_PATH
+    "Path to Alif CMSIS pack sources"
+    "${ALIF_SDK_FOLDER}"
+    PATH
+    )
+
+if (CMAKE_BUILD_TYPE STREQUAL Debug AND CMAKE_CXX_COMPILER_ID STREQUAL ARMClang)
+    USER_OPTION(ARMCLANG_DEBUG_DWARF_LEVEL
+        "Dwarf conformance level for armclang toolchain"
+        "4" # Default = 4 (Arm-DS etc). For model debugger specify "3"
+        STRING
         )
-
-    if (CMAKE_BUILD_TYPE STREQUAL Debug AND CMAKE_CXX_COMPILER_ID STREQUAL ARMClang)
-        USER_OPTION(ARMCLANG_DEBUG_DWARF_LEVEL
-            "Dwarf conformance level for armclang toolchain"
-            "4" # Default = 4 (Arm-DS etc). For model debugger specify "3"
-            STRING
-            )
-    elseif (DEFINED ARMCLANG_DEBUG_DWARF_LEVEL)
-        message(WARNING "ARMCLANG_DEBUG_DWARF_LEVEL definition is unsupported"
-                        "within current configuration. Removing definition...")
-        unset(ARMCLANG_DEBUG_DWARF_LEVEL CACHE)
-    endif()
+elseif (DEFINED ARMCLANG_DEBUG_DWARF_LEVEL)
+    message(WARNING "ARMCLANG_DEBUG_DWARF_LEVEL definition is unsupported"
+                    "within current configuration. Removing definition...")
+    unset(ARMCLANG_DEBUG_DWARF_LEVEL CACHE)
+endif()
 
 message(STATUS "Including ${PLATFORM_SOURCES_CMAKE_FILE}")
 include(${PLATFORM_SOURCES_CMAKE_FILE})
@@ -170,6 +189,9 @@ if (${CMAKE_CROSSCOMPILING})
     # All CMSIS headers to be used:
     set(CMSIS_HEADERS
         ${CMSIS_CORE_INC_DIR}
+        ${DEVICE_HEADERS}
+        ${ALIF_SDK_FOLDER}/CMSIS/Driver/Inc
+        ${ALIF_SDK_FOLDER}/CMSIS/Include
         ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/cmsis/Device/ARM/ARMCM55/Include
         ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/cmsis/Device/ARM/ARMCM55/Include/Template)
 endif ()
@@ -212,15 +234,15 @@ set(HAL_DIR ${SRC_PATH}/hal)
 
 # HAL API sources
 file(GLOB_RECURSE SRC_HAL
+    "${DEVICE_STARTUP}/*.c"
+    "${ALIF_SDK_FOLDER}/CMSIS/Driver/Src/*.c"
     "${HAL_DIR}/*.c"
     "${HAL_DIR}/image_processing/*.c"
-    "${HAL_DIR}/image_capture/*.c"
     )
 
 # Include directories:
 set(APPLICATION_INCLUDE_DIRS
     ${HAL_DIR}
-    ${HAL_DIR}/image_capture
     ${HAL_DIR}/image_processing
     ${PLAT_INCLUDE_DIRS}
     )

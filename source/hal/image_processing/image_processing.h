@@ -39,6 +39,9 @@ extern "C" {
 
 #define IMAGE_DATA_SIZE  ((MIMAGE_X*MIMAGE_Y*PIXEL_BYTES*RGB_BYTES)+ TIFF_HDR_SIZE)
 
+#define CAMERA_MODE_VIDEO 		0x0001
+#define CAMERA_MODE_SNAPSHOT 	0x0011
+
 
 typedef struct {
 	uint8_t tiff_header[TIFF_HDR_SIZE];
@@ -55,6 +58,11 @@ void color_correction(uint8_t *sp, uint8_t *dp);
 void white_balance(uint8_t *sp, uint8_t *dp);
 uint8_t *put_tiff(uint8_t * rgb, uint32_t width, uint32_t height, uint16_t bpp);
 int bayer_to_RGB(uint8_t *src, uint8_t *dest);
+
+int32_t camera_init(uint8_t *buffer);
+int32_t camera_vsync(uint32_t timeout_ms);
+int32_t camera_wait(uint32_t timeout_ms);
+int32_t camera_start(uint32_t mode);
 
 #ifdef __cplusplus
 }
