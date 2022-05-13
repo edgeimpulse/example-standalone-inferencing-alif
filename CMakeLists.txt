@@ -87,7 +87,7 @@ USER_OPTION(ETHOS_U_NPU_ENABLED "Select if Ethos-U55 is available for the platfo
 
 USER_OPTION(TARGET_SUBSYSTEM 
     "Choose target, 'HP' (for M55 Core 0, High Performance), or 'HE' (for M55 Core 1, High Effiency)"
-    "HE"
+    "HP"
     STRING)
 
 USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. Should be used only for MPS3 board."

@@ -331,7 +331,7 @@ void UTIMER_IRQHandler92    (void) __attribute__ ((weak, alias("Default_Handler"
 void UTIMER_IRQHandler93    (void) __attribute__ ((weak, alias("Default_Handler")));
 void UTIMER_IRQHandler94    (void) __attribute__ ((weak, alias("Default_Handler")));
 void UTIMER_IRQHandler95    (void) __attribute__ ((weak, alias("Default_Handler")));
-
+void arm_npu_irq_handler    (void) __attribute__ ((weak, alias("Default_Handler")));
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Vector table
@@ -417,7 +417,7 @@ extern const VECTOR_TABLE_Type __VECTOR_TABLE[496];
   Interrupt2_Handler,                       /*   2 Interrupt 2 */
   Interrupt3_Handler,                       /*   3 Interrupt 3 */
   Interrupt4_Handler,                       /*   4 Interrupt 4 */
-  Interrupt5_Handler,                       /*   5 Interrupt 5 */
+  arm_npu_irq_handler,                      /*   5 Interrupt 5 */
   Interrupt6_Handler,                       /*   6 Interrupt 6 */
   Interrupt7_Handler,                       /*   7 Interrupt 7 */
   Interrupt8_Handler,                       /*   8 Interrupt 8 */

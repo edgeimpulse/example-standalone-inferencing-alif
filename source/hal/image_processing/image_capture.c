@@ -211,6 +211,7 @@ error_uninitialize_dphy:
 
 int32_t camera_start(uint32_t mode)
 {
+    camera_event_flags = actual_events = 0;
 	int32_t ret = CAMERAdrv->CaptureFrame(framebuffer_pool);
 	if (ret != ARM_DRIVER_OK)
 	{
@@ -259,7 +260,6 @@ int32_t camera_vsync(uint32_t timeout_ms)
 	 * if the event flags are not set,
 	 *  this service suspends for a maximum of 'n' timer-ticks.
 	 */
-    camera_event_flags = actual_events = 0;
     while (camera_event_flags == 0)
     {
         /* code */
