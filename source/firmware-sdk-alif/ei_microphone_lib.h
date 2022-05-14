@@ -96,10 +96,10 @@ static uint32_t create_header(sensor_aq_payload_info *payload, EiDeviceMemory *m
 {
     auto dev = EiDeviceInfo::get_device();
 
-    sensor_aq_init_mbedtls_hs256_context(
-        ei_mic_signing_ctx,
-        ei_mic_hs_ctx,
-        dev->get_sample_hmac_key().c_str());
+    // sensor_aq_init_mbedtls_hs256_context(
+    //     ei_mic_signing_ctx,
+    //     ei_mic_hs_ctx,
+    //     dev->get_sample_hmac_key().c_str());
 
     auto ret = sensor_aq_init(ei_mic_ctx, payload, NULL, true);
 
