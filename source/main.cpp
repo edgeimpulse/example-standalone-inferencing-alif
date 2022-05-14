@@ -51,8 +51,8 @@ void* __stack_chk_guard = (void*)0xaeaeaeae;
 
 #include "image_processing.h"
 
-uint8_t raw_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES + 0x460] = {0};
-uint8_t rgb_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES] = {0};
+uint8_t raw_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES + 0x460];
+uint8_t rgb_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES];
 extern ARM_DRIVER_GPIO Driver_GPIO1;
 
 void SetupLEDs()
