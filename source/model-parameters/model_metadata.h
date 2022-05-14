@@ -44,10 +44,10 @@
 #define EI_CLASSIFIER_DATATYPE_FLOAT32           1
 #define EI_CLASSIFIER_DATATYPE_INT8              9
 
-#define EI_CLASSIFIER_PROJECT_ID                 89461
-#define EI_CLASSIFIER_PROJECT_OWNER              "Edge Impulse Inc."
-#define EI_CLASSIFIER_PROJECT_NAME               "FOMO Washers and Screws 96x96"
-#define EI_CLASSIFIER_PROJECT_DEPLOY_VERSION     19
+#define EI_CLASSIFIER_PROJECT_ID                 87291
+#define EI_CLASSIFIER_PROJECT_OWNER              "Demo Team"
+#define EI_CLASSIFIER_PROJECT_NAME               "Face detection - FOMO"
+#define EI_CLASSIFIER_PROJECT_DEPLOY_VERSION     73
 #define EI_CLASSIFIER_NN_INPUT_FRAME_SIZE        9216
 #define EI_CLASSIFIER_RAW_SAMPLE_COUNT           9216
 #define EI_CLASSIFIER_RAW_SAMPLES_PER_FRAME      1
@@ -56,7 +56,7 @@
 #define EI_CLASSIFIER_INPUT_HEIGHT               96
 #define EI_CLASSIFIER_INPUT_FRAMES               1
 #define EI_CLASSIFIER_INTERVAL_MS                1
-#define EI_CLASSIFIER_LABEL_COUNT                2
+#define EI_CLASSIFIER_LABEL_COUNT                1
 #define EI_CLASSIFIER_HAS_ANOMALY                0
 #define EI_CLASSIFIER_FREQUENCY                  0
 #define EI_CLASSIFIER_USE_QUANTIZED_DSP_BLOCK    0
@@ -66,7 +66,7 @@
 #define EI_CLASSIFIER_OBJECT_DETECTION             1
 #define EI_CLASSIFIER_OBJECT_DETECTION_CONSTRAINED 1
 #define EI_CLASSIFIER_OBJECT_DETECTION_COUNT       10
-#define EI_CLASSIFIER_OBJECT_DETECTION_THRESHOLD   0.5
+#define EI_CLASSIFIER_OBJECT_DETECTION_THRESHOLD   0.4
 #define EI_CLASSIFIER_TFLITE_OUTPUT_DATA_TENSOR    0
 #define EI_CLASSIFIER_TFLITE_OUTPUT_LABELS_TENSOR  1
 #define EI_CLASSIFIER_TFLITE_OUTPUT_SCORE_TENSOR   2
@@ -205,5 +205,11 @@ typedef struct {
     int high_frequency;
     float pre_cof;
 } ei_dsp_config_audio_syntiant_t;
+
+typedef struct {
+    uint16_t implementation_version;
+    int axes;
+    bool scaling;
+} ei_dsp_config_imu_syntiant_t;
 
 #endif // _EI_CLASSIFIER_MODEL_METADATA_H_
