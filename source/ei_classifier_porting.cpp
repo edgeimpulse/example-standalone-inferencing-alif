@@ -29,6 +29,8 @@
 #include "hal/cmsis.h"
 #include "hal/uart_stdout.h"
 
+#include "system_M55_HP.h"
+
 #ifndef EI_CORE_CLOCK_HZ
 #ifdef EI_CONFIG_ETHOS_U55_256
 #define EI_CORE_CLOCK_HZ 400000000 //default to M55_0 core
@@ -58,7 +60,7 @@ EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
 
 uint64_t ei_read_timer_us()
 {
-    return Get_SysTick_Cycle_Count() / (EI_CORE_CLOCK_HZ / 1000000);
+    return 0; //Get_SysTick_Cycle_Count() / ( EI_CORE_CLOCK_HZ / 1000000 );
 }
 
 uint64_t ei_read_timer_ms()

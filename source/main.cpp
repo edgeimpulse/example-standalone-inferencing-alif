@@ -33,6 +33,24 @@
 
 #include <cstdio>
 
+/* Project Includes */
+#include "Driver_PINMUX_AND_PINPAD.h"
+#include "Driver_GPIO.h" 
+
+#include "RTE_Device.h"
+#include "RTE_Components.h"
+
+#include "hal/bsp_core_log.h"
+
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "image_processing.h"
+
+
+extern ARM_DRIVER_GPIO Driver_GPIO1;
+
 #if !NDEBUG
 extern "C" void __stack_chk_fail(void)
 {
@@ -44,18 +62,35 @@ extern "C" void __stack_chk_fail(void)
 void *__stack_chk_guard = (void *)0xaeaeaeae;
 #endif
 
+void SetupLEDs()
+{
+	// Green LED
+	Driver_GPIO1.Initialize(PIN_NUMBER_15,NULL);
+	Driver_GPIO1.PowerControl(PIN_NUMBER_15,  ARM_POWER_FULL);
+	Driver_GPIO1.SetDirection(PIN_NUMBER_15, GPIO_PIN_DIRECTION_OUTPUT);
+	PINMUX_Config (PORT_NUMBER_1, PIN_NUMBER_15, PINMUX_ALTERNATE_FUNCTION_0);
+	PINPAD_Config (PORT_NUMBER_1, PIN_NUMBER_15, (0x09 | PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_04_MILI_AMPS));
+	Driver_GPIO1.SetValue(PIN_NUMBER_15, GPIO_PIN_OUTPUT_STATE_LOW);
+
+	// Red LED
+	Driver_GPIO1.Initialize(PIN_NUMBER_14,NULL);
+	Driver_GPIO1.PowerControl(PIN_NUMBER_14,  ARM_POWER_FULL);
+	Driver_GPIO1.SetDirection(PIN_NUMBER_14, GPIO_PIN_DIRECTION_OUTPUT);
+	PINMUX_Config (PORT_NUMBER_1, PIN_NUMBER_14, PINMUX_ALTERNATE_FUNCTION_0);
+	PINPAD_Config (PORT_NUMBER_1, PIN_NUMBER_14, (0x09 | PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_04_MILI_AMPS));
+	Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
+}
+
+extern "C" void ei_sleep_c(int32_t time_ms) { ei_sleep( time_ms ); }
+
 int main()
 {
-    // System init takes place in Reset function, see irqs.c
-
+    // System init takes place in Reset function, see startup_M55_HP.c
 #if defined(ARM_NPU)
-
-    /* If Arm Ethos-U NPU is to be used, we initialise it here */
-    if (0 != arm_npu_init())
-    {
+    /* If Arm Ethos-U NPU is to be used, we initialize it here */
+    if (0 != arm_npu_init()) {
         ei_printf("Failed to initialize NPU");
     }
-
 #endif /* ARM_NPU */
 
     if (UartStdOutInit())
@@ -64,6 +99,21 @@ int main()
         while (1)
             ;
     }
+    
+    // Setup Pin-Mux and Pad Control registers
+    SetupLEDs();
+
+	int cinit = camera_init(raw_image);
+	if (cinit != 0) {
+		while(1) {
+			Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
+			ei_sleep(300);
+			Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_HIGH);
+			ei_sleep(300);
+		}
+	}
+	// ei_printf("Camera initialized... \n");
+
     //setvbuf(stdout, NULL, _IONBF, 0);
     auto at = ATServer::get_instance();
 
@@ -81,7 +131,6 @@ int main()
     at->register_command(AT_RUNIMPULSE, AT_RUNIMPULSE_HELP_TEXT, run_nn_normal, nullptr, nullptr, nullptr);
     at->register_command(AT_RUNIMPULSEDEBUG, AT_RUNIMPULSEDEBUG_HELP_TEXT, nullptr, nullptr, run_nn_debug, AT_RUNIMPULSEDEBUG_ARGS);
     // at->register_command(AT_RUNIMPULSECONT, AT_RUNIMPULSECONT_HELP_TEXT, at_run_impulse_cont, nullptr, nullptr, nullptr);
-
 
     while (1)
     {

@@ -4,7 +4,16 @@ This builds and runs an exported impulse locally on your machine.
 
 ## Prerequisites
 1. Create an edge impulse account at [edgeimpulse.com](https://www.edgeimpulse.com/)
-2. Install the [ARM clang compiler](https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6) and ensure it is added to your path:
+2. Install either arm gcc or arm clang:
+
+### gcc
+Tested with:
+```
+gcc version 10.2.1 20201103 (release) (GNU Arm Embedded Toolchain 10-2020-q4-major)
+```
+
+### clang
+[ARM clang compiler](https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6) and ensure it is added to your path:
 ```
 which armclang
 ```
@@ -22,13 +31,16 @@ For pre-configured example code with features and edge-impulse libraries already
 ## Build the firmware
 1. Extract the zip file downloaded from edge impulse into the `source` directory of this repository
 2. Choose one of the following:
-    1. run cmake .. -DCORE=HP to target Cortex M55 core 0 (high performance) OR
-    2. run cmake .. -DCORE=HE to target Cortex M55 core 1 (high efficiency) 
-3. run make to build to app.axf
+    1. run cmake .. -DTARGET_SUBSYSTEM=HP to target Cortex M55 core 0 (high performance) OR
+    2. run cmake .. -DTARGET_SUBSYSTEM=HE to target Cortex M55 core 1 (high efficiency)
+3. If you wish to use gcc, add the cmake flag: -DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-gcc.cmake
+4. armclang is the default toolchain file (-DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-armclang.cmake)
+5. run make to build to app.axf
+6. Example:
 ```
 mkdir build
 cd build
-cmake .. -DCORE=HP
+cmake .. -DCORE=HP -DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-gcc.cmake
 make -j8
 ```
 
@@ -55,7 +67,7 @@ Timing calculations are performed in [ei_classifier_porting.cpp](source/ei_class
 
 Alif M55 processors have a private fast DTCM, and also access to a larger, but slower, chip global SRAM.
 - For armclang the linker file attempts to place as much as possible in DTCM, and overflows into SRAM if needed.
-- For gcc, the linker is unable to auto place based on size.  If you get an error during link, see [ensemble.ld](ensemble.ld) and uncomment the line that places the model in SRAM (instead of DTCM).  This will only slow down DSP, as the U55 has to use the SRAM bus to access the model regardless of placement.
+- For gcc, the linker is unable to auto place based on size.  If you get an error during link, see [The linker file for GCC, arena placement](ensemble.ld#L116) and uncomment the line that places the arena in SRAM (line 116) (instead of DTCM).  This will only slow down DSP, as the U55 has to use the SRAM bus to access the model regardless of placement.
 
 When your entire program can't fit into DTCM, sometimes customizing placement of objects can improve performance.
 See [ensemble.sct](ensemble.sct) for example placement commands (currently commented out)

@@ -38,7 +38,7 @@ extern struct ethosu_driver ethosu_drv; /* Default Ethos-U device driver */
  * @brief   Defines the Ethos-U interrupt handler: just a wrapper around the default
  *          implementation.
  **/
-static void arm_npu_irq_handler(void)
+void arm_npu_irq_handler(void)
 {
     /* Call the default interrupt handler from the NPU driver */
     ethosu_irq_handler(&ethosu_drv);
@@ -51,11 +51,10 @@ static void arm_npu_irq_init(void)
 {
     const IRQn_Type ethosu_irqnum = (IRQn_Type)EthosU_IRQn;
 
-    /* Register the EthosU IRQ handler in our vector table.
-     * Note, this handler comes from the EthosU driver */
-    NVIC_ClearPendingIRQ(336);
-    NVIC_SetVector(ethosu_irqnum, (uint32_t)arm_npu_irq_handler);
+    /* EthosU IRQ handler is set in the vector table at compile time.
+     * This way the table can reside in the NVM */
 
+    NVIC_ClearPendingIRQ(ethosu_irqnum);
     /* Enable the IRQ */
     NVIC_EnableIRQ(ethosu_irqnum);
 
