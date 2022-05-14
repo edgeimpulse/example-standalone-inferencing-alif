@@ -66,7 +66,7 @@ class EiCameraAlif : public EiCamera
         uint8_t *image,
         uint32_t image_size) override
     {
-        camera_start(CAMERA_MODE_SNAPSHOT); 
+        camera_start(CAMERA_MODE_SNAPSHOT, raw_image); 
         camera_vsync(100); // RGB conversion and frame resize 
         bayer_to_RGB(raw_image+0x460, rgb_image);
         memcpy(image, rgb_image, image_size);

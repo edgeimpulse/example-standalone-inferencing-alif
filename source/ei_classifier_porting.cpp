@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "hal/cmsis.h"
 #include "hal/uart_stdout.h"
 
 #include "system_M55_HP.h"

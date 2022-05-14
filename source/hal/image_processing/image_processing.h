@@ -59,10 +59,10 @@ void white_balance(uint8_t *sp, uint8_t *dp);
 uint8_t *put_tiff(uint8_t * rgb, uint32_t width, uint32_t height, uint16_t bpp);
 int bayer_to_RGB(uint8_t *src, uint8_t *dest);
 
-int32_t camera_init(uint8_t *buffer);
+int32_t camera_init();
 int32_t camera_vsync(uint32_t timeout_ms);
 int32_t camera_wait(uint32_t timeout_ms);
-int32_t camera_start(uint32_t mode);
+int32_t camera_start(uint32_t mode, uint8_t* buffer);
 
 #ifdef __cplusplus
 }

@@ -103,7 +103,7 @@ int main()
     // Setup Pin-Mux and Pad Control registers
     SetupLEDs();
 
-	int cinit = camera_init(raw_image);
+	int cinit = camera_init();
 	if (cinit != 0) {
 		while(1) {
 			Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
