@@ -60,6 +60,8 @@
   #error device not specified!
 #endif
 
+#include <stdio.h>
+#include <inttypes.h>
 /*----------------------------------------------------------------------------
   External References
  *----------------------------------------------------------------------------*/
@@ -78,15 +80,15 @@ __NO_RETURN void Reset_Handler  (void);
   Exception / Interrupt Handler
  *----------------------------------------------------------------------------*/
 /* Exceptions */
-void NMI_Handler            (void) __attribute__ ((weak, alias("Default_Handler")));
-void HardFault_Handler      (void) __attribute__ ((weak));
-void MemManage_Handler      (void) __attribute__ ((weak, alias("Default_Handler")));
-void BusFault_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
-void UsageFault_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void SecureFault_Handler    (void) __attribute__ ((weak, alias("Default_Handler")));
-void SVC_Handler            (void) __attribute__ ((weak, alias("Default_Handler")));
-void DebugMon_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
-void PendSV_Handler         (void) __attribute__ ((weak, alias("Default_Handler")));
+// void NMI_Handler            (void) __attribute__ ((weak, alias("Default_Handler")));
+// void HardFault_Handler      (void) __attribute__ ((weak));
+// void MemManage_Handler      (void) __attribute__ ((weak, alias("Default_Handler")));
+// void BusFault_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
+// void UsageFault_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
+// void SecureFault_Handler    (void) __attribute__ ((weak, alias("Default_Handler")));
+// void SVC_Handler            (void) __attribute__ ((weak, alias("Default_Handler")));
+// void DebugMon_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
+// void PendSV_Handler         (void) __attribute__ ((weak, alias("Default_Handler")));
 void SysTick_Handler        (void) __attribute__ ((weak, alias("Default_Handler")));
 
 void Interrupt0_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
@@ -332,6 +334,154 @@ void UTIMER_IRQHandler93    (void) __attribute__ ((weak, alias("Default_Handler"
 void UTIMER_IRQHandler94    (void) __attribute__ ((weak, alias("Default_Handler")));
 void UTIMER_IRQHandler95    (void) __attribute__ ((weak, alias("Default_Handler")));
 void arm_npu_irq_handler    (void) __attribute__ ((weak, alias("Default_Handler")));
+
+
+
+/*----------------------------------------------------------------------------
+  Reset Handler called on controller reset
+ *----------------------------------------------------------------------------*/
+__NO_RETURN void Reset_Handler(void) 
+{
+  /* Setup the main stack */
+  __asm volatile ("MSR MSPLIM, %0" : : "r" (&__STACK_LIMIT));
+  __asm volatile ("MSR MSP, %0" : : "r" (&__INITIAL_SP));
+
+  SystemInit();                             /* CMSIS System Initialization */
+  __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
+}
+
+
+#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wmissing-noreturn"
+#endif
+
+/**
+ * @brief   Dump core registers on stdout
+ */
+static void LogCoreCPURegisters(void)
+{
+    printf("CTRL    : 0x%08" PRIx32 "\n", __get_CONTROL());
+    printf("IPSR    : 0x%08" PRIx32 "\n", __get_IPSR());
+    printf("APSR    : 0x%08" PRIx32 "\n", __get_APSR());
+    printf("xPSR    : 0x%08" PRIx32 "\n", __get_xPSR());
+    printf("PSP     : 0x%08" PRIx32 "\n", __get_PSP());
+    printf("MSP     : 0x%08" PRIx32 "\n", __get_MSP());
+    printf("PRIMASK : 0x%08" PRIx32 "\n", __get_PRIMASK());
+    printf("BASEPRI : 0x%08" PRIx32 "\n", __get_BASEPRI());
+    printf("FAULTMSK: 0x%08" PRIx32 "\n", __get_FAULTMASK());
+}
+
+/**
+ * @brief   Default interrupt handler - an infinite loop.
+ **/
+__attribute__((noreturn)) void Default_Handler(void)
+{
+    LogCoreCPURegisters();
+    while (1) {
+        /* Without the following line, armclang may optimize away the
+         * infinite loop because it'd be without side effects and thus
+         * undefined behaviour. */
+        __ASM volatile("");
+    }
+}
+
+#define DEFAULT_HANDLER_CALL(type)              \
+    do {                                        \
+        printf("\n");                           \
+        printf("%s caught by function %s\n",    \
+             type, __FUNCTION__);               \
+        Default_Handler();                       \
+    } while (0)
+
+#define DEFAULT_ERROR_HANDLER_CALL()            \
+            DEFAULT_HANDLER_CALL("Exception")
+
+#define DEFAULT_IRQ_HANDLER_CALL()              \
+            DEFAULT_HANDLER_CALL("Interrupt")
+
+/**
+ * Dummy Exception Handlers for core interrupts.
+ *
+ * Weak definitions provided to be used if the user chooses not
+ * to override them.
+ **/
+
+/**
+ * @brief  Non maskable interrupt handler.
+ **/
+ __attribute__((weak)) void NMI_Handler(void)
+{
+    DEFAULT_ERROR_HANDLER_CALL();
+}
+
+/**
+ * @brief  Hardfault interrupt handler.
+ **/
+ __attribute__((weak)) void HardFault_Handler(void)
+{
+    DEFAULT_ERROR_HANDLER_CALL();
+}
+
+/**
+ * @brief  Memory management interrupt handler.
+ **/
+__attribute__((weak)) void MemManage_Handler(void)
+{
+    DEFAULT_IRQ_HANDLER_CALL();
+}
+
+/**
+ * @brief  Bus fault interrupt handler.
+ **/
+__attribute__((weak)) void BusFault_Handler(void)
+{
+    DEFAULT_ERROR_HANDLER_CALL();
+}
+
+/**
+ * @brief  Usage fault interrupt handler.
+ **/
+__attribute__((weak)) void UsageFault_Handler(void)
+{
+    DEFAULT_ERROR_HANDLER_CALL();
+}
+
+/**
+ * @brief  Secure access fault interrupt handler.
+ **/
+__attribute__((weak)) void SecureFault_Handler(void)
+{
+    DEFAULT_ERROR_HANDLER_CALL();
+}
+
+/**
+ * @brief  Supervisor call interrupt handler.
+ **/
+__attribute__((weak)) void SVC_Handler(void)
+{
+    DEFAULT_IRQ_HANDLER_CALL();
+}
+
+/**
+ * @brief  Debug monitor interrupt handler.
+ **/
+__attribute__((weak)) void DebugMon_Handler(void)
+{
+    DEFAULT_IRQ_HANDLER_CALL();
+}
+
+/**
+ * @brief  Pending SV call interrupt handler.
+ */
+__attribute__((weak)) void PendSV_Handler(void)
+{
+    DEFAULT_IRQ_HANDLER_CALL();
+}
+
+#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+  #pragma clang diagnostic pop
+#endif
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Vector table
@@ -832,43 +982,3 @@ extern const VECTOR_TABLE_Type __VECTOR_TABLE[496];
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
 #endif
-
-/*----------------------------------------------------------------------------
-  Reset Handler called on controller reset
- *----------------------------------------------------------------------------*/
-__NO_RETURN void Reset_Handler(void) 
-{
-  /* Setup the main stack */
-  __asm volatile ("MSR MSPLIM, %0" : : "r" (&__STACK_LIMIT));
-  __asm volatile ("MSR MSP, %0" : : "r" (&__INITIAL_SP));
-
-  SystemInit();                             /* CMSIS System Initialization */
-  __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
-}
-
-
-#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wmissing-noreturn"
-#endif
-
-/*----------------------------------------------------------------------------
-  Hard Fault Handler
- *----------------------------------------------------------------------------*/
-void HardFault_Handler(void)
-{
-  while(1);
-}
-
-/*----------------------------------------------------------------------------
-  Default Handler for Exceptions / Interrupts
- *----------------------------------------------------------------------------*/
-void Default_Handler(void)
-{
-  while(1);
-}
-
-#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-  #pragma clang diagnostic pop
-#endif
-

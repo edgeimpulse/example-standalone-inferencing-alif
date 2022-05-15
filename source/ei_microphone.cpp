@@ -27,7 +27,7 @@
 #include "firmware-sdk-alif/ei_microphone_lib.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
 #include "firmware-sdk-alif/at_base64_lib.h"
-
+#include "edge-impulse-sdk/dsp/image/processing.hpp"
 #include "image_processing.h"
 
 //TODO: use multiply of memory block size
@@ -66,9 +66,22 @@ class EiCameraAlif : public EiCamera
         uint8_t *image,
         uint32_t image_size) override
     {
-        camera_start(CAMERA_MODE_SNAPSHOT, raw_image); 
-        camera_vsync(100); // RGB conversion and frame resize 
+        //DEBUG
+        static bool first = true;
+        if(first) {
+            camera_start(CAMERA_MODE_SNAPSHOT, raw_image); 
+            camera_vsync(100); // RGB conversion and frame resize 
+            first = false;
+        }
         bayer_to_RGB(raw_image+0x460, rgb_image);
+        ei::image::processing::crop_and_interpolate_rgb888(
+            rgb_image,// const uint8_t *srcImage,
+            560,// int srcWidth,
+            560,// int srcHeight,
+            rgb_image,// uint8_t *dstImage,
+            96,// int dstWidth,
+            96// int dstHeight
+        );
         memcpy(image, rgb_image, image_size);
         return true;
     }

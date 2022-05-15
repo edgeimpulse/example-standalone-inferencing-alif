@@ -39,7 +39,7 @@ void run_nn(bool debug) {
     EI_ALLOCATE_AUTO_POINTER(image_p, IMAGE_SIZE);
 
     if( !image_p ) {
-        ei_printf("run_nn out of memory\n");
+        ei_printf("ERR: run_nn out of memory\n");
         return;
     }
 
