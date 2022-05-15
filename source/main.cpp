@@ -94,26 +94,33 @@ int main()
 
 	int cinit = camera_init(raw_image);
 	if (cinit != 0) {
-		while(1) {
-			Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
-			ei_sleep(300);
-			Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_HIGH);
-			ei_sleep(300);
+		// Retry init
+		camera_init(raw_image);
+		if (cinit != 0) {
+			while(1) {
+				Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
+				ei_sleep(300);
+				Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_HIGH);
+				ei_sleep(300);
+			}
 		}
 	}
 	ei_printf("Camera initialized... \n");
 
-    camera_start(CAMERA_MODE_SNAPSHOT);
-    camera_vsync(100);
-    // RGB conversion and frame resize
-    bayer_to_RGB(raw_image+0x460, rgb_image);
+    while (1)
+    {
+        if (camera_start(CAMERA_MODE_SNAPSHOT) == ARM_DRIVER_OK)
+        {
+			camera_vsync(100);
+			// RGB conversion and frame resize
+			bayer_to_RGB(raw_image+0x460, rgb_image);
 
-    for( int i=0; i<999; i++ ) {
-        ei_printf("%hi,",rgb_image[i]);
+			for( int i=0; i<999; i++ ) {
+				ei_printf("%hi,",rgb_image[i]);
+			}
+        }
+        ei_printf("\n\nEnd of stream\n");
     }
-
-    ei_printf("\n\nEnd of stream\n");
-
     while(1);
 
 //     ei_impulse_result_t result;
