@@ -3,12 +3,12 @@
 ; ***       Scatter-Loading Description File                ***
 ; *************************************************************
 
-LOAD_REGION_ITCM       0x00000000                  
+LOAD_REGION_MAIN       0x80000000 NOCOMPRESS                 
 {
     ;-----------------------------------------------------
     ; Code region
     ;-----------------------------------------------------
-    rom.bin         0x00000000	0x00040000
+    rom.bin         0x80000000	0x00040000
     {
         *.o (RESET, +First)
         * (InRoot$$Sections)
@@ -47,4 +47,13 @@ LOAD_REGION_ITCM       0x00000000
     PADDING +0 ALIGN 16 FILL 0 16
     {
     }
+}
+
+LOAD_REGION_PARTITION 0x8057F000 0x1000
+{
+	RESERVED +0 FILL 0 (0x1000 - 16) {
+	}
+	ATOC (0x8057F000 + 0x1000 - 16) 16 {
+		*(:gdef:__mram_atoc)
+	}
 }
