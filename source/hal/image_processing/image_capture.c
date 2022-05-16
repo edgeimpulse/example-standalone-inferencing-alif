@@ -131,7 +131,7 @@ int32_t camera_init()
 
     setup_pinmux();
 
-	int32_t ret = DPHYmaster->Initialize(MIPI_DSI_DPHY_FREQUENCY);
+	int32_t ret2, ret = DPHYmaster->Initialize(MIPI_DSI_DPHY_FREQUENCY);
 	if (ret != ARM_DRIVER_OK)
 	{
 		DEBUG_PRINTF("\r\n Error: MIPI DSI DPHY Master Initialize failed.\r\n");
@@ -178,29 +178,29 @@ int32_t camera_init()
     
 error_poweroff_camera:
 	/* Power off CAMERA peripheral */
-	ret = CAMERAdrv->PowerControl(ARM_POWER_OFF);
-	if (ret != ARM_DRIVER_OK)
+	ret2 = CAMERAdrv->PowerControl(ARM_POWER_OFF);
+	if (ret2 != ARM_DRIVER_OK)
     {
 		DEBUG_PRINTF("\r\n Error: CAMERA Power OFF failed.\r\n");
     }
 error_poweroff_dphy:
 	/* Power off MIPI DSI Master DPHY*/
-	ret = DPHYmaster->PowerControl(ARM_POWER_OFF);
-	if (ret != ARM_DRIVER_OK)
+	ret2 = DPHYmaster->PowerControl(ARM_POWER_OFF);
+	if (ret2 != ARM_DRIVER_OK)
     {
 		DEBUG_PRINTF("\r\n Error: MIPI DSI DPHY Master Power Off failed.\r\n");
     }
 error_uninitialize_camera:
 	/* Un-initialize CAMERA driver */
-	ret = CAMERAdrv->Uninitialize();
-	if (ret != ARM_DRIVER_OK)
+	ret2 = CAMERAdrv->Uninitialize();
+	if (ret2 != ARM_DRIVER_OK)
     {
 		DEBUG_PRINTF("\r\n Error: CAMERA Uninitialize failed.\r\n");
     }
 error_uninitialize_dphy:
 	/* Un-initialize MIPI DSI Master DPHY driver */
-	ret = DPHYmaster->Uninitialize();
-	if (ret != ARM_DRIVER_OK)
+	ret2 = DPHYmaster->Uninitialize();
+	if (ret2 != ARM_DRIVER_OK)
 	{
 		DEBUG_PRINTF("\r\n Error: MIPI DSI DPHY Master Uninitialize failed.\r\n");
 	}
@@ -221,26 +221,26 @@ int32_t camera_start(uint32_t mode, uint8_t* buffer)
 error_poweroff_camera:
 #if 0
 	/* Power off CAMERA peripheral */
-	ret = CAMERAdrv->PowerControl(ARM_POWER_OFF);
+	ret2 = CAMERAdrv->PowerControl(ARM_POWER_OFF);
 	if (ret != ARM_DRIVER_OK)
     {
 		DEBUG_PRINTF("\r\n Error: CAMERA Power OFF failed.\r\n");
     }
 	/* Power off MIPI DSI Master DPHY*/
-	ret = DPHYmaster->PowerControl(ARM_POWER_OFF);
-	if (ret != ARM_DRIVER_OK)
+	ret2 = DPHYmaster->PowerControl(ARM_POWER_OFF);
+	if (ret2 != ARM_DRIVER_OK)
 	{
         DEBUG_PRINTF("\r\n Error: MIPI DSI DPHY Master Power Off failed.\r\n");
     }
 	/* Un-initialize CAMERA driver */
-	ret = CAMERAdrv->Uninitialize();
-	if (ret != ARM_DRIVER_OK)
+	ret2 = CAMERAdrv->Uninitialize();
+	if (ret2 != ARM_DRIVER_OK)
     {
 		DEBUG_PRINTF("\r\n Error: CAMERA Uninitialize failed.\r\n");
     }
 	/* Un-initialize MIPI DSI Master DPHY driver */
-	ret = DPHYmaster->Uninitialize();
-	if (ret != ARM_DRIVER_OK)
+	ret2 = DPHYmaster->Uninitialize();
+	if (ret2 != ARM_DRIVER_OK)
 	{
 		DEBUG_PRINTF("\r\n Error: MIPI DSI DPHY Master Uninitialize failed.\r\n");
 	}
