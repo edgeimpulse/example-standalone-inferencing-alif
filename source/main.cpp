@@ -92,19 +92,17 @@ int main()
     // Setup Pin-Mux and Pad Control registers
     SetupLEDs();
 
-	int cinit = camera_init(raw_image);
-	if (cinit != 0) {
-		// Retry init
-		camera_init(raw_image);
-		if (cinit != 0) {
-			while(1) {
-				Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
-				ei_sleep(300);
-				Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_HIGH);
-				ei_sleep(300);
-			}
-		}
-	}
+   	int32_t cinit = camera_init(raw_image);
+   	if (cinit != 0)
+   	{
+   		cinit = camera_init(raw_image);
+   	   	if (cinit != 0)
+   	   	{
+   	   		cinit = camera_init(raw_image);
+   	   	   	if (cinit != 0)
+   	   	   		while (1);
+   	   	}
+    }
 	ei_printf("Camera initialized... \n");
 
     while (1)
