@@ -1,5 +1,6 @@
 #comment if you want to commit your model
-# source/edge-impulse-sdk
+source/edge-impulse-sdk
+source/firmware-sdk
 # source/model-parameters/*
 # source/tflite-model/*
 # source/CMakeLists.txt
@@ -7,6 +8,7 @@
 # IDE related
 .vscode
 .idea
+.DS_Store
 
 # Downloaded files
 resources_downloaded

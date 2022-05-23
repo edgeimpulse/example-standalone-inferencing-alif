@@ -113,6 +113,8 @@ SECTIONS
     *(*tensor_data*)
     *(*raw_image)
     *(*rgb_image)
+    *(*mbedtls*)
+    *(*twiddle*)
 
     /* Uncomment below if model doesn't fit */
     /* *(*tensor_arena*) */
