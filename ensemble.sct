@@ -3,17 +3,18 @@
 ; ***       Scatter-Loading Description File                ***
 ; *************************************************************
 
-LOAD_REGION_MAIN       0x80000000 NOCOMPRESS                 
+LOAD_REGION_MAIN       0x00000000 NOCOMPRESS                 
 {
     ;-----------------------------------------------------
     ; Code region
     ;-----------------------------------------------------
-    rom.bin         0x80000000	0x00040000
+    rom.bin         +0	0x00040000
     {
         *.o (RESET, +First)
         * (InRoot$$Sections)
 
         .ANY (+RO-CODE)
+        * (:gdef:mpu_table_hp)
     }
 
     ; max ANY is what's left after stack and heap
@@ -49,11 +50,11 @@ LOAD_REGION_MAIN       0x80000000 NOCOMPRESS
     }
 }
 
-LOAD_REGION_PARTITION 0x8057F000 0x1000
-{
-	RESERVED +0 FILL 0 (0x1000 - 16) {
-	}
-	ATOC (0x8057F000 + 0x1000 - 16) 16 {
-		*(:gdef:__mram_atoc)
-	}
-}
+;LOAD_REGION_PARTITION 0x8057F000 0x1000
+;{
+;	RESERVED +0 FILL 0 (0x1000 - 16) {
+;	}
+;	ATOC (0x8057F000 + 0x1000 - 16) 16 {
+;		*(:gdef:__mram_atoc)
+;	}
+;}

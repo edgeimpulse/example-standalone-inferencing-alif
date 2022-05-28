@@ -46,6 +46,14 @@
 #endif
 
 
+const ARM_MPU_Region_t mpu_table_hp[] = {
+    {
+  /* Low Power Peripheral Regions */
+        .RBAR = ARM_MPU_RBAR(0x70000000UL, ARM_MPU_SH_NON, 0UL, 1UL, 1UL),
+        .RLAR = ARM_MPU_RLAR(0x72FFFFFFUL, 0UL)
+    },
+};
+
 /* Public functions ----------------------------------------------------------*/
 /**
  * @brief  Load the MPU regions from the given table
@@ -56,19 +64,11 @@
  */
 static void MPU_Load_Regions(void)
 {
-    static const ARM_MPU_Region_t table[] = {
-         {
-	    /* Low Power Peripheral Regions */
-            .RBAR = ARM_MPU_RBAR(0x70000000UL, ARM_MPU_SH_NON, 0UL, 1UL, 1UL),
-            .RLAR = ARM_MPU_RLAR(0x72FFFFFFUL, 0UL)
-        },
-    };
-
     /* Define the possible Attribute regions */
      ARM_MPU_SetMemAttr(0UL, ARM_MPU_ATTR_DEVICE); /* Attr0, Device Memory */
 
     /* Load the regions from the table */
-    ARM_MPU_Load(0U, &table[0], 1U);
+    ARM_MPU_Load(0U, &mpu_table_hp[0], 1U);
 }
 
 /**

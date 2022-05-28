@@ -95,13 +95,7 @@ int main()
    	int32_t cinit = camera_init(raw_image);
    	if (cinit != 0)
    	{
-   		cinit = camera_init(raw_image);
-   	   	if (cinit != 0)
-   	   	{
-   	   		cinit = camera_init(raw_image);
-   	   	   	if (cinit != 0)
-   	   	   		while (1);
-   	   	}
+   		while (1);
     }
 	ei_printf("Camera initialized... \n");
 

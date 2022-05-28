@@ -365,7 +365,7 @@ int32_t camera_sensor_i2c_write(CAMERA_SENSOR_SLAVE_I2C_CONFIG *i2c,
       break;
 
     /* sleep or wait for millisecond depending on RTOS availability. */
-    DELAY_mSEC(1);
+    DELAY_mSEC(5);
   }
 
   /* i3c module failed to respond? de-init i3c driver and return error. */
@@ -538,7 +538,7 @@ int32_t camera_sensor_i2c_read(CAMERA_SENSOR_SLAVE_I2C_CONFIG *i2c,
       break;
 
     /* sleep or wait for millisecond depending on RTOS availability. */
-    DELAY_mSEC(1);
+    DELAY_mSEC(5);
   }
 
   /* i3c module failed to respond? de-init i3c driver and return error. */
@@ -574,7 +574,7 @@ int32_t camera_sensor_i2c_read(CAMERA_SENSOR_SLAVE_I2C_CONFIG *i2c,
       break;
 
     /* sleep or wait for millisecond depending on RTOS availability. */
-    DELAY_mSEC(1);
+    DELAY_mSEC(5);
   }
 
   /* i3c module failed to respond? de-init i3c driver and return error. */

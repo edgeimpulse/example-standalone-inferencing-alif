@@ -63,7 +63,6 @@ add_compile_options(
 
 # Arch compile options:
 add_compile_options(
-    -O3
     -mthumb
     -mcpu=${CPU_NAME}
     -mfloat-abi=${FLOAT_ABI}
