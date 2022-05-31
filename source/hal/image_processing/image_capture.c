@@ -66,7 +66,6 @@ typedef enum {
 
 static volatile uint32_t camera_event_flags;
 static volatile uint32_t actual_events;
-static uint8_t *framebuffer_pool;
 
 static void camera_callback(uint32_t event)
 {
@@ -126,7 +125,7 @@ static void setup_pinmux()
 	PINMUX_Config(PORT_NUMBER_2, PIN_NUMBER_7, PINMUX_ALTERNATE_FUNCTION_6);
 }
 
-int32_t camera_init(uint8_t *buffer)
+int32_t camera_init()
 {
 	ARM_CAMERA_RESOLUTION camera_resolution = CAMERA_RESOLUTION_560x560;
 
@@ -175,7 +174,6 @@ int32_t camera_init(uint8_t *buffer)
 		DEBUG_PRINTF("\r\n Error: CAMERA SENSOR Configuration failed.\r\n");
 		goto error_poweroff_camera;
 	}
-    framebuffer_pool = buffer;
 	return ARM_DRIVER_OK;
     
 error_poweroff_camera:
@@ -209,10 +207,10 @@ error_uninitialize_dphy:
 	return ret;
 };
 
-int32_t camera_start(uint32_t mode)
+int32_t camera_start(uint32_t mode, uint8_t* buffer)
 {
     camera_event_flags = actual_events = 0;
-	int32_t ret2, ret = CAMERAdrv->CaptureFrame(framebuffer_pool);
+	int32_t ret = CAMERAdrv->CaptureFrame(buffer);
 	if (ret != ARM_DRIVER_OK)
 	{
 		DEBUG_PRINTF("\r\n Error: CAMERA Capture Frame failed.\r\n");
