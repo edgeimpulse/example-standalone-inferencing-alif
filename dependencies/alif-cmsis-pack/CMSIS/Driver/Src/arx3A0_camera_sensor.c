@@ -332,8 +332,6 @@ int32_t ARX3A0_Start(void)
 	if(ret != ARM_DRIVER_OK)
 		return ARM_DRIVER_ERROR;
 
-	ARX3A0_DELAY_mSEC(1000);
-
 	return ARM_DRIVER_OK;
 }
 
