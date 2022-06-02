@@ -138,13 +138,6 @@ static uint64_t classifier_continuous_features_written = 0;
 
 #if (EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_MICROPHONE)
 static RecognizeEvents *avg_scores = NULL;
-const ei_model_performance_calibration_t ei_calibration = {
-    1,
-    (int32_t)(EI_CLASSIFIER_RAW_SAMPLE_COUNT/EI_CLASSIFIER_FREQUENCY)*1000, /* Model window */
-    0.8f, /* Default threshold */
-    (int32_t)(EI_CLASSIFIER_RAW_SAMPLE_COUNT/EI_CLASSIFIER_FREQUENCY)*500, /* Half of model window */
-    0   /* Don't use flags */
-};
 #endif
 
 /* Private functions ------------------------------------------------------- */
@@ -187,7 +180,7 @@ extern "C" void run_classifier_deinit(void)
  * @return     The ei impulse error.
  */
 extern "C" EI_IMPULSE_ERROR run_classifier_continuous(signal_t *signal, ei_impulse_result_t *result,
-                                                      bool debug = false)
+                                                      bool debug = false, bool enable_maf = true)
 {
     static ei::matrix_t static_features_matrix(1, EI_CLASSIFIER_NN_INPUT_FRAME_SIZE);
     if (!static_features_matrix.buffer) {
@@ -302,7 +295,7 @@ extern "C" EI_IMPULSE_ERROR run_classifier_continuous(signal_t *signal, ei_impul
         ei_impulse_error = run_inference(&classify_matrix, result, debug);
 
 #if (EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_MICROPHONE)
-        if((void *)avg_scores  != NULL) {
+        if((void *)avg_scores  != NULL && enable_maf == true) {
             result->label_detected = avg_scores->trigger(result->classification);
         }
 #endif

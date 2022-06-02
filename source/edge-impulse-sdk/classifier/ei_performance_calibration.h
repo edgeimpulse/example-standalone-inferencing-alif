@@ -184,7 +184,6 @@ private:
     uint32_t _suppression_samples;
     uint32_t _suppression_count;
     uint32_t _suppression_flags;
-    uint32_t _minimum_count;
     uint32_t _n_labels;
     float *_score_array;
     uint32_t _score_idx;

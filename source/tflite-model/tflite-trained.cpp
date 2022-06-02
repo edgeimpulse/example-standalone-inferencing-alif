@@ -19,37 +19,4 @@
  * SOFTWARE.
  */
 
-#ifndef _EI_CLASSIFIER_MODEL_VARIABLES_H_
-#define _EI_CLASSIFIER_MODEL_VARIABLES_H_
-
-#include <stdint.h>
-#include "model_metadata.h"
-#include "edge-impulse-sdk/classifier/ei_model_types.h"
-
-const char* ei_classifier_inferencing_categories[] = { "no", "noise", "yes" };
-
-uint8_t ei_dsp_config_971889_axes[] = { 0 };
-const uint32_t ei_dsp_config_971889_axes_size = 1;
-ei_dsp_config_mfcc_t ei_dsp_config_971889 = {
-    2,
-    1,
-    13,
-    0.02f,
-    0.02f,
-    32,
-    256,
-    101,
-    300,
-    0,
-    0.98f,
-    1
-};
-const ei_model_performance_calibration_t ei_calibration = {
-    1, /* integer version number */
-    (int32_t)(EI_CLASSIFIER_RAW_SAMPLE_COUNT / ((EI_CLASSIFIER_FREQUENCY > 0) ? EI_CLASSIFIER_FREQUENCY : 1)) * 1000, /* Model window */
-    0.8f, /* Default threshold */
-    (int32_t)(EI_CLASSIFIER_RAW_SAMPLE_COUNT / ((EI_CLASSIFIER_FREQUENCY > 0) ? EI_CLASSIFIER_FREQUENCY : 1)) * 500, /* Half of model window */
-    0   /* Don't use flags */
-};
-
-#endif // _EI_CLASSIFIER_MODEL_METADATA_H_
+// Empty on purpose
