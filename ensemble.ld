@@ -49,6 +49,8 @@ __ROM_SIZE = 0x00040000;
  -----------------------------------------------------------------------------*/
 __RAM_BASE = 0x20000000;
 __RAM_SIZE = 0x00040000;
+/* For HP targets, swap this line with above to access the rest of DTCM space */
+/* __RAM_SIZE = 0x00100000; */
 
 __SRAM_BASE = 0x02000000;
 __SRAM_SIZE = 0x00400000;
@@ -111,6 +113,8 @@ SECTIONS
     /* Put models in SRAM b/c U55 can't use TCM, and M55 doesn't touch it (it's RO) */
     *(*trained_tflite)
     *(*tensor_data*)
+    *(*mbedtls*)
+    *(*twiddle*)
 
     /* Uncomment below if model doesn't fit */
     /* *(*tensor_arena*) */

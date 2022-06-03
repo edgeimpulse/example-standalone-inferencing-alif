@@ -21,110 +21,73 @@
  */
 
 #include "../ei_classifier_porting.h"
-#if EI_PORTING_SYNAPTICS == 1
+#if EI_PORTING_ESPRESSIF == 1
 
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
+// Include FreeRTOS for delay
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
-#include "mcu.h"
-#include "uart_drv.h"
+// for millis and micros
+#include "esp_timer.h"
 
-extern "C" void *os_Malloc(unsigned long);
-extern "C" int os_Free(void *);
-extern "C" uint64_t get_time_ms(void);
-extern void print_out(const char *format, va_list args);
+#define EI_WEAK_FN __attribute__((weak))
 
-__attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled() {
+EI_WEAK_FN EI_IMPULSE_ERROR ei_run_impulse_check_canceled() {
     return EI_IMPULSE_OK;
 }
 
-/**
- * Cancelable sleep, can be triggered with signal from other thread
- */
-__attribute__((weak)) EI_IMPULSE_ERROR ei_sleep(int32_t time_ms) {
-
-    os_TaskSleep(time_ms);
-
+EI_WEAK_FN EI_IMPULSE_ERROR ei_sleep(int32_t time_ms) {
+    vTaskDelay(time_ms / portTICK_RATE_MS);
     return EI_IMPULSE_OK;
 }
 
 uint64_t ei_read_timer_ms() {
-
-    return get_time_ms();
+    return esp_timer_get_time()/1000;
 }
 
 uint64_t ei_read_timer_us() {
-
-    return get_time_ms() * 1000;
+    return esp_timer_get_time();
 }
 
+void ei_putchar(char c)
+{
+    /* Send char to serial output */
+    putchar(c);
+}
+
+/**
+ *  Printf function uses vsnprintf and output using USB Serial
+ */
 __attribute__((weak)) void ei_printf(const char *format, ...) {
+    static char print_buf[1024] = { 0 };
+
     va_list args;
     va_start(args, format);
-    print_out(format, args);
+    int r = vsnprintf(print_buf, sizeof(print_buf), format, args);
     va_end(args);
-}
 
-
-__attribute__((weak)) void ei_putchar(char c) {
-    uart_putchar(c);
-}
-
-__attribute__((weak)) void ei_printf_float(float f) {
-    float n = f;
-
-    static double PRECISION = 0.00001;
-    static int MAX_NUMBER_STRING_SIZE = 32;
-
-    char s[MAX_NUMBER_STRING_SIZE];
-
-    if (n == 0.0) {
-        ei_printf("0.00000");
-    } else {
-        int digit, m;  //, m1;
-        char *c = s;
-        int neg = (n < 0);
-        if (neg) {
-            n = -n;
-        }
-        // calculate magnitude
-        m = log10(n);
-        if (neg) {
-            *(c++) = '-';
-        }
-        if (m < 1.0) {
-            m = 0;
-        }
-        // convert the number
-        while (n > PRECISION || m >= 0) {
-            double weight = pow(10.0, m);
-            if (weight > 0 && !isinf(weight)) {
-                digit = floor(n / weight);
-                n -= (digit * weight);
-                *(c++) = '0' + digit;
-            }
-            if (m == 0 && n > 0) {
-                *(c++) = '.';
-            }
-            m--;
-        }
-        *(c) = '\0';
-        ei_printf("%s", s);
+    if (r > 0) {
+       printf(print_buf);
     }
 }
 
+__attribute__((weak)) void ei_printf_float(float f) {
+    ei_printf("%f", f);
+}
+
 __attribute__((weak)) void *ei_malloc(size_t size) {
-    return os_Malloc(size);
+    return malloc(size);
 }
 
 __attribute__((weak)) void *ei_calloc(size_t nitems, size_t size) {
-    return os_Malloc(nitems * size);
+    return calloc(nitems, size);
 }
 
 __attribute__((weak)) void ei_free(void *ptr) {
-    os_Free(ptr);
+    free(ptr);
 }
 
 #if defined(__cplusplus) && EI_C_LINKAGE == 1
@@ -134,4 +97,4 @@ __attribute__((weak)) void DebugLog(const char* s) {
     ei_printf("%s", s);
 }
 
-#endif // EI_PORTING_SYNAPTICS == 1
+#endif // EI_PORTING_ESPRESSIF == 1

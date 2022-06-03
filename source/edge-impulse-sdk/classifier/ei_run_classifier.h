@@ -40,6 +40,7 @@
 #endif
 #include "edge-impulse-sdk/porting/ei_classifier_porting.h"
 #include "model-parameters/dsp_blocks.h"
+#include "ei_performance_calibration.h"
 
 #if (EI_CLASSIFIER_INFERENCING_ENGINE == EI_CLASSIFIER_TFLITE) && (EI_CLASSIFIER_COMPILED != 1)
 #include <cmath>
@@ -127,11 +128,6 @@ static void calc_cepstral_mean_and_var_normalization_mfe(ei_matrix *matrix, void
 static void calc_cepstral_mean_and_var_normalization_spectrogram(ei_matrix *matrix, void *config_ptr);
 
 /* Private variables ------------------------------------------------------- */
-#if EI_CLASSIFIER_LABEL_COUNT > 0
-ei_impulse_maf classifier_maf[EI_CLASSIFIER_LABEL_COUNT] = {{0}};
-#else
-ei_impulse_maf classifier_maf[0];
-#endif
 
 // old models don't have this, add this here
 #ifndef EI_CLASSIFIER_TFLITE_OUTPUT_DATA_TENSOR
@@ -140,47 +136,11 @@ ei_impulse_maf classifier_maf[0];
 
 static uint64_t classifier_continuous_features_written = 0;
 
-/* Private functions ------------------------------------------------------- */
-
-/**
- * @brief      Run a moving average filter over the classification result.
- *             The size of the filter determines the response of the filter.
- *             It is now set to the number of slices per window.
- * @param      maf             Pointer to maf object
- * @param[in]  classification  Classification output on current slice
- *
- * @return     Averaged classification value
- */
-extern "C" float run_moving_average_filter(ei_impulse_maf *maf, float classification)
-{
-    maf->running_sum -= maf->maf_buffer[maf->buf_idx];
-    maf->running_sum += classification;
-    maf->maf_buffer[maf->buf_idx] = classification;
-
-    if (++maf->buf_idx >= (EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW >> 1)) {
-        maf->buf_idx = 0;
-    }
-
-#if (EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW > 1)
-    return maf->running_sum / (float)(EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW >> 1);
-#else
-    return maf->running_sum;
+#if (EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_MICROPHONE)
+static RecognizeEvents *avg_scores = NULL;
 #endif
-}
 
-/**
- * @brief      Reset all values in filter to 0
- *
- * @param      maf   Pointer to maf object
- */
-static void clear_moving_average_filter(ei_impulse_maf *maf)
-{
-    maf->running_sum = 0;
-
-    for (int i = 0; i < (EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW >> 1); i++) {
-        maf->maf_buffer[i] = 0.f;
-    }
-}
+/* Private functions ------------------------------------------------------- */
 
 /**
  * @brief      Init static vars
@@ -190,9 +150,23 @@ extern "C" void run_classifier_init(void)
     classifier_continuous_features_written = 0;
     ei_dsp_clear_continuous_audio_state();
 
-    for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-        clear_moving_average_filter(&classifier_maf[ix]);
+#if (EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_MICROPHONE)
+    const ei_model_performance_calibration_t *calibration = &ei_calibration;
+
+    if(calibration != NULL) {
+        avg_scores = new RecognizeEvents(calibration,
+            EI_CLASSIFIER_LABEL_COUNT, EI_CLASSIFIER_SLICE_SIZE, EI_CLASSIFIER_INTERVAL_MS);
     }
+#endif
+}
+
+extern "C" void run_classifier_deinit(void)
+{
+#if (EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_MICROPHONE)
+    if((void *)avg_scores != NULL) {
+        delete avg_scores;
+    }
+#endif
 }
 
 /**
@@ -202,7 +176,6 @@ extern "C" void run_classifier_init(void)
  * @param      signal  Sample data
  * @param      result  Classification output
  * @param[in]  debug   Debug output enable boot
- * @param      enable_maf Enables the moving average filter
  *
  * @return     The ei impulse error.
  */
@@ -321,14 +294,11 @@ extern "C" EI_IMPULSE_ERROR run_classifier_continuous(signal_t *signal, ei_impul
 #endif
         ei_impulse_error = run_inference(&classify_matrix, result, debug);
 
-        if (enable_maf) {
-            for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-    #if EI_CLASSIFIER_OBJECT_DETECTION != 1
-                result->classification[ix].value =
-                    run_moving_average_filter(&classifier_maf[ix], result->classification[ix].value);
-    #endif
-            }
+#if (EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_MICROPHONE)
+        if((void *)avg_scores  != NULL && enable_maf == true) {
+            result->label_detected = avg_scores->trigger(result->classification);
         }
+#endif
     }
     return ei_impulse_error;
 }
@@ -1379,7 +1349,7 @@ extern "C" void get_data(int8_t *in_buf_0, uint16_t in_buf_0_dim_0, uint16_t in_
         memcpy(in_buf_0, processed_features, EI_CLASSIFIER_NN_INPUT_FRAME_SIZE);
     }
 
-#endif // EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_ACCELEROMETER
+#endif
 }
 
 extern "C" void post_process(int8_t *out_buf_0, int8_t *out_buf_1)

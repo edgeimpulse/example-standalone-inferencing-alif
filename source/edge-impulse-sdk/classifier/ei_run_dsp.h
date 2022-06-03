@@ -152,50 +152,7 @@ __attribute__((unused)) int extract_spectral_analysis_features(signal_t *signal,
     return EIDSP_OK;
 }
 
-__attribute__((unused)) matrix_i16_t *create_edges_matrix(ei_dsp_config_spectral_analysis_t config, const float sampling_freq)
-{
-    // the spectral edges that we want to calculate
-    static matrix_i16_t edges_matrix_in(64, 1);
-    static bool matrix_created = false;
-    size_t edge_matrix_ix = 0;
 
-    if(matrix_created == false) {
-
-        char spectral_str[128] = { 0 };
-        if (strlen(config.spectral_power_edges) > sizeof(spectral_str) - 1) {
-            return NULL;
-        }
-        memcpy(spectral_str, config.spectral_power_edges, strlen(config.spectral_power_edges));
-
-        // convert spectral_power_edges (string) into float array
-        char *spectral_ptr = spectral_str;
-        while (spectral_ptr != NULL) {
-            while((*spectral_ptr) == ' ') {
-                spectral_ptr++;
-            }
-
-            float edge = (atof(spectral_ptr) / (float)(sampling_freq/2.f));
-            numpy::float_to_int16(&edge, &edges_matrix_in.buffer[edge_matrix_ix++], 1);
-
-            // find next (spectral) delimiter (or '\0' character)
-            while((*spectral_ptr != ',')) {
-                spectral_ptr++;
-                if (*spectral_ptr == '\0') break;
-            }
-
-            if (*spectral_ptr == '\0') {
-                spectral_ptr = NULL;
-            }
-            else  {
-                spectral_ptr++;
-            }
-        }
-        edges_matrix_in.rows = edge_matrix_ix;
-        matrix_created = true;
-    }
-
-    return &edges_matrix_in;
-}
 
 __attribute__((unused)) int extract_raw_features(signal_t *signal, matrix_t *output_matrix, void *config_ptr, const float frequency) {
     ei_dsp_config_raw_t config = *((ei_dsp_config_raw_t*)config_ptr);
@@ -226,6 +183,7 @@ __attribute__((unused)) int extract_raw_features(signal_t *signal, matrix_t *out
 
     return EIDSP_OK;
 }
+
 
 __attribute__((unused)) int extract_flatten_features(signal_t *signal, matrix_t *output_matrix, void *config_ptr, const float frequency) {
     ei_dsp_config_flatten_t config = *((ei_dsp_config_flatten_t*)config_ptr);

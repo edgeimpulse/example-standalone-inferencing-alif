@@ -44,21 +44,21 @@
 #define EI_CLASSIFIER_DATATYPE_FLOAT32           1
 #define EI_CLASSIFIER_DATATYPE_INT8              9
 
-#define EI_CLASSIFIER_PROJECT_ID                 21342
-#define EI_CLASSIFIER_PROJECT_OWNER              "AlexE"
-#define EI_CLASSIFIER_PROJECT_NAME               "Calc-Mentos"
-#define EI_CLASSIFIER_PROJECT_DEPLOY_VERSION     32
-#define EI_CLASSIFIER_NN_INPUT_FRAME_SIZE        76800
-#define EI_CLASSIFIER_RAW_SAMPLE_COUNT           25600
+#define EI_CLASSIFIER_PROJECT_ID                 3
+#define EI_CLASSIFIER_PROJECT_OWNER              "Edge Impulse Inc."
+#define EI_CLASSIFIER_PROJECT_NAME               "Keyword spotting"
+#define EI_CLASSIFIER_PROJECT_DEPLOY_VERSION     46
+#define EI_CLASSIFIER_NN_INPUT_FRAME_SIZE        650
+#define EI_CLASSIFIER_RAW_SAMPLE_COUNT           16000
 #define EI_CLASSIFIER_RAW_SAMPLES_PER_FRAME      1
 #define EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE       (EI_CLASSIFIER_RAW_SAMPLE_COUNT * EI_CLASSIFIER_RAW_SAMPLES_PER_FRAME)
-#define EI_CLASSIFIER_INPUT_WIDTH                160
-#define EI_CLASSIFIER_INPUT_HEIGHT               160
-#define EI_CLASSIFIER_INPUT_FRAMES               1
-#define EI_CLASSIFIER_INTERVAL_MS                1
-#define EI_CLASSIFIER_LABEL_COUNT                2
+#define EI_CLASSIFIER_INPUT_WIDTH                0
+#define EI_CLASSIFIER_INPUT_HEIGHT               0
+#define EI_CLASSIFIER_INPUT_FRAMES               0
+#define EI_CLASSIFIER_INTERVAL_MS                0.0625
+#define EI_CLASSIFIER_LABEL_COUNT                3
 #define EI_CLASSIFIER_HAS_ANOMALY                0
-#define EI_CLASSIFIER_FREQUENCY                  0
+#define EI_CLASSIFIER_FREQUENCY                  16000
 #define EI_CLASSIFIER_USE_QUANTIZED_DSP_BLOCK    0
 #define EI_CLASSIFIER_HAS_MODEL_VARIABLES        1
 
@@ -69,8 +69,8 @@
 
 #define EI_CLASSIFIER_TFLITE_INPUT_DATATYPE         EI_CLASSIFIER_DATATYPE_INT8
 #define EI_CLASSIFIER_TFLITE_INPUT_QUANTIZED        1
-#define EI_CLASSIFIER_TFLITE_INPUT_SCALE            0.003860053839161992
-#define EI_CLASSIFIER_TFLITE_INPUT_ZEROPOINT        -128
+#define EI_CLASSIFIER_TFLITE_INPUT_SCALE            0.04737618938088417
+#define EI_CLASSIFIER_TFLITE_INPUT_ZEROPOINT        19
 #define EI_CLASSIFIER_TFLITE_OUTPUT_DATATYPE        EI_CLASSIFIER_DATATYPE_INT8
 #define EI_CLASSIFIER_TFLITE_OUTPUT_QUANTIZED       1
 #define EI_CLASSIFIER_TFLITE_OUTPUT_SCALE           0.00390625
@@ -86,17 +86,17 @@
 
 
 #define EI_CLASSIFIER_HAS_FFT_INFO               1
-#define EI_CLASSIFIER_LOAD_FFT_32                0
+#define EI_CLASSIFIER_LOAD_FFT_32                1
 #define EI_CLASSIFIER_LOAD_FFT_64                0
 #define EI_CLASSIFIER_LOAD_FFT_128               0
-#define EI_CLASSIFIER_LOAD_FFT_256               0
+#define EI_CLASSIFIER_LOAD_FFT_256               1
 #define EI_CLASSIFIER_LOAD_FFT_512               0
 #define EI_CLASSIFIER_LOAD_FFT_1024              0
 #define EI_CLASSIFIER_LOAD_FFT_2048              0
 #define EI_CLASSIFIER_LOAD_FFT_4096              0
 
-#define EI_CLASSIFIER_SENSOR                     EI_CLASSIFIER_SENSOR_CAMERA
-#define EI_CLASSIFIER_FUSION_AXES_STRING         "image"
+#define EI_CLASSIFIER_SENSOR                     EI_CLASSIFIER_SENSOR_MICROPHONE
+#define EI_CLASSIFIER_FUSION_AXES_STRING         "audio"
 
 #ifndef EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW
 #define EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW    4
@@ -200,5 +200,11 @@ typedef struct {
     int high_frequency;
     float pre_cof;
 } ei_dsp_config_audio_syntiant_t;
+
+typedef struct {
+    uint16_t implementation_version;
+    int axes;
+    bool scaling;
+} ei_dsp_config_imu_syntiant_t;
 
 #endif // _EI_CLASSIFIER_MODEL_METADATA_H_

@@ -20,21 +20,21 @@
  * SOFTWARE.
  */
 
+/* Includes */
 #include "../ei_classifier_porting.h"
-#if EI_PORTING_SYNAPTICS == 1
+#if EI_PORTING_RENESASRA65 == 1
 
+#include "common_utils.h"
 #include <stdarg.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
+#include "unistd.h"
+#include "peripheral/uart_ep.h"
 #include <math.h>
 
-#include "mcu.h"
-#include "uart_drv.h"
-
-extern "C" void *os_Malloc(unsigned long);
-extern "C" int os_Free(void *);
-extern "C" uint64_t get_time_ms(void);
-extern void print_out(const char *format, va_list args);
+// extern "C" void Serial_Out(char *string, int length);
+extern "C" uint64_t timer_get_ms(void);
+// extern "C" fsp_err_t uart_print_user_msg(uint8_t *p_msg);
 
 __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled() {
     return EI_IMPULSE_OK;
@@ -45,31 +45,37 @@ __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled() {
  */
 __attribute__((weak)) EI_IMPULSE_ERROR ei_sleep(int32_t time_ms) {
 
-    os_TaskSleep(time_ms);
+    uint64_t start_time = ei_read_timer_ms();
+
+    while(start_time + time_ms > ei_read_timer_ms()){};
 
     return EI_IMPULSE_OK;
 }
 
 uint64_t ei_read_timer_ms() {
 
-    return get_time_ms();
+    return timer_get_ms();//Timer_getMs();
 }
 
 uint64_t ei_read_timer_us() {
 
-    return get_time_ms() * 1000;
+    /* TI board hangs when trying to call callback function each micro second */
+    return 0;
 }
 
 __attribute__((weak)) void ei_printf(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    print_out(format, args);
-    va_end(args);
-}
 
+    char buffer[256] = {0};
+    int length;
+    va_list myargs;
+    va_start(myargs, format);
+    length = vsnprintf(buffer, sizeof(buffer), format, myargs);
+    va_end(myargs);
 
-__attribute__((weak)) void ei_putchar(char c) {
-    uart_putchar(c);
+    if (length > 0){
+        uart_print_user_msg((uint8_t *)buffer);
+    }
+    
 }
 
 __attribute__((weak)) void ei_printf_float(float f) {
@@ -81,9 +87,10 @@ __attribute__((weak)) void ei_printf_float(float f) {
     char s[MAX_NUMBER_STRING_SIZE];
 
     if (n == 0.0) {
-        ei_printf("0.00000");
-    } else {
-        int digit, m;  //, m1;
+        strcpy(s, "0");
+    }
+    else {
+        int digit, m;
         char *c = s;
         int neg = (n < 0);
         if (neg) {
@@ -111,20 +118,21 @@ __attribute__((weak)) void ei_printf_float(float f) {
             m--;
         }
         *(c) = '\0';
-        ei_printf("%s", s);
     }
+
+    ei_printf("%s", s);
 }
 
 __attribute__((weak)) void *ei_malloc(size_t size) {
-    return os_Malloc(size);
+    return malloc(size);
 }
 
 __attribute__((weak)) void *ei_calloc(size_t nitems, size_t size) {
-    return os_Malloc(nitems * size);
+    return calloc(nitems, size);
 }
 
 __attribute__((weak)) void ei_free(void *ptr) {
-    os_Free(ptr);
+    free(ptr);
 }
 
 #if defined(__cplusplus) && EI_C_LINKAGE == 1
@@ -134,4 +142,4 @@ __attribute__((weak)) void DebugLog(const char* s) {
     ei_printf("%s", s);
 }
 
-#endif // EI_PORTING_SYNAPTICS == 1
+#endif // EI_PORTING_RENESASRA65 == 1
