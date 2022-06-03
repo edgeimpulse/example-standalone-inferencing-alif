@@ -78,10 +78,11 @@ int main()
 
     /* EXPECTED OUTPUT
     Begin output
-    [  no: 0.17968
-    ,   noise: 0.0351
-    ,   yes: 0.7851
-    ]
+run_classifier returned: 0 (DSP 18710 us., Classification 88 us., Anomaly 0 ms.)
+[  no: 0.98828
+,   noise: 0.00000
+,   yes: 0.01172
+]
     End output
     */
 
