@@ -634,36 +634,6 @@ public:
     }
 
     /**
-     * Scale a q15 matrix in place, per row
-     * @todo Now works for scale values between 0 and 1. Should also work for bigger values.
-     * @param matrix Input matrix (MxN)
-     * @param scale_matrix Scale matrix (Mx1)
-     * @returns 0 if OK
-     */
-    static int scale(matrix_i16_t *matrix, float scale) {
-        if (scale == 1.0f) return EIDSP_OK;
-        else if(scale > 1.0f) return EIDSP_PARAMETER_INVALID;
-
-        EIDSP_i16 scale_i16;
-        float_to_int16(&scale, &scale_i16, 1);
-
-#if EIDSP_USE_CMSIS_DSP
-        const arm_matrix_instance_q15 mi = {(uint16_t)matrix->rows, (uint16_t)matrix->cols, matrix->buffer };
-        arm_matrix_instance_q15 mo = { (uint16_t)matrix->rows, (uint16_t)matrix->cols, matrix->buffer };
-        int status = arm_mat_scale_q15(&mi, scale_i16, 0, &mo);
-        if (status != ARM_MATH_SUCCESS) {
-            return status;
-        }
-#else
-        for (size_t ix = 0; ix < matrix->rows * matrix->cols; ix++) {
-            int32_t prod = (int32_t)matrix->buffer[ix] * scale_i16;
-            matrix->buffer[ix] = saturate((EIDSP_i16)(prod >> 15), 16);
-        }
-#endif
-        return EIDSP_OK;
-    }
-
-    /**
      * Scale a q31 matrix in place, per row
      * @todo Now works for scale values between 0 and 1. Should also work for bigger values.
      * @param matrix Input matrix (MxN)
@@ -773,19 +743,6 @@ public:
     }
 
     /**
-     * Subtract q15 from matrix in place
-     * @param matrix
-     * @param subtraction
-     * @returns 0 if OK
-     */
-    static int subtract(matrix_i16_t *matrix, EIDSP_i16 subtraction) {
-        for (uint32_t ix = 0; ix < matrix->rows * matrix->cols; ix++) {
-            matrix->buffer[ix] -= subtraction;
-        }
-        return EIDSP_OK;
-    }
-
-    /**
      * Add on a matrix in place, per row
      * @param matrix Input matrix (MxN)
      * @param add Scale matrix (Mx1)
@@ -802,32 +759,6 @@ public:
 
         for (size_t row = 0; row < matrix->rows; row++) {
             EI_DSP_MATRIX_B(temp, 1, matrix->cols, matrix->buffer + (row * matrix->cols));
-            int ret = subtract(&temp, subtract_matrix->buffer[row]);
-            if (ret != EIDSP_OK) {
-                EIDSP_ERR(ret);
-            }
-        }
-
-        return EIDSP_OK;
-    }
-
-    /**
-     * Subract subtract_matrix from matrix
-     * @param matrix Input matrix (MxN)
-     * @param add Scale matrix (Mx1)
-     * @returns 0 if OK
-     */
-    static int subtract(matrix_i16_t *matrix, matrix_i16_t *subtract_matrix) {
-        if (matrix->rows != subtract_matrix->rows) {
-            EIDSP_ERR(EIDSP_MATRIX_SIZE_MISMATCH);
-        }
-
-        if (subtract_matrix->cols != 1) {
-            EIDSP_ERR(EIDSP_MATRIX_SIZE_MISMATCH);
-        }
-
-        for (size_t row = 0; row < matrix->rows; row++) {
-            EI_DSP_i16_MATRIX_B(temp, 1, matrix->cols, matrix->buffer + (row * matrix->cols));
             int ret = subtract(&temp, subtract_matrix->buffer[row]);
             if (ret != EIDSP_OK) {
                 EIDSP_ERR(ret);
@@ -871,39 +802,6 @@ public:
     }
 
     /**
-     * Calculate the root mean square of a q15 matrix, one per row
-     * @param matrix Matrix of size (MxN)
-     * @param output_matrix Matrix of size (Mx1)
-     * @returns 0 if OK
-     */
-    static int rms(matrix_i16_t *matrix, matrix_i16_t *output_matrix) {
-        if (matrix->rows != output_matrix->rows) {
-            EIDSP_ERR(EIDSP_MATRIX_SIZE_MISMATCH);
-        }
-
-        if (output_matrix->cols != 1) {
-            EIDSP_ERR(EIDSP_MATRIX_SIZE_MISMATCH);
-        }
-
-        for (size_t row = 0; row < matrix->rows; row++) {
-#if EIDSP_USE_CMSIS_DSP
-            EIDSP_i16 rms_result;
-            arm_rms_q15(matrix->buffer + (row * matrix->cols), matrix->cols, &rms_result);
-            output_matrix->buffer[row] = rms_result;
-#else
-            int64_t sum = 0;
-            for(size_t ix = 0; ix < matrix->cols; ix++) {
-                int32_t v = matrix->buffer[(row * matrix->cols) + ix];
-                sum += (int64_t)abs(v * v);
-            }
-            sqrt_q15(saturate((sum / matrix->cols)>>15, 16UL), &output_matrix->buffer[row]);
-#endif
-        }
-
-        return EIDSP_OK;
-    }
-
-    /**
      * Calculate the mean over a matrix per row
      * @param input_matrix Input matrix (MxN)
      * @param output_matrix Output matrix (Mx1)
@@ -929,38 +827,6 @@ public:
             }
 
             output_matrix->buffer[row] = sum / input_matrix->cols;
-#endif
-        }
-
-        return EIDSP_OK;
-    }
-
-    /**
-     * Calculate the mean over a q15 matrix per row
-     * @param input_matrix Input matrix (MxN)
-     * @param output_matrix Output matrix (Mx1)
-     */
-    static int mean(matrix_i16_t *input_matrix, matrix_i16_t *output_matrix) {
-        if (input_matrix->rows != output_matrix->rows) {
-            EIDSP_ERR(EIDSP_MATRIX_SIZE_MISMATCH);
-        }
-        if (output_matrix->cols != 1) {
-            EIDSP_ERR(EIDSP_MATRIX_SIZE_MISMATCH);
-        }
-
-        for (size_t row = 0; row < input_matrix->rows; row++) {
-#if EIDSP_USE_CMSIS_DSP
-            EIDSP_i16 mean;
-            arm_mean_q15(input_matrix->buffer + (row * input_matrix->cols), input_matrix->cols, &mean);
-            output_matrix->buffer[row] = mean;
-#else
-            int32_t sum = 0.0f;
-
-            for (size_t col = 0; col < input_matrix->cols; col++) {
-                sum += input_matrix->buffer[( row * input_matrix->cols ) + col];
-            }
-
-            output_matrix->buffer[row] = (EIDSP_i16)(sum / input_matrix->cols);
 #endif
         }
 
@@ -1495,45 +1361,6 @@ public:
 
         // step size
         float step = (stop - start) / (number - 1);
-
-        // do steps
-        for (uint32_t ix = 0; ix < number - 1; ix++) {
-            out[ix] = start + ix * step;
-        }
-
-        // last entry always stop
-        out[number - 1] = stop;
-
-        return EIDSP_OK;
-    }
-
-    /**
-     * Return evenly spaced q15 numbers over a specified interval.
-     * Returns num evenly spaced samples, calculated over the interval [start, stop].
-     * The endpoint of the interval can optionally be excluded.
-     *
-     * Based on https://github.com/ntessore/algo/blob/master/linspace.c
-     * Licensed in public domain (see LICENSE in repository above)
-     *
-     * @param start The starting value of the sequence.
-     * @param stop The end value of the sequence.
-     * @param number Number of samples to generate.
-     * @param out Out array, with size `number`
-     * @returns 0 if OK
-     */
-    static int linspace(EIDSP_i16 start, EIDSP_i16 stop, uint32_t number, EIDSP_i16 *out)
-    {
-        if (number < 1 || !out) {
-            EIDSP_ERR(EIDSP_PARAMETER_INVALID);
-        }
-
-        if (number == 1) {
-            out[0] = start;
-            return EIDSP_OK;
-        }
-
-        // step size
-        EIDSP_i16 step = (stop - start) / (number - 1);
 
         // do steps
         for (uint32_t ix = 0; ix < number - 1; ix++) {

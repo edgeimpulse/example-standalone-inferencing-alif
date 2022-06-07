@@ -113,7 +113,9 @@ SECTIONS
     *(*tensor_data*)
     *(*raw_image)
     *(*rgb_image)
-
+    *(.rodata*)
+    *(*arm_*)
+    *(*tflite*)
     /* Uncomment below if model doesn't fit */
     /* *(*tensor_arena*) */
 
@@ -141,7 +143,6 @@ SECTIONS
     *(SORT(.dtors.*))
     *(.dtors)
 
-    *(.rodata*)
 
     KEEP(*(.eh_frame*))
   } > FLASH
