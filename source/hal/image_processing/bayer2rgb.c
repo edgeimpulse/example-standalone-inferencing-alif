@@ -10,9 +10,6 @@
 #include <string.h>
 #include "base_def.h"
 #include "bayer.h"
-#include "delay.h"
-
-#include "Driver_CPI.h"
 #include "image_processing.h"
 
 extern uint8_t  	rgb_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES];

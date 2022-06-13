@@ -108,6 +108,7 @@ SECTIONS
 {
   .sram :
   {
+    . = ALIGN(4);
     /* Put models in SRAM b/c U55 can't use TCM, and M55 doesn't touch it (it's RO) */
     *(*trained_tflite)
     *(*tensor_data*)
@@ -123,6 +124,7 @@ SECTIONS
   
   .text :
   {
+    . = ALIGN(4);
     KEEP(*(.vectors))
     *(.text*)
 

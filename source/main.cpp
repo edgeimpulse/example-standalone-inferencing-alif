@@ -30,6 +30,7 @@
 #include "firmware-sdk-alif/ei_image_lib.h"
 #include "ei_microphone.h"
 #include "ei_run_impulse.h"
+#include "timing.h"
 
 #include <cstdio>
 
@@ -46,6 +47,8 @@ void *__stack_chk_guard = (void *)0xaeaeaeae;
 
 int main()
 {
+    int Init_SysTick();
+
     // System init takes place in Reset function, see irqs.c
 
 #if defined(ARM_NPU)
