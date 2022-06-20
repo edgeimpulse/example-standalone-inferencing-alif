@@ -58,7 +58,10 @@ EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
 
 uint64_t ei_read_timer_us()
 {
-    return Get_SysTick_Cycle_Count() / (EI_CORE_CLOCK_HZ / 1000000);
+    // return Get_SysTick_Cycle_Count() / (EI_CORE_CLOCK_HZ / 1000000);
+    static uint64_t us_count = 0;
+
+    return us_count++;
 }
 
 uint64_t ei_read_timer_ms()

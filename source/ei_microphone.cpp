@@ -31,7 +31,7 @@
 #include "image_processing.h"
 
 extern "C"{
-#include "Driver_SAI.h"
+#include "hal/Driver_SAI.h"
 #include "Driver_PINMUX_AND_PINPAD.h"
 }
 
@@ -318,14 +318,14 @@ int ei_microphone_init(int idx)
         return -1;
     }
 
-//    startup_buffer = (int16_t *)ei_malloc(64000 * sizeof(microphone_sample_t));
-//
-//    if(startup_buffer != NULL) {
-//        micAlif.async_start(startup_buffer, 64000);
-//        micAlif.await_samples();
-//
-//        ei_free(startup_buffer);
-//    }
+   startup_buffer = (int16_t *)ei_malloc(64000 * sizeof(microphone_sample_t));
+
+   if(startup_buffer != NULL) {
+       micAlif.async_start(startup_buffer, 64000);
+       micAlif.await_samples();
+
+       ei_free(startup_buffer);
+   }
 
     return 0;
 
