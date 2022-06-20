@@ -213,56 +213,45 @@ typedef struct _ARM_SAI_STATUS {
   \fn          ARM_DRIVER_VERSION ARM_SAI_GetVersion (void)
   \brief       Get driver version.
   \return      \ref ARM_DRIVER_VERSION
-
   \fn          ARM_SAI_CAPABILITIES ARM_SAI_GetCapabilities (void)
   \brief       Get driver capabilities.
   \return      \ref ARM_SAI_CAPABILITIES
-
   \fn          int32_t ARM_SAI_Initialize (ARM_SAI_SignalEvent_t cb_event)
   \brief       Initialize SAI Interface.
   \param[in]   cb_event  Pointer to \ref ARM_SAI_SignalEvent
   \return      \ref execution_status
-
   \fn          int32_t ARM_SAI_Uninitialize (void)
   \brief       De-initialize SAI Interface.
   \return      \ref execution_status
-
   \fn          int32_t ARM_SAI_PowerControl (ARM_POWER_STATE state)
   \brief       Control SAI Interface Power.
   \param[in]   state  Power state
   \return      \ref execution_status
-
   \fn          int32_t ARM_SAI_Send (const void *data, uint32_t num)
   \brief       Start sending data to SAI transmitter.
   \param[in]   data  Pointer to buffer with data to send to SAI transmitter
   \param[in]   num   Number of data items to send
   \return      \ref execution_status
-
   \fn          int32_t ARM_SAI_Receive (void *data, uint32_t num)
   \brief       Start receiving data from SAI receiver.
   \param[out]  data  Pointer to buffer for data to receive from SAI receiver
   \param[in]   num   Number of data items to receive
   \return      \ref execution_status
-
   \fn          uint32_t ARM_SAI_GetTxCount (void)
   \brief       Get transmitted data count.
   \return      number of data items transmitted
-
   \fn          uint32_t ARM_SAI_GetRxCount (void)
   \brief       Get received data count.
   \return      number of data items received
-
   \fn          int32_t ARM_SAI_Control (uint32_t control, uint32_t arg1, uint32_t arg2)
   \brief       Control SAI Interface.
   \param[in]   control  Operation
   \param[in]   arg1     Argument 1 of operation (optional)
   \param[in]   arg2     Argument 2 of operation (optional)
   \return      common \ref execution_status and driver specific \ref sai_execution_status
-
   \fn          ARM_SAI_STATUS ARM_SAI_GetStatus (void)
   \brief       Get SAI status.
   \return      SAI status \ref ARM_SAI_STATUS
-
   \fn          void ARM_SAI_SignalEvent (uint32_t event)
   \brief       Signal SAI Events.
   \param[in]   event \ref SAI_events notification mask

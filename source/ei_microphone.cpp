@@ -31,7 +31,7 @@
 #include "image_processing.h"
 
 extern "C"{
-#include "hal/Driver_SAI.h"
+#include "Driver_SAI.h"
 #include "Driver_PINMUX_AND_PINPAD.h"
 }
 
