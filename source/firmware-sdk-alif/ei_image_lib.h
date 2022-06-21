@@ -56,4 +56,7 @@ bool ei_camera_start_snapshot_stream(size_t width, size_t height, bool use_max_b
 
 void ei_camera_register_at_snapshot_cmds(ATServer* at);
 
+bool at_take_snapshot(const char **argv, const int argc);
+bool at_snapshot_stream(const char **argv, const int argc);
+
 #endif /* EI_IMAGE_LIB_H */

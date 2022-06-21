@@ -105,6 +105,8 @@ static ei_device_sensor_t sensor_list[] = {
 
 class EiDeviceAlif : public EiDeviceInfo
 {
+private:
+    ei_device_snapshot_resolutions_t snapshot_resolutions[1];
 public:
     bool get_sensor_list(const ei_device_sensor_t **p_sensor_list, size_t *sensor_list_size) override
     {
@@ -122,7 +124,32 @@ public:
             return false;
         }
     }
+    bool get_snapshot_list(const ei_device_snapshot_resolutions_t **resolution_list, size_t *resolution_list_size,
+						   const char **color_depth);
 };
+
+/**
+ * @brief      Create resolution list for snapshot setting
+ *             The studio and daemon require this list
+ * @param      snapshot_list       Place pointer to resolution list
+ * @param      snapshot_list_size  Write number of resolutions here
+ *
+ * @return     False if all went ok
+ */
+bool EiDeviceAlif::get_snapshot_list(const ei_device_snapshot_resolutions_t **snapshot_list, size_t *snapshot_list_size,
+                                         const char **color_depth)
+{
+    snapshot_resolutions[0].width = 96;
+    snapshot_resolutions[0].height = 96;
+    // snapshot_resolutions[1].width = 128;
+    // snapshot_resolutions[1].height = 96;
+
+    *snapshot_list      = snapshot_resolutions;
+    *snapshot_list_size = 1;//EI_DEVICE_N_RESOLUTIONS;
+    *color_depth = "RGB";
+
+    return false;
+}
 
 EiDeviceInfo *EiDeviceInfo::get_device()
 {
