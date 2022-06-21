@@ -8,6 +8,9 @@
 .vscode
 .idea
 
+# OS related
+.DS_Store
+
 # Downloaded files
 resources_downloaded
 
