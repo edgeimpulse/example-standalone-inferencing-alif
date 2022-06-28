@@ -102,11 +102,12 @@ static ei_device_sensor_t sensor_list[] = {
     }
 };
 
+#define EI_DEVICE_N_RESOLUTIONS
 
 class EiDeviceAlif : public EiDeviceInfo
 {
 private:
-    ei_device_snapshot_resolutions_t snapshot_resolutions[1];
+    ei_device_snapshot_resolutions_t snapshot_resolutions[EI_DEVICE_N_RESOLUTIONS];
 public:
     bool get_sensor_list(const ei_device_sensor_t **p_sensor_list, size_t *sensor_list_size) override
     {
@@ -139,13 +140,13 @@ public:
 bool EiDeviceAlif::get_snapshot_list(const ei_device_snapshot_resolutions_t **snapshot_list, size_t *snapshot_list_size,
                                          const char **color_depth)
 {
-    snapshot_resolutions[0].width = 96;
-    snapshot_resolutions[0].height = 96;
-    // snapshot_resolutions[1].width = 128;
-    // snapshot_resolutions[1].height = 96;
+    snapshot_resolutions[0].width = 32;
+    snapshot_resolutions[0].height = 32;
+    snapshot_resolutions[1].width = 96;
+    snapshot_resolutions[1].height = 96;
 
     *snapshot_list      = snapshot_resolutions;
-    *snapshot_list_size = 1;//EI_DEVICE_N_RESOLUTIONS;
+    *snapshot_list_size = EI_DEVICE_N_RESOLUTIONS;
     *color_depth = "RGB";
 
     return false;
