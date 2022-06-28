@@ -333,14 +333,14 @@ int ei_microphone_init(void)
         return -1;
     }
 
-    startup_buffer = (int16_t *)ei_malloc(64000 * sizeof(microphone_sample_t));
+    // startup_buffer = (int16_t *)ei_malloc(64000 * sizeof(microphone_sample_t));
 
-    if(startup_buffer != NULL) {
-        micAlif.async_start(startup_buffer, 64000);
-        micAlif.await_samples();
+    // if(startup_buffer != NULL) {
+    //     micAlif.async_start(startup_buffer, 64000);
+    //     micAlif.await_samples();
 
-        ei_free(startup_buffer);
-    }
+    //     ei_free(startup_buffer);
+    // }
 
     return 0;
 
