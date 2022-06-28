@@ -38,7 +38,7 @@
 #ifndef __DRIVER_I2S_H
 #define __DRIVER_I2S_H
 /* Includes ------------------------------------------------------------------*/
-#include <Driver_SAI.h>
+#include "Driver_SAI.h"
 #include "RTE_Device.h"
 #include "RTE_Components.h"
 #include CMSIS_device_header
@@ -74,6 +74,9 @@ extern "C"
 
 #define I2S_CLK_38P4MHZ          38400000.0   /*!< I2S 38.4Mhz Input Clock Source */
 #define I2S_CLK_160MHZ           160000000.0  /*!< I2S 160Mhz Input Clock Source */
+
+#define I2S_CLKREG_CLKAON_Pos   20U                          /* I2S CLKREG.DIV: Clock Divider */
+#define I2S_CLKREG_CLKAON_Msk   (0x1UL << I2S_CLKREG_CLKAON_Pos)
 
 /* Register fields and masks */
 #define I2S_IER_IEN_Pos          0U                          /* I2S IER.IEN: Global Enable */
@@ -178,6 +181,7 @@ typedef enum {
 	I2S_FLAG_CLKSRC_ENABLED   = (1U << 0),      /*!< I2S ClockSource Status */
 	I2S_FLAG_DRV_INIT_DONE    = (1U << 1),      /*!< I2S Driver is Initialized */
 	I2S_FLAG_DRV_CONFIG_DONE  = (1U << 2),      /*!< I2S Driver is Configured */
+	I2S_FLAG_DRV_MONO_MODE    = (1U << 3),      /*!< I2S Driver in Mono Mode */
 } I2S_FLAG_Type;
 
 typedef enum {

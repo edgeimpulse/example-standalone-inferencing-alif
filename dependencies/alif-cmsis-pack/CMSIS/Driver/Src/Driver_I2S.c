@@ -4,13 +4,13 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
    - Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
+	 notice, this list of conditions and the following disclaimer.
    - Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
+	 notice, this list of conditions and the following disclaimer in the
+	 documentation and/or other materials provided with the distribution.
    - Neither the name of ALIF SEMICONDUCTOR nor the names of its contributors
-     may be used to endorse or promote products derived from this software
-     without specific prior written permission.
+	 may be used to endorse or promote products derived from this software
+	 without specific prior written permission.
    *
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -59,11 +59,11 @@ static const ARM_DRIVER_VERSION DriverVersion = {
 
 #if (RTE_I2S0)
 static I2S_CONFIG_INFO I2S0_CONFIG = {
-    .wss_len         = RTE_I2S0_WSS_CLOCK_CYCLES,
-    .sclkg           = RTE_I2S0_SCLKG_CLOCK_CYCLES,
-    .clk_source      = RTE_I2S0_CLK_SOURCE,
-    .rx_fifo_trg_lvl = RTE_I2S0_RX_TRIG_LVL,
-    .tx_fifo_trg_lvl = RTE_I2S0_TX_TRIG_LVL,
+	.wss_len         = RTE_I2S0_WSS_CLOCK_CYCLES,
+	.sclkg           = RTE_I2S0_SCLKG_CLOCK_CYCLES,
+	.clk_source      = RTE_I2S0_CLK_SOURCE,
+	.rx_fifo_trg_lvl = RTE_I2S0_RX_TRIG_LVL,
+	.tx_fifo_trg_lvl = RTE_I2S0_TX_TRIG_LVL,
 };
 
 static I2S_DRV_INFO I2S0 = {
@@ -79,11 +79,11 @@ static I2S_DRV_INFO I2S0 = {
 #endif //RTE_I2S0
 #if (RTE_I2S1)
 static I2S_CONFIG_INFO I2S1_CONFIG = {
-    .wss_len         = RTE_I2S1_WSS_CLOCK_CYCLES,
-    .sclkg           = RTE_I2S1_SCLKG_CLOCK_CYCLES,
-    .clk_source      = RTE_I2S1_CLK_SOURCE,
-    .rx_fifo_trg_lvl = RTE_I2S1_RX_TRIG_LVL,
-    .tx_fifo_trg_lvl = RTE_I2S1_TX_TRIG_LVL,
+	.wss_len         = RTE_I2S1_WSS_CLOCK_CYCLES,
+	.sclkg           = RTE_I2S1_SCLKG_CLOCK_CYCLES,
+	.clk_source      = RTE_I2S1_CLK_SOURCE,
+	.rx_fifo_trg_lvl = RTE_I2S1_RX_TRIG_LVL,
+	.tx_fifo_trg_lvl = RTE_I2S1_TX_TRIG_LVL,
 };
 
 static I2S_DRV_INFO I2S1 = {
@@ -99,11 +99,11 @@ static I2S_DRV_INFO I2S1 = {
 #endif //RTE_I2S1
 #if (RTE_I2S2)
 static I2S_CONFIG_INFO I2S2_CONFIG = {
-    .wss_len         = RTE_I2S2_WSS_CLOCK_CYCLES,
-    .sclkg           = RTE_I2S2_SCLKG_CLOCK_CYCLES,
-    .clk_source      = RTE_I2S2_CLK_SOURCE,
-    .rx_fifo_trg_lvl = RTE_I2S2_RX_TRIG_LVL,
-    .tx_fifo_trg_lvl = RTE_I2S2_TX_TRIG_LVL,
+	.wss_len         = RTE_I2S2_WSS_CLOCK_CYCLES,
+	.sclkg           = RTE_I2S2_SCLKG_CLOCK_CYCLES,
+	.clk_source      = RTE_I2S2_CLK_SOURCE,
+	.rx_fifo_trg_lvl = RTE_I2S2_RX_TRIG_LVL,
+	.tx_fifo_trg_lvl = RTE_I2S2_TX_TRIG_LVL,
 };
 static I2S_DRV_INFO I2S2 = {
 		.cb_event  = NULL,
@@ -118,11 +118,11 @@ static I2S_DRV_INFO I2S2 = {
 #endif //RTE_I2S2
 #if (RTE_I2S3)
 static I2S_CONFIG_INFO I2S3_CONFIG = {
-    .wss_len         = RTE_I2S3_WSS_CLOCK_CYCLES,
-    .sclkg           = RTE_I2S3_SCLKG_CLOCK_CYCLES,
-    .clk_source      = RTE_I2S3_CLK_SOURCE,
-    .rx_fifo_trg_lvl = RTE_I2S3_RX_TRIG_LVL,
-    .tx_fifo_trg_lvl = RTE_I2S3_TX_TRIG_LVL,
+	.wss_len         = RTE_I2S3_WSS_CLOCK_CYCLES,
+	.sclkg           = RTE_I2S3_SCLKG_CLOCK_CYCLES,
+	.clk_source      = RTE_I2S3_CLK_SOURCE,
+	.rx_fifo_trg_lvl = RTE_I2S3_RX_TRIG_LVL,
+	.tx_fifo_trg_lvl = RTE_I2S3_TX_TRIG_LVL,
 };
 static I2S_DRV_INFO I2S3 = {
 		.cb_event  = NULL,
@@ -138,18 +138,18 @@ static I2S_DRV_INFO I2S3 = {
 
 /* Driver Capabilities */
 static const ARM_SAI_CAPABILITIES DriverCapabilities = {
-    1, /* supports asynchronous Transmit/Receive */
-    1, /* supports synchronous Transmit/Receive */
-    0, /* supports user defined Protocol */
-    1, /* supports I2S Protocol */
-    0, /* supports MSB/LSB justified Protocol */
-    0, /* supports PCM short/long frame Protocol */
-    0, /* supports AC'97 Protocol */
-    0, /* supports Mono mode */
-    0, /* supports Companding */
-    0, /* supports MCLK (Master Clock) pin */
-    0, /* supports Frame error event: \ref ARM_SAI_EVENT_FRAME_ERROR */
-    0  /* reserved (must be zero) */
+	1, /* supports asynchronous Transmit/Receive */
+	1, /* supports synchronous Transmit/Receive */
+	0, /* supports user defined Protocol */
+	1, /* supports I2S Protocol */
+	0, /* supports MSB/LSB justified Protocol */
+	0, /* supports PCM short/long frame Protocol */
+	0, /* supports AC'97 Protocol */
+	1, /* supports Mono mode */
+	0, /* supports Companding */
+	0, /* supports MCLK (Master Clock) pin */
+	0, /* supports Frame error event: \ref ARM_SAI_EVENT_FRAME_ERROR */
+	0  /* reserved (must be zero) */
 };
 
 //
@@ -203,11 +203,12 @@ static int32_t I2S_Configure_ClockSource (bool enable, I2S_DRV_INFO *i2s)
 		else
 			return ARM_DRIVER_ERROR_PARAMETER;
 
-		if ((div > I2S_CLK_DIVISOR_MAX)|| (div < I2S_CLK_DIVISOR_MIN))
+		if ((div > I2S_CLK_DIVISOR_MAX) || (div < I2S_CLK_DIVISOR_MIN))
 			return ARM_DRIVER_ERROR_PARAMETER;
 
 		*(i2s->clkreg_paddr) &= ~I2S_CLKREG_DIVISOR_Msk;
 		*(i2s->clkreg_paddr) |=  _VAL2FLD(I2S_CLKREG_DIVISOR, div);
+		*(i2s->clkreg_paddr) |=  _VAL2FLD(I2S_CLKREG_CLKAON, 1);
 	}
 
 	return ARM_DRIVER_OK;
@@ -220,7 +221,7 @@ static int32_t I2S_Configure_ClockSource (bool enable, I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_GlobalEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->IER = _VAL2FLD(I2S_IER_IEN, 1U);
+	i2s->paddr->IER = _VAL2FLD(I2S_IER_IEN, 1U);
 }
 
 /**
@@ -230,7 +231,7 @@ __STATIC_INLINE void I2S_GlobalEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_GlobalDisable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->IER &= ~I2S_IER_IEN_Msk;
+	i2s->paddr->IER &= ~I2S_IER_IEN_Msk;
 }
 
 /**
@@ -240,7 +241,7 @@ __STATIC_INLINE void I2S_GlobalDisable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_RxBlockEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->IRER = _VAL2FLD(I2S_IRER_RXEN, 1U);
+	i2s->paddr->IRER = _VAL2FLD(I2S_IRER_RXEN, 1U);
 }
 
 /**
@@ -250,7 +251,7 @@ __STATIC_INLINE void I2S_RxBlockEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_RxBlockDisable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->IRER &= ~I2S_IRER_RXEN_Msk;
+	i2s->paddr->IRER &= ~I2S_IRER_RXEN_Msk;
 }
 
 /**
@@ -260,7 +261,7 @@ __STATIC_INLINE void I2S_RxBlockDisable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_TxBlockEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->ITER = _VAL2FLD(I2S_ITER_TXEN, 1U);
+	i2s->paddr->ITER = _VAL2FLD(I2S_ITER_TXEN, 1U);
 }
 
 /**
@@ -270,7 +271,7 @@ __STATIC_INLINE void I2S_TxBlockEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_TxBlockDisable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->ITER &= ~I2S_ITER_TXEN_Msk;
+	i2s->paddr->ITER &= ~I2S_ITER_TXEN_Msk;
 }
 
 /**
@@ -280,7 +281,7 @@ __STATIC_INLINE void I2S_TxBlockDisable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_ClockEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->CER = _VAL2FLD(I2S_CER_CLKEN, 1U);
+	i2s->paddr->CER = _VAL2FLD(I2S_CER_CLKEN, 1U);
 }
 
 /**
@@ -290,19 +291,19 @@ __STATIC_INLINE void I2S_ClockEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_ClockDisable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->CER &= ~I2S_CER_CLKEN_Msk;
+	i2s->paddr->CER &= ~I2S_CER_CLKEN_Msk;
 }
 
 /**
   \fn          void I2S_ConfigureClock (I2S_DRV_INFO *i2s)
   \brief       Control I2S Configure WSS and SCLKG in Master Mode.
-               Should be called with Clock disabled.
+			   Should be called with Clock disabled.
   \param[in]   i2s     Pointer to I2S resources
 */
 __STATIC_INLINE void I2S_ConfigureClock (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->CCR = _VAL2FLD(I2S_CCR_SCLKG, i2s->cfg->sclkg) | \
-                      _VAL2FLD(I2S_CCR_WSS, i2s->cfg->wss_len);
+	i2s->paddr->CCR = _VAL2FLD(I2S_CCR_SCLKG, i2s->cfg->sclkg) | \
+					  _VAL2FLD(I2S_CCR_WSS, i2s->cfg->wss_len);
 }
 
 /**
@@ -315,7 +316,6 @@ __STATIC_INLINE uint32_t I2S_ReadLeftRx (I2S_DRV_INFO *i2s)
 {
 	return i2s->paddr->LRBR;
 }
-
 
 /**
   \fn          void I2S_WriteLeftTx (uint32_t data, I2S_DRV_INFO *i2s)
@@ -357,7 +357,7 @@ __STATIC_INLINE void I2S_WriteRightTx (uint32_t data, I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_RxChannelEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->RER = _VAL2FLD(I2S_RER_RXCHEN, 1U);
+	i2s->paddr->RER = _VAL2FLD(I2S_RER_RXCHEN, 1U);
 }
 
 /**
@@ -367,7 +367,7 @@ __STATIC_INLINE void I2S_RxChannelEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_RxChannelDisable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->RER &= ~I2S_RER_RXCHEN_Msk;
+	i2s->paddr->RER &= ~I2S_RER_RXCHEN_Msk;
 }
 
 /**
@@ -377,7 +377,7 @@ __STATIC_INLINE void I2S_RxChannelDisable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_TxChannelEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->TER = _VAL2FLD(I2S_TER_TXCHEN, 1U);
+	i2s->paddr->TER = _VAL2FLD(I2S_TER_TXCHEN, 1U);
 }
 
 /**
@@ -387,13 +387,13 @@ __STATIC_INLINE void I2S_TxChannelEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_TxChannelDisable (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->TER &= ~I2S_TER_TXCHEN_Msk;
+	i2s->paddr->TER &= ~I2S_TER_TXCHEN_Msk;
 }
 
 /**
   \fn          void I2S_RxConfigWlen (I2S_DRV_INFO *i2s)
   \brief       Set Wlen in Receive Configuration Register
-               Should be called with RXCHEN disabled.
+			   Should be called with RXCHEN disabled.
   \param[in]   i2s     Pointer to I2S resources
 */
 __STATIC_INLINE void I2S_RxConfigWlen (I2S_DRV_INFO *i2s)
@@ -404,12 +404,12 @@ __STATIC_INLINE void I2S_RxConfigWlen (I2S_DRV_INFO *i2s)
 /**
   \fn          void I2S_TxConfigWlen (I2S_DRV_INFO *i2s)
   \brief       Set Wlen in Transmit Configuration Register
-               Should be called with TXCHEN disabled.
+			   Should be called with TXCHEN disabled.
   \param[in]   i2s     Pointer to I2S resources
 */
 __STATIC_INLINE void I2S_TxConfigWlen (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->TCR = _VAL2FLD(I2S_TCR_WLEN, i2s->cfg->wlen);
+	i2s->paddr->TCR = _VAL2FLD(I2S_TCR_WLEN, i2s->cfg->wlen);
 }
 
 /**
@@ -469,23 +469,23 @@ __STATIC_INLINE void I2S_ClearTxOverrun (I2S_DRV_INFO *i2s)
 /**
   \fn          void I2S_SetRxTriggerLevel (I2S_DRV_INFO *i2s)
   \brief       Program the Trigger Level in RxFIFO
-               The channel must be disabled before doing this
+			   The channel must be disabled before doing this
   \param[in]   i2s     Pointer to I2S resources
 */
 __STATIC_INLINE void I2S_SetRxTriggerLevel (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->RFCR = _VAL2FLD(I2S_RFCR_RXCHDT, i2s->cfg->rx_fifo_trg_lvl);
+	i2s->paddr->RFCR = _VAL2FLD(I2S_RFCR_RXCHDT, i2s->cfg->rx_fifo_trg_lvl);
 }
 
 /**
   \fn          void I2S_SetTxTriggerLevel (I2S_DRV_INFO *i2s)
   \brief       Program the Trigger Level in TxFIFO
-               The channel must be disabled before doing this
+			   The channel must be disabled before doing this
   \param[in]   i2s     Pointer to I2S resources
 */
 __STATIC_INLINE void I2S_SetTxTriggerLevel (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->TFCR = _VAL2FLD(I2S_TFCR_TXCHET, i2s->cfg->tx_fifo_trg_lvl);
+	i2s->paddr->TFCR = _VAL2FLD(I2S_TFCR_TXCHET, i2s->cfg->tx_fifo_trg_lvl);
 }
 
 /**
@@ -495,7 +495,7 @@ __STATIC_INLINE void I2S_SetTxTriggerLevel (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_RxFifoReset (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->RFF = _VAL2FLD(I2S_RFF_RXCHFR, 1U);
+	i2s->paddr->RFF = _VAL2FLD(I2S_RFF_RXCHFR, 1U);
 }
 
 /**
@@ -505,7 +505,7 @@ __STATIC_INLINE void I2S_RxFifoReset (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_TxFifoReset (I2S_DRV_INFO *i2s)
 {
-    i2s->paddr->TFF = _VAL2FLD(I2S_TFF_TXCHFR, 1U);
+	i2s->paddr->TFF = _VAL2FLD(I2S_TFF_TXCHFR, 1U);
 }
 
 /**
@@ -515,7 +515,7 @@ __STATIC_INLINE void I2S_TxFifoReset (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_RxDMAEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->dma_paddr->DMACR |= _VAL2FLD(I2S_DMACR_DMAEN_RXBLOCK, 1U);
+	i2s->dma_paddr->DMACR |= _VAL2FLD(I2S_DMACR_DMAEN_RXBLOCK, 1U);
 }
 
 /**
@@ -525,7 +525,7 @@ __STATIC_INLINE void I2S_RxDMAEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_RxDMADisable (I2S_DRV_INFO *i2s)
 {
-    i2s->dma_paddr->DMACR &= ~I2S_DMACR_DMAEN_RXBLOCK_Msk;
+	i2s->dma_paddr->DMACR &= ~I2S_DMACR_DMAEN_RXBLOCK_Msk;
 }
 
 /**
@@ -535,7 +535,7 @@ __STATIC_INLINE void I2S_RxDMADisable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_TxDMAEnable (I2S_DRV_INFO *i2s)
 {
-    i2s->dma_paddr->DMACR |= _VAL2FLD(I2S_DMACR_DMAEN_TXBLOCK, 1U);
+	i2s->dma_paddr->DMACR |= _VAL2FLD(I2S_DMACR_DMAEN_TXBLOCK, 1U);
 }
 
 /**
@@ -545,7 +545,7 @@ __STATIC_INLINE void I2S_TxDMAEnable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_TxDMADisable (I2S_DRV_INFO *i2s)
 {
-    i2s->dma_paddr->DMACR &= ~I2S_DMACR_DMAEN_TXBLOCK_Msk;
+	i2s->dma_paddr->DMACR &= ~I2S_DMACR_DMAEN_TXBLOCK_Msk;
 }
 
 /**
@@ -555,11 +555,11 @@ __STATIC_INLINE void I2S_TxDMADisable (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_EnableTxInterrupt (I2S_DRV_INFO *i2s)
 {
-    uint32_t imr;
+	uint32_t imr;
 
-    imr = I2S_GetInterruptMask (i2s);
-    imr &= ~(I2S_IMR_TXFEM_Msk | I2S_IMR_TXFOM_Msk);
-    I2S_SetInterruptMask (imr, i2s);
+	imr = I2S_GetInterruptMask (i2s);
+	imr &= ~(I2S_IMR_TXFEM_Msk | I2S_IMR_TXFOM_Msk);
+	I2S_SetInterruptMask (imr, i2s);
 }
 
 /**
@@ -569,11 +569,11 @@ __STATIC_INLINE void I2S_EnableTxInterrupt (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_DisableTxInterrupt (I2S_DRV_INFO *i2s)
 {
-    uint32_t imr;
+	uint32_t imr;
 
-    imr = I2S_GetInterruptMask (i2s);
-    imr |= _VAL2FLD(I2S_IMR_TXFEM, 1U) | _VAL2FLD(I2S_IMR_TXFOM, 1U);
-    I2S_SetInterruptMask (imr, i2s);
+	imr = I2S_GetInterruptMask (i2s);
+	imr |= _VAL2FLD(I2S_IMR_TXFEM, 1U) | _VAL2FLD(I2S_IMR_TXFOM, 1U);
+	I2S_SetInterruptMask (imr, i2s);
 }
 
 /**
@@ -583,11 +583,11 @@ __STATIC_INLINE void I2S_DisableTxInterrupt (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_EnableRxInterrupt (I2S_DRV_INFO *i2s)
 {
-    uint32_t imr;
+	uint32_t imr;
 
-    imr = I2S_GetInterruptMask (i2s);
-    imr &= ~(I2S_IMR_RXDAM_Msk | I2S_IMR_RXFOM_Msk);
-    I2S_SetInterruptMask (imr, i2s);
+	imr = I2S_GetInterruptMask (i2s);
+	imr &= ~(I2S_IMR_RXDAM_Msk | I2S_IMR_RXFOM_Msk);
+	I2S_SetInterruptMask (imr, i2s);
 }
 
 /**
@@ -597,11 +597,11 @@ __STATIC_INLINE void I2S_EnableRxInterrupt (I2S_DRV_INFO *i2s)
 */
 __STATIC_INLINE void I2S_DisableRxInterrupt (I2S_DRV_INFO *i2s)
 {
-    uint32_t imr;
+	uint32_t imr;
 
-    imr = I2S_GetInterruptMask (i2s);
-    imr |= _VAL2FLD(I2S_IMR_RXDAM, 1U) | _VAL2FLD(I2S_IMR_RXFOM, 1U);
-    I2S_SetInterruptMask (imr, i2s);
+	imr = I2S_GetInterruptMask (i2s);
+	imr |= _VAL2FLD(I2S_IMR_RXDAM, 1U) | _VAL2FLD(I2S_IMR_RXFOM, 1U);
+	I2S_SetInterruptMask (imr, i2s);
 }
 
 /**
@@ -693,11 +693,14 @@ static int32_t I2S_Initialize (ARM_SAI_SignalEvent_t cb_event, I2S_DRV_INFO *i2s
 	i2s->tx_buff.buf =  NULL;
 	i2s->tx_buff.ofs =  0;
 	i2s->tx_buff.total_len =  0;
+	i2s->drv_status.status_b.tx_busy = 0U;
+	i2s->drv_status.status_b.tx_underflow = 0U;
 
 	i2s->rx_buff.buf =  NULL;
 	i2s->rx_buff.ofs =  0;
 	i2s->rx_buff.total_len =  0;
-
+	i2s->drv_status.status_b.rx_busy = 0U;
+	i2s->drv_status.status_b.rx_overflow = 0U;
 
 	/* FIXME : Do the pin muxing based on the RTE Master/Slave */
 	/* FIXME : Do the DMA Initialization */
@@ -788,7 +791,7 @@ static int32_t I2S_Send (const void *data, uint32_t num, I2S_DRV_INFO *i2s)
 	if ((i2s->cfg->wlen > IGNORE_WLEN) && (i2s->cfg->wlen <= RES_16_BIT))
 		i2s->tx_buff.total_len = num * sizeof(uint16_t);
 	else
-		i2s->tx_buff.total_len = num * sizeof(uint32_t);;
+		i2s->tx_buff.total_len = num * sizeof(uint32_t);
 	i2s->tx_buff.ofs = 0U;
 
 	/* Clear Overrun interrupt if any */
@@ -948,7 +951,7 @@ static int32_t I2S_Control (uint32_t control, uint32_t arg1, uint32_t arg2, I2S_
 			/* Set the Tx flags*/
 			i2s->drv_status.status_b.tx_busy = 0U;
 		} else
-			return ARM_DRIVER_ERROR;
+			return ARM_DRIVER_ERROR_UNSUPPORTED;
 
 		return ARM_DRIVER_OK;
 	case ARM_SAI_CONTROL_RX:
@@ -969,8 +972,7 @@ static int32_t I2S_Control (uint32_t control, uint32_t arg1, uint32_t arg2, I2S_
 			I2S_RxBlockEnable (i2s);
 			/* Disable Tx Channel */
 			I2S_TxChannelDisable (i2s);
-		}
-		else if (arg1 == false)
+		} else
 		{
 			/* Disable Rx Channel */
 			I2S_RxChannelDisable (i2s);
@@ -984,8 +986,7 @@ static int32_t I2S_Control (uint32_t control, uint32_t arg1, uint32_t arg2, I2S_
 
 			/* Set the rx flags*/
 			i2s->drv_status.status_b.rx_busy = 0U;
-		}else
-			return ARM_DRIVER_ERROR;
+		}
 
 		return ARM_DRIVER_OK;
 	case ARM_SAI_ABORT_SEND:
@@ -1044,7 +1045,7 @@ static int32_t I2S_Control (uint32_t control, uint32_t arg1, uint32_t arg2, I2S_
 		return ARM_SAI_ERROR_PROTOCOL;
 	}
 
-	/* Handle DataSize */
+	/* Handle Data Size */
 	datasize = ((control & ARM_SAI_DATA_SIZE_Msk) >> ARM_SAI_DATA_SIZE_Pos) + 1;
 	switch (datasize)
 	{
@@ -1078,9 +1079,15 @@ static int32_t I2S_Control (uint32_t control, uint32_t arg1, uint32_t arg2, I2S_
 			return ARM_SAI_ERROR_BIT_ORDER;
 	}
 
+	/* Handle Mono Mode */
+	if (control & ARM_SAI_MONO_MODE)
+	{
+		i2s->flags |= I2S_FLAG_DRV_MONO_MODE;
+	}
+
 	/* Unsupported Codes */
-	if ((control & ARM_SAI_MONO_MODE) || (control & ARM_SAI_COMPANDING_Msk)
-			|| (control & ARM_SAI_CLOCK_POLARITY_Msk) || (control & ARM_SAI_MCLK_PIN_Msk))
+	if ((control & ARM_SAI_CLOCK_POLARITY_Msk) || (control & ARM_SAI_MCLK_PIN_Msk)
+			|| (control & ARM_SAI_COMPANDING_Msk))
 		return ARM_DRIVER_ERROR_UNSUPPORTED;
 
 	/* Handle Frame Length */
@@ -1141,14 +1148,28 @@ static void I2S_RxIRQHandler (I2S_DRV_INFO *i2s)
 		/* Assuming that application uses 16bit buffer for 16bit data resolution */
 		if ((i2s->cfg->wlen > IGNORE_WLEN) && (i2s->cfg->wlen <= RES_16_BIT))
 		{
-			(*(uint16_t*)(buff + i2s->rx_buff.ofs)) = (uint16_t)I2S_ReadLeftRx (i2s);
-			(*(uint16_t*)(buff + i2s->rx_buff.ofs + I2S_16BIT_BUF_TYPE)) = (uint16_t)I2S_ReadRightRx (i2s);
-			i2s->rx_buff.ofs = i2s->rx_buff.ofs + 2*I2S_16BIT_BUF_TYPE;
+			if (i2s->flags & I2S_FLAG_DRV_MONO_MODE)
+			{
+				(*(uint16_t*)(buff + i2s->rx_buff.ofs)) = (uint16_t)I2S_ReadLeftRx (i2s);
+				I2S_ReadRightRx (i2s);
+				i2s->rx_buff.ofs = i2s->rx_buff.ofs + I2S_16BIT_BUF_TYPE;
+			} else {
+				(*(uint16_t*)(buff + i2s->rx_buff.ofs)) = (uint16_t)I2S_ReadLeftRx (i2s);
+				(*(uint16_t*)(buff + i2s->rx_buff.ofs + I2S_16BIT_BUF_TYPE)) = (uint16_t)I2S_ReadRightRx (i2s);
+				i2s->rx_buff.ofs = i2s->rx_buff.ofs + 2*I2S_16BIT_BUF_TYPE;
+			}
 		} else /* For > 16bit data resolution consider as 32bit buffer*/
 		{
-			(*(uint32_t*)(buff + i2s->rx_buff.ofs)) = I2S_ReadLeftRx (i2s);
-			(*(uint32_t*)(buff + i2s->rx_buff.ofs + I2S_32BIT_BUF_TYPE)) = I2S_ReadRightRx (i2s);
-			i2s->rx_buff.ofs = i2s->rx_buff.ofs + 2*I2S_32BIT_BUF_TYPE;
+			if (i2s->flags & I2S_FLAG_DRV_MONO_MODE)
+			{
+				(*(uint32_t*)(buff + i2s->rx_buff.ofs)) = I2S_ReadLeftRx (i2s);
+				I2S_ReadRightRx (i2s);
+				i2s->rx_buff.ofs = i2s->rx_buff.ofs + I2S_32BIT_BUF_TYPE;
+			} else {
+				(*(uint32_t*)(buff + i2s->rx_buff.ofs)) = I2S_ReadLeftRx (i2s);
+				(*(uint32_t*)(buff + i2s->rx_buff.ofs + I2S_32BIT_BUF_TYPE)) = I2S_ReadRightRx (i2s);
+				i2s->rx_buff.ofs = i2s->rx_buff.ofs + 2*I2S_32BIT_BUF_TYPE;
+			}
 		}
 	}
 
@@ -1393,17 +1414,17 @@ void I2S0_IRQHandler (void)
 extern \
 ARM_DRIVER_SAI Driver_SAI0;
 ARM_DRIVER_SAI Driver_SAI0 = {
-    I2S_GetVersion,
-    I2S_GetCapabilities,
-    I2S0_Initialize,
-    I2S0_Uninitialize,
-    I2S0_PowerControl,
-    I2S0_Send,
-    I2S0_Receive,
-    I2S0_GetTxCount,
-    I2S0_GetRxCount,
-    I2S0_Control,
-    I2S0_GetStatus
+	I2S_GetVersion,
+	I2S_GetCapabilities,
+	I2S0_Initialize,
+	I2S0_Uninitialize,
+	I2S0_PowerControl,
+	I2S0_Send,
+	I2S0_Receive,
+	I2S0_GetTxCount,
+	I2S0_GetRxCount,
+	I2S0_Control,
+	I2S0_GetStatus
 };
 #endif //RTE_I2S0
 
@@ -1522,17 +1543,17 @@ void I2S1_IRQHandler (void)
 extern \
 ARM_DRIVER_SAI Driver_SAI1;
 ARM_DRIVER_SAI Driver_SAI1 = {
-    I2S_GetVersion,
-    I2S_GetCapabilities,
-    I2S1_Initialize,
-    I2S1_Uninitialize,
-    I2S1_PowerControl,
-    I2S1_Send,
-    I2S1_Receive,
-    I2S1_GetTxCount,
-    I2S1_GetRxCount,
-    I2S1_Control,
-    I2S1_GetStatus
+	I2S_GetVersion,
+	I2S_GetCapabilities,
+	I2S1_Initialize,
+	I2S1_Uninitialize,
+	I2S1_PowerControl,
+	I2S1_Send,
+	I2S1_Receive,
+	I2S1_GetTxCount,
+	I2S1_GetRxCount,
+	I2S1_Control,
+	I2S1_GetStatus
 };
 #endif //RTE_I2S1
 
@@ -1651,17 +1672,17 @@ void I2S2_IRQHandler (void)
 extern \
 ARM_DRIVER_SAI Driver_SAI2;
 ARM_DRIVER_SAI Driver_SAI2 = {
-    I2S_GetVersion,
-    I2S_GetCapabilities,
-    I2S2_Initialize,
-    I2S2_Uninitialize,
-    I2S2_PowerControl,
-    I2S2_Send,
-    I2S2_Receive,
-    I2S2_GetTxCount,
-    I2S2_GetRxCount,
-    I2S2_Control,
-    I2S2_GetStatus
+	I2S_GetVersion,
+	I2S_GetCapabilities,
+	I2S2_Initialize,
+	I2S2_Uninitialize,
+	I2S2_PowerControl,
+	I2S2_Send,
+	I2S2_Receive,
+	I2S2_GetTxCount,
+	I2S2_GetRxCount,
+	I2S2_Control,
+	I2S2_GetStatus
 };
 #endif //RTE_I2S2
 
@@ -1780,16 +1801,16 @@ void I2S3_IRQHandler (void)
 extern \
 ARM_DRIVER_SAI Driver_SAI3;
 ARM_DRIVER_SAI Driver_SAI3 = {
-    I2S_GetVersion,
-    I2S_GetCapabilities,
-    I2S3_Initialize,
-    I2S3_Uninitialize,
-    I2S3_PowerControl,
-    I2S3_Send,
-    I2S3_Receive,
-    I2S3_GetTxCount,
-    I2S3_GetRxCount,
-    I2S3_Control,
-    I2S3_GetStatus
+	I2S_GetVersion,
+	I2S_GetCapabilities,
+	I2S3_Initialize,
+	I2S3_Uninitialize,
+	I2S3_PowerControl,
+	I2S3_Send,
+	I2S3_Receive,
+	I2S3_GetTxCount,
+	I2S3_GetRxCount,
+	I2S3_Control,
+	I2S3_GetStatus
 };
 #endif //RTE_I2S3

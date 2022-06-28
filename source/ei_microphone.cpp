@@ -102,7 +102,7 @@ static ei_device_sensor_t sensor_list[] = {
     }
 };
 
-#define EI_DEVICE_N_RESOLUTIONS
+#define EI_DEVICE_N_RESOLUTIONS 2
 
 class EiDeviceAlif : public EiDeviceInfo
 {
