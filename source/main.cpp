@@ -105,8 +105,7 @@ int main()
 
 	while (camera_init()!=0);
 
-	// ei_printf("Camera initialized... \n");
-    ei_microphone_init(0);
+    ei_microphone_init();
 
     //setvbuf(stdout, NULL, _IONBF, 0);
     auto at = ATServer::get_instance();

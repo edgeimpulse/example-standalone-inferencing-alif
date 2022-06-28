@@ -257,7 +257,7 @@ EiCamera* EiCamera::get_camera()
     return &cam;
 }
 
-int ei_microphone_init(int idx)
+int ei_microphone_init(void)
 {
     int32_t status = 0;
     int16_t *startup_buffer;
