@@ -77,6 +77,16 @@ __NO_RETURN void Reset_Handler  (void);
             void Default_Handler(void);
 
 /*----------------------------------------------------------------------------
+  Forward Declarations
+ *----------------------------------------------------------------------------*/
+int Init_SysTick(void);
+
+/*----------------------------------------------------------------------------
+  Private variables
+ *----------------------------------------------------------------------------*/
+static uint64_t cpu_cycle_count = 0;
+
+/*----------------------------------------------------------------------------
   Exception / Interrupt Handler
  *----------------------------------------------------------------------------*/
 /* Exceptions */
@@ -89,7 +99,7 @@ __NO_RETURN void Reset_Handler  (void);
 // void SVC_Handler            (void) __attribute__ ((weak, alias("Default_Handler")));
 // void DebugMon_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
 // void PendSV_Handler         (void) __attribute__ ((weak, alias("Default_Handler")));
-void SysTick_Handler        (void) __attribute__ ((weak, alias("Default_Handler")));
+// void SysTick_Handler        (void) __attribute__ ((weak, alias("Default_Handler")));
 
 void Interrupt0_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
 void Interrupt1_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
@@ -347,6 +357,7 @@ __NO_RETURN void Reset_Handler(void)
   __asm volatile ("MSR MSP, %0" : : "r" (&__INITIAL_SP));
 
   SystemInit();                             /* CMSIS System Initialization */
+  Init_SysTick();                           /* Initialize system tick */
   __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
 }
 
@@ -482,6 +493,58 @@ __attribute__((weak)) void PendSV_Handler(void)
 #if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
   #pragma clang diagnostic pop
 #endif
+
+/**
+ * @brief   System tick interrupt handler.
+ **/
+__attribute__((weak)) void SysTick_Handler(void)
+{
+    /* Increment the cycle counter based on load value. */
+    cpu_cycle_count += SysTick->LOAD + 1;
+}
+
+/**
+ * Gets the current SysTick derived counter value
+ */
+uint64_t Get_SysTick_Cycle_Count(void)
+{
+    uint32_t systick_val;
+
+    NVIC_DisableIRQ(SysTick_IRQn);
+    systick_val = SysTick->VAL & SysTick_VAL_CURRENT_Msk;
+    NVIC_EnableIRQ(SysTick_IRQn);
+
+    return cpu_cycle_count + (SysTick->LOAD - systick_val);
+}
+
+/**
+ * SysTick initialisation
+ */
+int Init_SysTick(void)
+{
+    const uint32_t ticks_10ms = GetSystemCoreClock()/100 + 1;
+    int err = 0;
+
+    /* Reset CPU cycle count value. */
+    cpu_cycle_count = 0;
+
+    /* Changing configuration for sys tick => guard from being
+     * interrupted. */
+    NVIC_DisableIRQ(SysTick_IRQn);
+
+    /* SysTick init - this will enable interrupt too. */
+    err = SysTick_Config(ticks_10ms);
+
+    /* Enable interrupt again. */
+    NVIC_EnableIRQ(SysTick_IRQn);
+
+    /* Wait for SysTick to kick off */
+    while (!err && !SysTick->VAL) {
+        __NOP();
+    }
+
+    return err;
+}
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Vector table

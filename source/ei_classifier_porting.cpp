@@ -28,7 +28,11 @@
 #include <stdlib.h>
 #include "hal/uart_stdout.h"
 
+#if EI_CONFIG_ALIF_HP == 1
 #include "system_M55_HP.h"
+#else
+#include "system_M55_HE.h"
+#endif
 
 #ifndef EI_CORE_CLOCK_HZ
 #ifdef EI_CONFIG_ETHOS_U55_256
@@ -37,6 +41,8 @@
 #define EI_CORE_CLOCK_HZ 160000000
 #endif
 #endif
+
+extern "C" uint64_t Get_SysTick_Cycle_Count(void);
 
 EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
 {
@@ -59,7 +65,7 @@ EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
 
 uint64_t ei_read_timer_us()
 {
-    return 0; //Get_SysTick_Cycle_Count() / ( EI_CORE_CLOCK_HZ / 1000000 );
+    return Get_SysTick_Cycle_Count() / ( EI_CORE_CLOCK_HZ / 1000000 );
 }
 
 uint64_t ei_read_timer_ms()
