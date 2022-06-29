@@ -218,7 +218,8 @@ class EiCameraAlif : public EiCamera
             96,// int dstWidth,
             96// int dstHeight
         );
-        memcpy(image, rgb_image, image_size);
+        white_balance(rgb_image, image);
+        // memcpy(image, rgb_image, image_size);
         return true;
     }
 

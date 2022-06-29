@@ -22,8 +22,8 @@ extern "C" {
 #define CIMAGE_Y		560
 
 // ML scaled image dimensions
-#define MIMAGE_X		224
-#define MIMAGE_Y		224
+#define MIMAGE_X		96
+#define MIMAGE_Y		96
 
 // Display dimensions
 #define DIMAGE_X		480
