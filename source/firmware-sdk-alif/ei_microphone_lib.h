@@ -208,6 +208,11 @@ bool ei_microphone_sample_record_lib(EiMicrophone *mic, EiDeviceMemory *mem)
     ei_printf("\tHMAC Key: %s\n", dev->get_sample_hmac_key().c_str());
     ei_printf("\tFile name: %s\n", dev->get_sample_label().c_str());
 
+    /* TODO: use time calculations from target and signal exact time to studio */
+    ei_printf(
+        "Starting in %lu ms... (or until all flash was erased)\n",
+        2000);
+
     // Minimum delay of 2000 ms for daemon
     uint32_t start_time = ei_read_timer_ms();
 
@@ -228,6 +233,8 @@ bool ei_microphone_sample_record_lib(EiMicrophone *mic, EiDeviceMemory *mem)
     }
 
     auto requested_buffer_size = mic->requested_buffer_size();
+
+    ei_printf("Sampling...\n");
 
     auto samples_required = ei_microphone_get_samples_required();
     for (auto samples_left = samples_required; samples_left > 0;) //decrement inside loop
@@ -347,6 +354,7 @@ bool ei_microphone_sample_record_lib(EiMicrophone *mic, EiDeviceMemory *mem)
         "Not uploading file, not connected to WiFi. Used buffer, from=%u, to=%lu.\n",
         0,
         buffer_offset);
+    ei_printf("[1/1] Uploading file to Edge Impulse OK (took %d ms.)\n", 0);//upload_timer.read_ms());
     ei_printf("OK\n");
 
     return true;

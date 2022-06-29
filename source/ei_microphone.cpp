@@ -180,11 +180,10 @@ public:
 
     uint32_t await_samples()
     {
-        uint32_t timeout = 0;
         /* Wait for the completion event */
         while(1) {
             /*TODO: Add timeout */
-            if (i2s_callback_flag || timeout++ > 1000) {
+            if (i2s_callback_flag) {
                 break;
             }
         }
