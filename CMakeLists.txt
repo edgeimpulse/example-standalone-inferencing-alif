@@ -78,13 +78,12 @@ USER_OPTION(LOG_LEVEL "Log level for the application"
     STRING)
 
 set(TARGET_PLATFORM ensemble)
-set(TARGET_SUBSYSTEM none)
 
 USER_OPTION(ETHOS_U_NPU_ENABLED "Select if Ethos-U55 is available for the platform and subsystem"
     ON
     BOOL)
 
-USER_OPTION(CORE 
+USER_OPTION(TARGET_SUBSYSTEM 
     "Choose target, 'HP' (for M55 Core 0, High Performance), or 'HE' (for M55 Core 1, High Effiency)"
     "None"
     STRING)
@@ -96,12 +95,12 @@ USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. S
     message(STATUS "Platform: Ensemble platform with minimal peripherals")
     set(DEFAULT_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_DIR}/bare-metal-armclang.cmake)
 
-if (CORE STREQUAL "HP")
+if (TARGET_SUBSYSTEM STREQUAL "HP")
     add_compile_definitions(EI_CONFIG_ALIF_HP=1)
 elseif(CORE STREQUAL "HE")
     add_compile_definitions(EI_CONFIG_ALIF_HE=1)
 else()
-    message(FATAL_ERROR "Please choose either HP or HE target care (ex: cmake -DCORE=HP)")
+    message(FATAL_ERROR "Please choose either HP or HE target subsystem (ex: cmake -DTARGET_SUBSYSTEM=HP)")
 endif()
 
 if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -111,19 +110,17 @@ endif()
 message(STATUS "Using CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 project(edge_impulse_alif
-        VERSION     21.05
+        VERSION     21.06
         DESCRIPTION "Example program for Edge Impulse running on Alif hardware")
 
 enforce_compiler_version()
 
 if (ETHOS_U_NPU_ENABLED)
     add_compile_definitions(EI_ETHOS=1 EI_ALIF_ADDR_TRANSLATION=1)
-    if (CORE STREQUAL "HP")
+    if (TARGET_SUBSYSTEM STREQUAL "HP")
         add_compile_definitions(EI_CONFIG_ETHOS_U55_256=1)
-    elseif(CORE STREQUAL "HE")
-        add_compile_definitions(EI_CONFIG_ETHOS_U55_128=1)
     else()
-        message(FATAL_ERROR "Please choose either HP or HE target care (ex: cmake -DCORE=HP)")
+        add_compile_definitions(EI_CONFIG_ETHOS_U55_128=1)
     endif()
 endif()
 
