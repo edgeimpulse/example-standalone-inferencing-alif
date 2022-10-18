@@ -6,11 +6,11 @@
  * Define the Device Header File: 
  */
 #if EI_CONFIG_ALIF_HP
-#define CMSIS_device_header "M55_HP.h"
+#define CMSIS_device_header "hal/M55_HP.h"
 #endif
 
 #if EI_CONFIG_ALIF_HE
-#define CMSIS_device_header "M55_HE.h"
+#define CMSIS_device_header "hal/M55_HE.h"
 #endif
 
 /* AlifSemiconductor::CMSIS Driver:SOC Peripherals:GPIO:1.0.0 */

@@ -98,7 +98,7 @@
 #define PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_04_MILI_AMPS     (0x20)
 #define PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_08_MILI_AMPS     (0x40)
 #define PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_12_MILI_AMPS     (0x60)
-#define PAD_FUNCTION_DRIVER_PUSH_PULL                       (0x80)
+#define PAD_FUNCTION_DRIVER_OPEN_DRAIN                      (0x80)
 #define PAD_FUNCTION_DISABLE                                (0x00)
 
 int32_t PINMUX_Config (uint8_t port, uint8_t pin_no, uint8_t AF_number);

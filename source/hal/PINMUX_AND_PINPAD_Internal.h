@@ -39,9 +39,9 @@
 #ifndef __PINMUX_AND_PINPAD_INTERNAL_H__
 #define __PINMUX_AND_PINPAD_INTERNAL_H__
 
-#include "RTE_Device.h"
-#include "RTE_Components.h"
-#include "Driver_PINMUX_AND_PINPAD.h"
+#include "hal/RTE_Device.h"
+#include "hal/RTE_Components.h"
+#include "hal/Driver_PINMUX_AND_PINPAD.h"
 #include CMSIS_device_header
 
 #define DRIVER_OK                               (0)
