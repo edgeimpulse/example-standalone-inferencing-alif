@@ -22,12 +22,16 @@
 #include "hal/RTE_Components.h"
 #include CMSIS_device_header
 #include "hal/hal.h"
-#include "hal/uart_stdout.h"
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
 
-#include "hal/drv_lptimer.h"
-#include "hal/BMI323_imu_driver.h"
+#define G_TO_MS 9.80665
+
+extern "C" {
+    #include "hal/uart_stdout.h"
+    #include "hal/drv_lptimer.h"
+    #include "hal/BMI323_imu_driver.h"
+}
 
 #include <cstdio>
 
@@ -37,65 +41,6 @@ void delay(uint32_t nticks) { nticks += ms_ticks; while(ms_ticks < nticks); }
 
 #define IMU_SAMPLE_RATE		(62.5)
 #define LPTIMER_INSTANCE	2
-
-extern "C" int32_t IMU_Init(uint8_t dev_addr);
-extern "C" void IMU_ACC_Get(xyz_accel_s *get);
-
-//---drv_lptimer---//
-void LPTIMER_ll_Initialize (uint8_t channel) {
-
-    LPTIMER_reg_info *reg_ptr = (LPTIMER_reg_info*) LPTIMER_BASE;
-
-    reg_ptr->ch_cntrl_reg[channel].control_reg &= ~LPTIMER_CONTROL_REG_TIMER_ENABLE_BIT;
-
-	reg_ptr->ch_cntrl_reg[channel].control_reg |=  LPTIMER_CONTROL_REG_TIMER_MODE_BIT;
-
-    reg_ptr->ch_cntrl_reg[channel].control_reg &= ~LPTIMER_CONTROL_REG_TIMER_INTERRUPT_MASK_BIT;
-
-    *((uint32_t *)(VBAT_REGS_BASE + 0x28)) |= (0x3UL << (channel * 2));
-}
-
-void LPTIMER_ll_Set_Count_Value (uint8_t channel, uint32_t count) {
-
-    LPTIMER_reg_info *reg_ptr = (LPTIMER_reg_info*) LPTIMER_BASE;
-
-	reg_ptr->ch_cntrl_reg[channel].load_count = count;
-}
-
-uint32_t LPTIMER_ll_Get_Count_Value (uint8_t channel) {
-
-    LPTIMER_reg_info *reg_ptr = (LPTIMER_reg_info*) LPTIMER_BASE;
-
-    return reg_ptr->ch_cntrl_reg[channel].current_value;
-}
-
-void LPTIMER_ll_Start (uint8_t channel) {
-
-    LPTIMER_reg_info *reg_ptr = (LPTIMER_reg_info*) LPTIMER_BASE;
-
-    reg_ptr->ch_cntrl_reg[channel].control_reg |= LPTIMER_CONTROL_REG_TIMER_ENABLE_BIT;
-}
-
-void LPTIMER_ll_Stop (uint8_t channel) {
-
-    LPTIMER_reg_info *reg_ptr = (LPTIMER_reg_info*) LPTIMER_BASE;
-
-    reg_ptr->ch_cntrl_reg[channel].control_reg &= ~LPTIMER_CONTROL_REG_TIMER_ENABLE_BIT;
-}
-
-void LPTIMER_ll_Wait (uint8_t channel) {
-
-    LPTIMER_reg_info *reg_ptr = (LPTIMER_reg_info*) LPTIMER_BASE;
-
-    while (1) {
-    	if (reg_ptr->ch_cntrl_reg[channel].int_status)
-    		break;
-    }
-
-    (void) reg_ptr->ch_cntrl_reg[channel].eoi;
-}
-
-//---drv_lptimer---//
 
 static float raw_features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE] = {
 		0.0700, 0.0000, 10.1300, 0.0900, -0.0100, 10.1100, 0.0600, -0.0300, 10.0900, 0.0100, -0.0200, 10.0700, 0.0100, -0.0200, 10.0600, 0.0100, -0.0200, 10.0600, 0.0400, -0.0300, 10.1500, 0.0600, -0.0500, 10.1000, 0.0700, 0.0000, 10.1100, 0.0800, 0.0200, 10.1700, 0.0500, 0.0000, 10.1300, 0.0300, -0.0500, 10.0900, 0.0300, -0.0500, 10.0900, 0.0500, -0.0300, 10.1100, 0.0800, 0.0000, 10.1200, 0.0600, 0.0000, 10.1100, 0.0500, -0.0200, 10.1100, 0.0400, -0.0300, 10.1100, 0.0200, -0.0300, 10.0900, 0.0200, -0.0300, 10.0900, 0.0200, -0.0100, 10.0900, 0.0300, -0.0100, 10.0900, 0.0600, -0.0200, 10.1100, 0.0800, -0.0200, 10.1200, 0.0500, -0.0100, 10.1100, 0.0300, -0.0200, 10.0900, 0.0300, -0.0200, 10.0900, 0.0400, -0.0300, 10.1100, 0.0600, 0.0000, 10.1300, 0.0600, -0.0100, 10.1200, 0.0500, -0.0100, 10.1100, 0.0500, -0.0100, 10.1200, 0.0400, -0.0300, 10.1000, 0.0400, -0.0300, 10.1000, 0.0400, -0.0400, 10.0900, 0.0300, -0.0200, 10.1100, 0.0400, 0.0000, 10.1000, 0.0600, 0.0000, 10.1300, 0.0600, -0.0100, 10.1300, 0.0500, -0.0200, 10.1100, 0.0500, -0.0200, 10.1100, 0.0400, -0.0300, 10.1000, 0.0500, -0.0100, 10.1100, 0.0500, -0.0100, 10.1400, 0.0500, -0.0200, 10.0900, 0.0500, 0.0000, 10.1200, 0.0400, 0.0000, 10.1300, 0.0400, 0.0000, 10.1300, 0.0400, -0.0400, 10.1000, 0.0400, -0.0500, 10.1000, 0.0500, -0.0200, 10.1100, 0.0600, 0.0000, 10.1200, 0.0500, 0.0000, 10.1400, 0.0600, -0.0100, 10.1200, 0.0600, -0.0100, 10.1200, 0.0400, -0.0400, 10.1100, 0.0500, -0.0200, 10.1000, 0.0500, -0.0200, 10.1300, 0.0400, -0.0200, 10.1100, 0.0400, -0.0200, 10.1200, 0.0400, -0.0200, 10.1200, 0.0500, -0.0100, 10.1200, 0.0400, -0.0100, 10.1200, 0.0300, -0.0200, 10.1000, 0.0400, -0.0400, 10.1100, 0.0700, -0.0300, 10.1200, 0.0700, 0.0000, 10.1300, 0.0700, 0.0000, 10.1300, 0.0400, 0.0000, 10.1300, 0.0400, -0.0100, 10.1100, 0.0500, -0.0300, 10.1000, 0.0500, -0.0300, 10.1200, 0.0400, -0.0300, 10.1100, 0.0400, -0.0200, 10.1000, 0.0400, -0.0200, 10.1000, 0.0600, -0.0100, 10.1300, 0.0600, 0.0000, 10.1200, 0.0400, -0.0200, 10.1100, 0.0400, -0.0200, 10.1000, 0.0500, -0.0200, 10.1200, 0.0600, -0.0200, 10.1200, 0.0600, -0.0200, 10.1200, 0.0700, -0.0100, 10.1400, 0.0600, -0.0100, 10.1200, 0.0400, -0.0100, 10.1100, 0.0300, -0.0200, 10.1100, 0.0300, -0.0300, 10.0900, 0.0400, -0.0300, 10.1200, 0.0400, -0.0300, 10.1200, 0.0600, -0.0100, 10.1200, 0.0600, -0.0100, 10.1200, 0.0600, -0.0200, 10.1200, 0.0400, -0.0200, 10.1100, 0.0400, -0.0200, 10.1100, 0.0500, -0.0100, 10.1200, 0.0500, -0.0100, 10.1200, 0.0500, -0.0100, 10.1300, 0.0700, -0.0200, 10.1300, 0.0500, -0.0100, 10.1200, 0.0400, -0.0200, 10.1200, 0.0300, -0.0300, 10.1000, 0.0300, -0.0200, 10.1100, 0.0300, -0.0200, 10.1100, 0.0500, -0.0100, 10.1200, 0.0600, -0.0200, 10.1300, 0.0600, -0.0400, 10.1400, 0.0500, 0.0000, 10.1100, 0.0300, 0.0000, 10.1200, 0.0300, -0.0300, 10.0900, 0.0300, -0.0300, 10.0900, 0.0400, -0.0100, 10.1300, 0.0600, -0.0100, 10.1100, 0.0600, -0.0200, 10.1500, 0.0500, 0.0000, 10.0900, 0.0300, -0.0500, 10.1200, 0.0300, -0.0500, 10.1200, 0.0400, -0.0500, 10.1100, 0.0500, 0.0000, 10.1200, 0.0400, 0.0000, 10.1300, 0.0500, -0.0200, 10.1000, 0.0600, -0.0200, 10.1000, 0.0500, -0.0200, 10.1300, 0.0500, -0.0200, 10.1300, 0.0300, -0.0300, 10.1100, 0.0300, 0.0000, 10.1000
@@ -121,7 +66,7 @@ void calibtrate_IMU(xyz_accel_s *calibration)
 		IMU_ACC_Get(&temp);
 		motion.x += temp.x;
 		motion.y += temp.y;
-		motion.z += temp.z - 4096;
+		motion.z += temp.z;
 	}
 	motion.x = motion.x / 100;
 	motion.y = motion.y / 100;
@@ -143,7 +88,7 @@ int main()
 
     #endif /* ARM_NPU */
 
-    UartStdOutInit();
+    stdout_init();
 
     xyz_accel_s motion, calibration;
 	  IMU_Init(i2c_addr_68);
@@ -163,11 +108,14 @@ int main()
             LPTIMER_ll_Wait(LPTIMER_INSTANCE);
             IMU_ACC_Get(&motion);
 
-            raw_features[i + 0] = -1 * motion.x - calibration.x;
-            raw_features[i + 1] = -1 * motion.y - calibration.y;
-            raw_features[i + 2] = motion.z - calibration.z;
+            raw_features[i + 0] = (-1.0 * (float) (motion.x - calibration.x)) / 4096.0 * G_TO_MS;
+            raw_features[i + 1] = (-1.0 * (float) (motion.y - calibration.y)) / 4096.0 * G_TO_MS;
+            raw_features[i + 2] = ((float) (motion.z - calibration.z)) / 4096.0 * G_TO_MS;
 
-		        ei_printf("%4d %4d %4d \n", raw_features[i + 0], raw_features[i + 1], raw_features[i + 2]);
+            	/* Uncomment this line, and comment out the lines 133 to 148, to collect data
+            	 * via the edge-impulse-data-forwarder cli:
+            	 */ 	https://docs.edgeimpulse.com/docs/edge-impulse-cli/cli-data-forwarder
+		        //ei_printf("%.4f,%.4f,%.4f\n", raw_features[i + 0], raw_features[i + 1], raw_features[i + 2]);
         }
 
         ei_impulse_result_t result;

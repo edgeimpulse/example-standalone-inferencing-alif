@@ -3,7 +3,7 @@
 ; ***       Scatter-Loading Description File                ***
 ; *************************************************************
 
-LOAD_REGION_ITCM       0x00000000                  0x00040000
+LOAD_REGION_MAIN       0x00000000 NOCOMPRESS
 {
     ;-----------------------------------------------------
     ; Code region
@@ -14,13 +14,11 @@ LOAD_REGION_ITCM       0x00000000                  0x00040000
         * (InRoot$$Sections)
 
         .ANY (+RO-CODE)
+        * (:gdef:mpu_table_hp)
     }
-}
 
-LOAD_REGION_DTCM       0x20000000                  0x100000 ;1MB
-{
     ; max ANY is what's left after stack and heap
-    dctm          +0 ANY_SIZE (0x100000-4000-30000) ALIGN 16
+    dctm          0x20000000 ANY_SIZE (0x100000-4000-30000) ALIGN 16
     {
         .ANY2 (+RO-DATA) ; ANY2 means map here first
         .ANY2 (+RW +ZI)
@@ -32,10 +30,7 @@ LOAD_REGION_DTCM       0x20000000                  0x100000 ;1MB
 
     ARM_LIB_HEAP  +0 EMPTY ALIGN 8      30000
     {}
-}
 
-LOAD_REGION_SRAM    0x02000000                  0x00400000
-{ 
     sram0.bin       0x02000000 ALIGN 16         0x00400000
     {
         ; Uncomment these to place model in SRAM, in case of a large model (image, etc)
@@ -43,5 +38,9 @@ LOAD_REGION_SRAM    0x02000000                  0x00400000
         ; main.o(*trained_tflite) ; use this when not using EON Compiler
         .ANY1 (+RO-DATA)
         .ANY1 (+RW +ZI)
+    }
+
+    PADDING +0 ALIGN 16 FILL 0 16
+    {
     }
 }

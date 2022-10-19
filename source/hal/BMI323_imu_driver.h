@@ -103,7 +103,7 @@ typedef struct {
 } xyz_accel_s;
 
 
-//int32_t IMU_Init(uint8_t i2c_addr);
-//void    IMU_ACC_Get(xyz_accel_s *);
+int32_t IMU_Init(uint8_t i2c_addr);
+void    IMU_ACC_Get(xyz_accel_s *);
 void    IMU_GYR_Get(xyz_accel_s *);
 int32_t IMU_Deinit(uint8_t i2c_addr);

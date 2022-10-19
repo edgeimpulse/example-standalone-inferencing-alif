@@ -197,7 +197,6 @@ char *RETARGET(_command_string)(char *cmd, int len)
 
 void RETARGET(_exit)(int return_code)
 {
-   UartEndSimulation(return_code);
 }
 
 int system(const char *cmd)
@@ -245,14 +244,14 @@ int fputc(int ch, FILE *f)
 {
    UNUSED(f);
 
-   return UartPutc(ch);
+   return stdout_putchar(ch);
 }
 
 int fgetc(FILE *f)
 {
    UNUSED(f);
 
-   return UartPutc(UartGetc());
+   return stdout_putchar('n');
 }
 
 #ifndef ferror
