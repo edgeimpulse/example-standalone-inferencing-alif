@@ -4,7 +4,8 @@ This builds and runs an exported impulse locally on your machine.
 
 ## Prerequisites
 1. Create an edge impulse account at [edgeimpulse.com](https://www.edgeimpulse.com/)
-2. Install either arm gcc or arm clang:
+2. Install and follow the [Quick Start Guide](https://alifsemi.com/download/AQSG0002) for the [Alif Security Toolkit - Version 0.54.0](https://alifsemi.com/kits/) to set up and enable programming via the SEUART interface.
+3. Install either arm gcc or arm clang:
 
 ### gcc
 Tested with:
@@ -45,9 +46,30 @@ make -j8
 ```
 
 ## Flash your device
-If you are using the Alif Dev kit, see Alif `AN0002` for instructions on flashing your Alif development kit with `build/bin/app.axf`
 
-Once programmed, the firmware will run inference and print the results over the serial port.
+1. If using `armclang`, generate a .bin file from the compiled .axf via:
+
+```
+fromelf -v --bin --output bin/app.bin bin/app.axf
+```
+
+If using `gcc`, generate a .bin file from the compiled .axf via `objcopy`:
+```
+arm-none-eabi-objcopy -O binary bin/app.axf bin/app.bin
+```
+
+2. Navigate to your installed copy of the Alif Security Toolkit. 
+
+3. Copy the `ei-app-cfg.json` from this repository to the `./build/config` directory of the toolkitcopy
+
+4. Copy the generated `build/bin/app.bin` from this repository into the `./build/images` directory of the toolkit.
+
+5. Run the commands to generate and flash the Alif device via SEUART:
+
+```
+app-gen-toc -f build/config/ei-app-cfg.json
+app-write-mram
+```
 
 ## Serial out is on UART2, which is connected to pins P3_16,P3_17 (on connector J413)
 

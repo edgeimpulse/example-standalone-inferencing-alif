@@ -1,0 +1,23 @@
+{
+    "A32_APP": {
+        "binary": "a32_stub_0.bin",
+        "version" : "1.0.0",
+        "loadAddress": "0x02000000",
+        "cpu_id": "A32_0",
+        "flags": ["load","boot"]
+    },  
+    "HP_APP": {
+        "binary": "app.bin",
+        "version" : "1.0.0",
+        "loadAddress": "0x50000000",
+        "cpu_id": "M55_HP",
+        "flags": ["load","boot"]
+    },
+    "HE_APP": {
+        "binary": "m55_stub_he.bin",
+        "version" : "1.0.0",
+        "loadAddress": "0x60000000",
+        "cpu_id": "M55_HE",
+        "flags": ["load", "boot"]
+    }
+}
