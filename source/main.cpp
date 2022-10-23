@@ -42,9 +42,7 @@ void delay(uint32_t nticks) { nticks += ms_ticks; while(ms_ticks < nticks); }
 #define IMU_SAMPLE_RATE		(62.5)
 #define LPTIMER_INSTANCE	2
 
-static float raw_features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE] = {
-		0.0700, 0.0000, 10.1300, 0.0900, -0.0100, 10.1100, 0.0600, -0.0300, 10.0900, 0.0100, -0.0200, 10.0700, 0.0100, -0.0200, 10.0600, 0.0100, -0.0200, 10.0600, 0.0400, -0.0300, 10.1500, 0.0600, -0.0500, 10.1000, 0.0700, 0.0000, 10.1100, 0.0800, 0.0200, 10.1700, 0.0500, 0.0000, 10.1300, 0.0300, -0.0500, 10.0900, 0.0300, -0.0500, 10.0900, 0.0500, -0.0300, 10.1100, 0.0800, 0.0000, 10.1200, 0.0600, 0.0000, 10.1100, 0.0500, -0.0200, 10.1100, 0.0400, -0.0300, 10.1100, 0.0200, -0.0300, 10.0900, 0.0200, -0.0300, 10.0900, 0.0200, -0.0100, 10.0900, 0.0300, -0.0100, 10.0900, 0.0600, -0.0200, 10.1100, 0.0800, -0.0200, 10.1200, 0.0500, -0.0100, 10.1100, 0.0300, -0.0200, 10.0900, 0.0300, -0.0200, 10.0900, 0.0400, -0.0300, 10.1100, 0.0600, 0.0000, 10.1300, 0.0600, -0.0100, 10.1200, 0.0500, -0.0100, 10.1100, 0.0500, -0.0100, 10.1200, 0.0400, -0.0300, 10.1000, 0.0400, -0.0300, 10.1000, 0.0400, -0.0400, 10.0900, 0.0300, -0.0200, 10.1100, 0.0400, 0.0000, 10.1000, 0.0600, 0.0000, 10.1300, 0.0600, -0.0100, 10.1300, 0.0500, -0.0200, 10.1100, 0.0500, -0.0200, 10.1100, 0.0400, -0.0300, 10.1000, 0.0500, -0.0100, 10.1100, 0.0500, -0.0100, 10.1400, 0.0500, -0.0200, 10.0900, 0.0500, 0.0000, 10.1200, 0.0400, 0.0000, 10.1300, 0.0400, 0.0000, 10.1300, 0.0400, -0.0400, 10.1000, 0.0400, -0.0500, 10.1000, 0.0500, -0.0200, 10.1100, 0.0600, 0.0000, 10.1200, 0.0500, 0.0000, 10.1400, 0.0600, -0.0100, 10.1200, 0.0600, -0.0100, 10.1200, 0.0400, -0.0400, 10.1100, 0.0500, -0.0200, 10.1000, 0.0500, -0.0200, 10.1300, 0.0400, -0.0200, 10.1100, 0.0400, -0.0200, 10.1200, 0.0400, -0.0200, 10.1200, 0.0500, -0.0100, 10.1200, 0.0400, -0.0100, 10.1200, 0.0300, -0.0200, 10.1000, 0.0400, -0.0400, 10.1100, 0.0700, -0.0300, 10.1200, 0.0700, 0.0000, 10.1300, 0.0700, 0.0000, 10.1300, 0.0400, 0.0000, 10.1300, 0.0400, -0.0100, 10.1100, 0.0500, -0.0300, 10.1000, 0.0500, -0.0300, 10.1200, 0.0400, -0.0300, 10.1100, 0.0400, -0.0200, 10.1000, 0.0400, -0.0200, 10.1000, 0.0600, -0.0100, 10.1300, 0.0600, 0.0000, 10.1200, 0.0400, -0.0200, 10.1100, 0.0400, -0.0200, 10.1000, 0.0500, -0.0200, 10.1200, 0.0600, -0.0200, 10.1200, 0.0600, -0.0200, 10.1200, 0.0700, -0.0100, 10.1400, 0.0600, -0.0100, 10.1200, 0.0400, -0.0100, 10.1100, 0.0300, -0.0200, 10.1100, 0.0300, -0.0300, 10.0900, 0.0400, -0.0300, 10.1200, 0.0400, -0.0300, 10.1200, 0.0600, -0.0100, 10.1200, 0.0600, -0.0100, 10.1200, 0.0600, -0.0200, 10.1200, 0.0400, -0.0200, 10.1100, 0.0400, -0.0200, 10.1100, 0.0500, -0.0100, 10.1200, 0.0500, -0.0100, 10.1200, 0.0500, -0.0100, 10.1300, 0.0700, -0.0200, 10.1300, 0.0500, -0.0100, 10.1200, 0.0400, -0.0200, 10.1200, 0.0300, -0.0300, 10.1000, 0.0300, -0.0200, 10.1100, 0.0300, -0.0200, 10.1100, 0.0500, -0.0100, 10.1200, 0.0600, -0.0200, 10.1300, 0.0600, -0.0400, 10.1400, 0.0500, 0.0000, 10.1100, 0.0300, 0.0000, 10.1200, 0.0300, -0.0300, 10.0900, 0.0300, -0.0300, 10.0900, 0.0400, -0.0100, 10.1300, 0.0600, -0.0100, 10.1100, 0.0600, -0.0200, 10.1500, 0.0500, 0.0000, 10.0900, 0.0300, -0.0500, 10.1200, 0.0300, -0.0500, 10.1200, 0.0400, -0.0500, 10.1100, 0.0500, 0.0000, 10.1200, 0.0400, 0.0000, 10.1300, 0.0500, -0.0200, 10.1000, 0.0600, -0.0200, 10.1000, 0.0500, -0.0200, 10.1300, 0.0500, -0.0200, 10.1300, 0.0300, -0.0300, 10.1100, 0.0300, 0.0000, 10.1000
-};
+static float raw_features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE];
 
 #if !NDEBUG
 extern "C" void __stack_chk_fail(void) { 
@@ -108,14 +106,15 @@ int main()
             LPTIMER_ll_Wait(LPTIMER_INSTANCE);
             IMU_ACC_Get(&motion);
 
-            raw_features[i + 0] = (-1.0 * (float) (motion.x - calibration.x)) / 4096.0 * G_TO_MS;
-            raw_features[i + 1] = (-1.0 * (float) (motion.y - calibration.y)) / 4096.0 * G_TO_MS;
-            raw_features[i + 2] = ((float) (motion.z - calibration.z)) / 4096.0 * G_TO_MS;
+            raw_features[i + 0] = (-1.0 * (float) (motion.x - calibration.x)); // / 4096.0 * G_TO_MS;
+            raw_features[i + 1] = (-1.0 * (float) (motion.y - calibration.y)); // / 4096.0 * G_TO_MS;
+            raw_features[i + 2] = ((float) (motion.z - calibration.z)); // / 4096.0 * G_TO_MS;
 
             	/* Uncomment this line, and comment out the lines 133 to 148, to collect data
             	 * via the edge-impulse-data-forwarder cli:
-            	 */ 	https://docs.edgeimpulse.com/docs/edge-impulse-cli/cli-data-forwarder
-		        //ei_printf("%.4f,%.4f,%.4f\n", raw_features[i + 0], raw_features[i + 1], raw_features[i + 2]);
+            	 * 	https://docs.edgeimpulse.com/docs/edge-impulse-cli/cli-data-forwarder
+               */
+		        // ei_printf("%.4f,%.4f,%.4f\n", raw_features[i + 0], raw_features[i + 1], raw_features[i + 2]);
         }
 
         ei_impulse_result_t result;
@@ -124,25 +123,17 @@ int main()
         numpy::signal_from_buffer(&raw_features[0], ARRAY_LENGTH(raw_features), &signal);
 
         EI_IMPULSE_ERROR res = run_classifier(&signal, &result, false);
-        ei_printf("run_classifier returned: %d (DSP %lld us., Classification %lld us., Anomaly %d ms.)\n", res,
-            result.timing.dsp_us, result.timing.classification_us, result.timing.anomaly);
 
-        ei_printf("Begin output:\n");
-
-        // print the predictions
-        ei_printf("[");
+        ei_printf("%d ms. ", result.timing.dsp + result.timing.classification);
         for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-            ei_printf("%.5f", result.classification[ix].value);
-#if EI_CLASSIFIER_HAS_ANOMALY == 1
-            ei_printf(", ");
-#else
+            ei_printf("%s: %.05f", result.classification[ix].label, result.classification[ix].value);
             if (ix != EI_CLASSIFIER_LABEL_COUNT - 1) {
                 ei_printf(", ");
             }
-#endif
         }
+        ei_printf("\n");
 #if EI_CLASSIFIER_HAS_ANOMALY == 1
-        ei_printf("%.3f", result.anomaly);
+        ei_printf("anomaly score: %.3f", result.anomaly);
 #endif
         ei_printf("]\n");
         ei_printf("End output\n");
