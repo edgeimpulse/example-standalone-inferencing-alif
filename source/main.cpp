@@ -92,7 +92,7 @@ int main()
 	  IMU_Init(i2c_addr_68);
 
     /* Optional 'calibration' step */
-    calibtrate_IMU(&calibration);
+    // calibtrate_IMU(&calibration);
 
 	  /* Initialize timer to poll IMU at specified rate */
     LPTIMER_ll_Initialize(LPTIMER_INSTANCE);
@@ -102,42 +102,37 @@ int main()
     LPTIMER_ll_Start(LPTIMER_INSTANCE);
 
     while (1) {
-        for (int i = 0; i < EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE - 3; i += 3) {
+        for (int i = 0; i < EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE - 2; i += 3) {
             LPTIMER_ll_Wait(LPTIMER_INSTANCE);
             IMU_ACC_Get(&motion);
 
-            raw_features[i + 0] = (-1.0 * (float) (motion.x - calibration.x)); // / 4096.0 * G_TO_MS;
-            raw_features[i + 1] = (-1.0 * (float) (motion.y - calibration.y)); // / 4096.0 * G_TO_MS;
-            raw_features[i + 2] = ((float) (motion.z - calibration.z)); // / 4096.0 * G_TO_MS;
+            raw_features[i + 0] = (-1.0 * (float) (motion.x - calibration.x)) / 4096.0 * G_TO_MS;
+            raw_features[i + 1] = (-1.0 * (float) (motion.y - calibration.y)) / 4096.0 * G_TO_MS;
+            raw_features[i + 2] = ((float) (motion.z - calibration.z)) / 4096.0 * G_TO_MS;
 
             	/* Uncomment this line, and comment out the lines 133 to 148, to collect data
             	 * via the edge-impulse-data-forwarder cli:
             	 * 	https://docs.edgeimpulse.com/docs/edge-impulse-cli/cli-data-forwarder
                */
-		        // ei_printf("%.4f,%.4f,%.4f\n", raw_features[i + 0], raw_features[i + 1], raw_features[i + 2]);
+		        // ei_printf("%.9g, %.9g,%.9g\n", raw_features[i + 0], raw_features[i + 1], raw_features[i + 2]);
         }
 
-        ei_impulse_result_t result;
+         ei_impulse_result_t result;
+ 
+         signal_t signal;
+         numpy::signal_from_buffer(&raw_features[0], ARRAY_LENGTH(raw_features), &signal);
+ 
+         EI_IMPULSE_ERROR res = run_classifier(&signal, &result, false);
 
-        signal_t signal;
-        numpy::signal_from_buffer(&raw_features[0], ARRAY_LENGTH(raw_features), &signal);
-
-        EI_IMPULSE_ERROR res = run_classifier(&signal, &result, false);
-
-        ei_printf("%d ms. ", result.timing.dsp + result.timing.classification);
-        for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-            ei_printf("%s: %.05f", result.classification[ix].label, result.classification[ix].value);
-            if (ix != EI_CLASSIFIER_LABEL_COUNT - 1) {
-                ei_printf(", ");
-            }
-        }
-        ei_printf("\n");
-#if EI_CLASSIFIER_HAS_ANOMALY == 1
-        ei_printf("anomaly score: %.3f", result.anomaly);
-#endif
-        ei_printf("]\n");
-        ei_printf("End output\n");
-    }
+         ei_printf("\nrun_classifier returned: %d (DSP %lld us., Classification %lld us., Anomaly %d ms.)\n", res, result.timing.dsp_us, result.timing.classification_us, result.timing.anomaly);
+         ei_printf("\nInference Results:\n");
+         for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
+             ei_printf("%s: %.9g\n", result.classification[ix].label, result.classification[ix].value);
+         }
+ #if EI_CLASSIFIER_HAS_ANOMALY == 1
+         ei_printf("anomaly score: %.9g\n", result.anomaly);
+ #endif
+     }
 }
 
 // remove unneeded bloat
