@@ -110,7 +110,7 @@ int main()
             raw_features[i + 1] = (-1.0 * (float) (motion.y - calibration.y)) / 4096.0 * G_TO_MS;
             raw_features[i + 2] = ((float) (motion.z - calibration.z)) / 4096.0 * G_TO_MS;
 
-            	/* Uncomment this line, and comment out the lines 133 to 148, to collect data
+            	/* Uncomment this line, and comment out the lines 120 to 134, to collect data
             	 * via the edge-impulse-data-forwarder cli:
             	 * 	https://docs.edgeimpulse.com/docs/edge-impulse-cli/cli-data-forwarder
                */
