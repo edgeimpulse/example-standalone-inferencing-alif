@@ -4,10 +4,11 @@ This builds and runs an exported impulse locally on your machine.
 
 ## Prerequisites
 1. Create an edge impulse account at [edgeimpulse.com](https://www.edgeimpulse.com/)
-2. Install the latest `Alif Security Toolkit`
-    a. Navigate to the [Alif Semiconductor Kit documentation](https://alifsemi.com/kits) page (you will need to register to create an account or log in). and download the latest `App Security Toolkit` (tested with version 0.54.0) for windows or linux. If you are using MacOS, download the linux version.
-    b. Extract archive and place `app-release` in the root of this repo
-    c. Follow the instructions in local the `Alif Security Toolkit Quickstart Guide` to finalize the installation.
+2. Install the latest `Alif Security Toolkit`:
+
+    * Navigate to the [Alif Semiconductor Kit documentation](https://alifsemi.com/kits) page (you will need to register to create an account or log in). and download the latest `App Security Toolkit` (tested with version 0.54.0) for windows or linux. If you are using MacOS, download the linux version.
+    * Extract archive and place `app-release` in the root of this repo
+    * Follow the instructions in local the `Alif Security Toolkit Quickstart Guide` to finalize the installation.
 3. Install either arm gcc or arm clang: 
 
 ### gcc
@@ -64,7 +65,7 @@ When prompted to select the serial interface to program over. Select the corresp
 
 Once programmed, the firmware will run inference and print the results over the UART2 serial port.
 
-## Serial out is on UART2, which is connected to baseboard pins P3_16,P3_17 (on connector J413).
+### Serial out is on UART2, which is connected to baseboard pins P3_16,P3_17 (on connector J413).
 - Baud 115200
 - "8,N,1" (the typical settings for everything else, 8 bit, no parity, 1 stop bit)
 - 1.8 Vcc
