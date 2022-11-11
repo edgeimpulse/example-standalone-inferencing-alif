@@ -4,7 +4,7 @@ This builds and runs an exported impulse locally on your machine.
 
 ## Prerequisites
 1. Create an edge impulse account at [edgeimpulse.com](https://www.edgeimpulse.com/)
-2. Install either arm gcc or arm clang:
+2. Install either arm gcc or arm clang: 
 
 ### gcc
 Tested with:
@@ -17,6 +17,12 @@ gcc version 10.2.1 20201103 (release) (GNU Arm Embedded Toolchain 10-2020-q4-maj
 ```
 which armclang
 ```
+
+3. Install the latest `Alif Security Toolkit`
+    a. Navigate to the [Alif Semiconductor Kit documentation](https://alifsemi.com/kits) page (you will need to register to create an account or log in). and download the latest `App Security Toolkit` (tested with version 0.54.0) for windows or linux. If you are using MacOS, download the linux version.
+    b. Extract archive and place `app-release` in the root of this repo
+    c. Follow the instructions in local the `Alif Security Toolkit Quickstart Guide` to finalize the installation.
+
 
 ## Downloading your Edge Impulse model
 Using an Edge Impulse project with the Alif beta enabled, navigate to the **Deployment** tab. Here you should see an `Ethos-U library` deployment option. Select this and click **build** to download a zip file of the contents. If your project does not have the ethos deployment option, contact [david@edgeimpulse.com](david@edgeimpulse.com)
@@ -45,12 +51,22 @@ make -j8
 ```
 
 ## Flash your device
-If you are using the Alif Dev kit, see Alif `AN0002` for instructions on flashing your Alif development kit with `build/bin/app.axf`
+0. Ensure your board is configured for programming over the SEUART interface by following the [Edge Impulse Ensemble E7 setup guide](https://docs.edgeimpulse.com/docs/development-platforms/officially-supported-mcu-targets/alif-ensemble-e7#connecting-to-edge-impulse)
+1. Copy `./build/bin/app.bin` into the Alif Security Toolkit directory `./app-release/build/images`
+2. Copy the `app-cfg-gcc.json` file into the Alif Security Toolkit directory `./app-release/build/config`
+3. Execute the following commands to program your board:
 
-Once programmed, the firmware will run inference and print the results over the serial port.
+```
+cd app-release
+./app-gen-toc -f ./build/config/app-cfg-gcc.json
+./app-write-mram.py -d
+```
 
-## Serial out is on UART2, which is connected to pins P3_16,P3_17 (on connector J413)
+When prompted to select the serial interface to program over. Select the corresponding the FTDI COM interface.
 
+Once programmed, the firmware will run inference and print the results over the UART2 serial port.
+
+## Serial out is on UART2, which is connected to baseboard pins P3_16,P3_17 (on connector J413).
 - Baud 115200
 - "8,N,1" (the typical settings for everything else, 8 bit, no parity, 1 stop bit)
 - 1.8 Vcc
@@ -67,16 +83,5 @@ Timing calculations are performed in [ei_classifier_porting.cpp](source/ei_class
 
 Alif M55 processors have a private fast DTCM, and also access to a larger, but slower, chip global SRAM.
 - For armclang the linker file attempts to place as much as possible in DTCM, and overflows into SRAM if needed.
-- For gcc, the linker is unable to auto place based on size.  If you get an error during link, see [The linker file for GCC, arena placement](ensemble.ld#L116) and uncomment the line that places the arena in SRAM (line 116) (instead of DTCM).  This will only slow down DSP, as the U55 has to use the SRAM bus to access the model regardless of placement.
-
-When your entire program can't fit into DTCM, sometimes customizing placement of objects can improve performance.
+- For gcc, the linker is unable to auto place based on size. When your entire program can't fit into DTCM, sometimes customizing placement of objects can improve performance.
 See [ensemble.sct](ensemble.sct) for example placement commands (currently commented out)
-
-## Known issues
-
-With debugger attached, my device boots up directly into Bus_Fault (or possibly another fault).  This can especially happen when you entered Hard Fault before your last reset.
-
-- Power cycle your board and reload your program
-
-Device hangs when using LOG_LEVEL_* (anything not ERROR)
-- The ethos IRQ handler from ARM has logging statements.  The default logging calls into the UART driver, which cannot be called from an interrupt. (I suspect there is a deadlock issue). Either comment out these logging statements, set LOG_LEVEL_ERROR (the default), or redirect the logging statements to something interrupt safe.
