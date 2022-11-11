@@ -18,6 +18,7 @@ gcc version 10.2.1 20201103 (release) (GNU Arm Embedded Toolchain 10-2020-q4-maj
 which armclang
 ```
 
+
 3. Install the latest `Alif Security Toolkit`
     a. Navigate to the [Alif Semiconductor Kit documentation](https://alifsemi.com/kits) page (you will need to register to create an account or log in). and download the latest `App Security Toolkit` (tested with version 0.54.0) for windows or linux. If you are using MacOS, download the linux version.
     b. Extract archive and place `app-release` in the root of this repo
