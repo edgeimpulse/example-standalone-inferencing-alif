@@ -27,7 +27,7 @@ which armclang
 Using an Edge Impulse project with the Alif beta enabled, navigate to the **Deployment** tab. Here you should see an `Ethos-U library` deployment option. Select this and click **build** to download a zip file of the contents.
 
 ## Add static features
-Edge Impulse static examples show the minimal code to run inference, with no peripherals connected to provide data. Instead, we provide a static buffer of data obtained from a studio sample. Follow the steps described [here](https://docs.edgeimpulse.com/docs/running-your-impulse-locally-zephyr#running-the-impulse) to extract sample features from studio, and use these to populate the features array in `source/main.cpp`
+Edge Impulse static examples show the minimal code to run inference, with no peripherals connected to provide data. Instead, we provide a static buffer of data obtained from a studio sample. Follow the steps described [here](https://docs.edgeimpulse.com/docs/deployment/running-your-impulse-locally/running-your-impulse-alif-ensemble) to extract sample features from studio, and use these to populate the features array in `source/main.cpp`
 
 ## Build the firmware
 1. Extract the zip file downloaded from edge impulse into the `source` directory of this repository
