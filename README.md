@@ -41,7 +41,7 @@ Edge Impulse static examples show the minimal code to run inference, with no per
 ```
 mkdir build
 cd build
-cmake .. -DTARGET_SUBSYSTEM=HP -DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-gcc.cmake
+cmake .. -DTARGET_SUBSYSTEM=HP -DCMAKE_TOOLCHAIN_FILE=../scripts/cmake/toolchains/bare-metal-gcc.cmake -G"Unix Makefiles"
 make -j8
 ```
 
