@@ -4,7 +4,11 @@ This builds and runs an exported impulse locally on your machine.
 
 ## Prerequisites
 1. Create an edge impulse account at [edgeimpulse.com](https://www.edgeimpulse.com/)
-2. Install either arm gcc or arm clang: 
+2. Install the latest `Alif Security Toolkit`
+    a. Navigate to the [Alif Semiconductor Kit documentation](https://alifsemi.com/kits) page (you will need to register to create an account or log in). and download the latest `App Security Toolkit` (tested with version 0.54.0) for windows or linux. If you are using MacOS, download the linux version.
+    b. Extract archive and place `app-release` in the root of this repo
+    c. Follow the instructions in local the `Alif Security Toolkit Quickstart Guide` to finalize the installation.
+3. Install either arm gcc or arm clang: 
 
 ### gcc
 Tested with:
@@ -17,13 +21,6 @@ gcc version 10.2.1 20201103 (release) (GNU Arm Embedded Toolchain 10-2020-q4-maj
 ```
 which armclang
 ```
-
-
-3. Install the latest `Alif Security Toolkit`
-    a. Navigate to the [Alif Semiconductor Kit documentation](https://alifsemi.com/kits) page (you will need to register to create an account or log in). and download the latest `App Security Toolkit` (tested with version 0.54.0) for windows or linux. If you are using MacOS, download the linux version.
-    b. Extract archive and place `app-release` in the root of this repo
-    c. Follow the instructions in local the `Alif Security Toolkit Quickstart Guide` to finalize the installation.
-
 
 ## Downloading your Edge Impulse model
 Using an Edge Impulse project with the Alif beta enabled, navigate to the **Deployment** tab. Here you should see an `Ethos-U library` deployment option. Select this and click **build** to download a zip file of the contents. If your project does not have the ethos deployment option, contact [david@edgeimpulse.com](david@edgeimpulse.com)
