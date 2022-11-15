@@ -43,9 +43,7 @@
 #include "hal/RTE_Components.h"
 #include "hal/Driver_PINMUX_AND_PINPAD.h"
 #include CMSIS_device_header
-
-#define DRIVER_OK                               (0)
-#define DRIVER_ERROR                            (-1)
+#include "Driver_Common.h"
 
 #define PORT1_MAX_PIN_NUMBER                    (32)
 #define PORT2_MAX_PIN_NUMBER                    (32)

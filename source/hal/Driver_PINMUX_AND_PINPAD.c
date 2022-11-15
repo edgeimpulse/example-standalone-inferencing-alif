@@ -48,32 +48,32 @@
  */
 
 int32_t PINMUX_Config (uint8_t port, uint8_t pin_no, uint8_t AF_number) {
-   
+
     volatile uint32_t *ptr;
     uint32_t value = 0;
 
     if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
     if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
     if (AF_number > PINMUX_ALTERNATE_FUNCTION_7)    { return ARM_DRIVER_ERROR_PARAMETER; }
-	
-    if (port == PORT_NUMBER_4)
-	{
-	     	if (pin_no > PIN_NUMBER_7)                  { return ARM_DRIVER_ERROR_PARAMETER; }
 
-	           /* Configure GPIO_SWPORTA_CTL register - select AUX or Data Register signal */
-	        ptr = (volatile uint32_t*) (GPIO4_BASE + 0x08);
-	        if (AF_number == PINMUX_ALTERNATE_FUNCTION_0)
-	        {
-	               /* 0 indicates software mode - GPIO pin is driven by Data Register value set by software */
-	          *ptr &= ~(1 << pin_no);
-	        }
-	        else if (AF_number == PINMUX_ALTERNATE_FUNCTION_1)
-	        {
-	               /* 1 indicates hardware mode - GPIO pin is driven by Auxiliary signal - connected to LPTIMER input or output */
-	                  *ptr |= (1 << pin_no);
-	        }
-	        return ARM_DRIVER_OK;
-	 }
+    if (port == PORT_NUMBER_4)
+    {
+        if (pin_no > PIN_NUMBER_7)                  { return ARM_DRIVER_ERROR_PARAMETER; }
+
+        /* Configure GPIO_SWPORTA_CTL register - select AUX or Data Register signal */
+        ptr = (volatile uint32_t*) (GPIO4_BASE + 0x08);
+        if (AF_number == PINMUX_ALTERNATE_FUNCTION_0)
+        {
+            /* 0 indicates software mode - GPIO pin is driven by Data Register value set by software */
+            *ptr &= ~(1 << pin_no);
+        }
+        else if (AF_number == PINMUX_ALTERNATE_FUNCTION_1)
+        {
+            /* 1 indicates hardware mode - GPIO pin is driven by Auxiliary signal - connected to LPTIMER input or output */
+            *ptr |= (1 << pin_no);
+        }
+        return ARM_DRIVER_OK;
+    }
 
     port = (port *16) + 16;
 
@@ -121,19 +121,15 @@ int32_t PINMUX_read (uint8_t port, uint8_t pin_no, uint32_t *AF_number) {
     if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
     if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
     if (AF_number == 0)                             { return ARM_DRIVER_ERROR_PARAMETER; }
-	      
+
     if (port == PORT_NUMBER_4)
-	{
-		if (pin_no > PIN_NUMBER_7)                  { return ARM_DRIVER_ERROR_PARAMETER; }
+    {
+        if (pin_no > PIN_NUMBER_7)                  { return ARM_DRIVER_ERROR_PARAMETER; }
 
-	        ptr = (volatile uint32_t*) (GPIO4_BASE + 0x08);
-	        *AF_number = (*ptr & (1 << pin_no)) ? PINMUX_ALTERNATE_FUNCTION_1 : PINMUX_ALTERNATE_FUNCTION_0;
-	        return ARM_DRIVER_OK;
-	}
-
-    if (port > PORT_NUMBER_4)                       { return ARM_DRIVER_ERROR_PARAMETER; }
-    if (pin_no > PIN_NUMBER_31)                     { return ARM_DRIVER_ERROR_PARAMETER; }
-    if (AF_number == 0)                             { return ARM_DRIVER_ERROR_PARAMETER; }
+        ptr = (volatile uint32_t*) (GPIO4_BASE + 0x08);
+        *AF_number = (*ptr & (1 << pin_no)) ? PINMUX_ALTERNATE_FUNCTION_1 : PINMUX_ALTERNATE_FUNCTION_0;
+        return ARM_DRIVER_OK;
+    }
 
     port = (port *16) + 16;
 

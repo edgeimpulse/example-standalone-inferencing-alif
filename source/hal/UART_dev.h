@@ -260,6 +260,13 @@ extern "C" {
 
 #endif /* end of RS485_SUPPORT */
 
+/* UART Status */
+typedef enum
+{
+    UART_STATUS_FREE          = 0,      /* UART Status Free. */
+    UART_STATUS_BUSY          = 1       /* UART Status Busy. */
+}uart_status_t;
+
 /**
  * UART Device TX Empty Trigger (TET) Types Enum
  * This is used to select the empty threshold level
@@ -379,7 +386,7 @@ typedef struct uart_transfer_info
     uint8_t  *rx_buf;                   /* Pointer to in data buffer                    */
     uint32_t  rx_total_num;             /* Total number of data to be received          */
     uint32_t  rx_curr_cnt;              /* Number of data received                      */
-    uint8_t   send_busy;                /* Send active flag                             */
+    uint8_t   tx_busy;                  /* Transmitter busy flag                        */
 } uart_transfer_info_t;
 
 /* UART Receive Status */

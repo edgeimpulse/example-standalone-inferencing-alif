@@ -35,8 +35,10 @@
  * @Note     None
  ******************************************************************************/
 
-#if defined (M55_HP)
+#if EI_CONFIG_ALIF_HP
   #include "M55_HP.h"
+#elif EI_CONFIG_ALIF_HE
+  #include "M55_HE.h"
 #else
   #error device not specified!
 #endif
@@ -98,6 +100,13 @@ void PMU_delay_loop_us(unsigned int delay_us)
 {
     if (delay_us == 0)
             return;
+
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    ARM_PMU_Enable();
+    ARM_PMU_CNTR_Enable(1U << 31);
+    ARM_PMU_CYCCNT_Reset();
+
+    extern uint32_t GetSystemCoreClock();
     uint32_t timestamp = ARM_PMU_Get_CCNTR();
     unsigned int delay_in_cycles = delay_us * (GetSystemCoreClock()/1000000);
     unsigned int diff = 0, curt_count = 0;

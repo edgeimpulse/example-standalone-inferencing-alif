@@ -129,29 +129,21 @@
 #define RTE_MIPI_DSI_VC_ID                      0
 #define RTE_MIPI_DSI_NON_CONTINUOUS_CLOCK_MODE  1
 #define RTE_MIPI_DSI_PLL_INPUT_DIV_FACTOR_N     3
-#define RTE_MIPI_DSI_PHY_CLKHS2LP_TIME          0
-#define RTE_MIPI_DSI_PHY_CLKLP2HS_TIME          0
-#define RTE_MIPI_DSI_PHY_HS2LP_TIME             0
-#define RTE_MIPI_DSI_PHY_LP2HS_TIME             0
+#define RTE_MIPI_DSI_PHY_CLKHS2LP_TIME          0x42
+#define RTE_MIPI_DSI_PHY_CLKLP2HS_TIME          0xB5
+#define RTE_MIPI_DSI_PHY_HS2LP_TIME             0x32
+#define RTE_MIPI_DSI_PHY_LP2HS_TIME             0x99
 #define RTE_MIPI_DSI_TX_ESC_CLK_DIVISION        4
-#define RTE_MIPI_DSI_VID_MODE_TYPE              2
-#define RTE_MIPI_DSI_VID_PKT_SIZE               480
+#define RTE_MIPI_DSI_VID_MODE_TYPE              2	/* Burst Mode */
+#define RTE_MIPI_DSI_VID_PKT_SIZE               480	/* Number of pixels per video packet */
 #define RTE_MIPI_DSI_VID_NUM_CHUNKS             0
 #define RTE_MIPI_DSI_VID_NLL_SIZE               0
-#define RTE_MIPI_DSI_DPI_COLOR_CODE             5
+#define RTE_MIPI_DSI_DPI_COLOR_CODE             5	/* 1: 16-bit, 4: 18-bit, 5: 24-bit */
 #define RTE_MIPI_DSI_DPI_DATAEN_ACTIVE_LOW      0
 #define RTE_MIPI_DSI_DPI_VSYNC_ACTIVE_LOW       0
 #define RTE_MIPI_DSI_DPI_HSYNC_ACTIVE_LOW       0
 #define RTE_MIPI_DSI_DPI_SHUTD_ACTIVE_LOW       0
 #define RTE_MIPI_DSI_DPI_COLORM_ACTIVE_LOW      0
-#define RTE_MIPI_DSI_DPI_HSA_TIME               8
-#define RTE_MIPI_DSI_DPI_HBP_TIME               10
-#define RTE_MIPI_DSI_DPI_HFP_TIME               10
-#define RTE_MIPI_DSI_DPI_HACTIVE_TIME           960
-#define RTE_MIPI_DSI_DPI_VSA_LINE               2
-#define RTE_MIPI_DSI_DPI_VBP_LINE               10
-#define RTE_MIPI_DSI_DPI_VFP_LINE               10
-#define RTE_MIPI_DSI_DPI_VACTIVE_LINE           800
 #define RTE_MIPI_DSI_IRQ_PRI                    0
 
 #define RTE_MIPI_DSI_ILI9806E_PANEL  1
@@ -160,12 +152,33 @@
 
 #define RTE_ILI9806E_PANEL_E43RB_FW405_EN      0
 #define RTE_ILI9806E_PANEL_E43GB_MW405_EN      1
+#define RTE_ILI9806E_PANEL_E50RA_MW550_EN      0
 
 #define RTE_ILI9806E_PANEL_RESET_PIN_NO                  6
 #define RTE_ILI9806E_PANEL_RESET_GPIO_PORT               4
 #define RTE_ILI9806E_PANEL_BL_LED_PIN_NO                 4
 #define RTE_ILI9806E_PANEL_BL_LED_GPIO_PORT              4
 #define RTE_ILI9806E_PANEL_BPP                           24
+#endif
+
+#if RTE_ILI9806E_PANEL_E43RB_FW405_EN || RTE_ILI9806E_PANEL_E43GB_MW405_EN
+#define RTE_MIPI_DSI_DPI_HSA_TIME               8
+#define RTE_MIPI_DSI_DPI_HBP_TIME               10
+#define RTE_MIPI_DSI_DPI_HFP_TIME               10
+#define RTE_MIPI_DSI_DPI_HACTIVE_TIME           960
+#define RTE_MIPI_DSI_DPI_VSA_LINE               2
+#define RTE_MIPI_DSI_DPI_VBP_LINE               10
+#define RTE_MIPI_DSI_DPI_VFP_LINE               10
+#define RTE_MIPI_DSI_DPI_VACTIVE_LINE           800
+#elif RTE_ILI9806E_PANEL_E50RA_MW550_EN
+#define RTE_MIPI_DSI_DPI_HSA_TIME               8
+#define RTE_MIPI_DSI_DPI_HBP_TIME               60
+#define RTE_MIPI_DSI_DPI_HFP_TIME               36
+#define RTE_MIPI_DSI_DPI_HACTIVE_TIME           960
+#define RTE_MIPI_DSI_DPI_VSA_LINE               8
+#define RTE_MIPI_DSI_DPI_VBP_LINE               60
+#define RTE_MIPI_DSI_DPI_VFP_LINE               40
+#define RTE_MIPI_DSI_DPI_VACTIVE_LINE           854
 #endif
 
 #endif
@@ -179,6 +192,8 @@
 #if RTE_CDC200
 #define RTE_CDC200_PIXCLK_DIV                16
 #define RTE_CDC200_PIXEL_FORMAT              1	/* 0: 32-bit ARGB888, 1: 24-bit RGB888, CDC_Ln_PIX_FORMAT */
+
+#if RTE_ILI9806E_PANEL_E43RB_FW405_EN || RTE_ILI9806E_PANEL_E43GB_MW405_EN
 #define RTE_CDC200_DPI_HSYNC_TIME            4
 #define RTE_CDC200_DPI_HBP_TIME              5
 #define RTE_CDC200_DPI_HFP_TIME              5
@@ -187,6 +202,16 @@
 #define RTE_CDC200_DPI_VBP_LINE              10
 #define RTE_CDC200_DPI_VFP_LINE              10
 #define RTE_CDC200_DPI_VACTIVE_LINE          800
+#elif RTE_ILI9806E_PANEL_E50RA_MW550_EN
+#define RTE_CDC200_DPI_HSYNC_TIME            4
+#define RTE_CDC200_DPI_HBP_TIME              30
+#define RTE_CDC200_DPI_HFP_TIME              18
+#define RTE_CDC200_DPI_HACTIVE_TIME          480
+#define RTE_CDC200_DPI_VSYNC_LINE            4
+#define RTE_CDC200_DPI_VBP_LINE              30
+#define RTE_CDC200_DPI_VFP_LINE              20
+#define RTE_CDC200_DPI_VACTIVE_LINE          854
+#endif
 
 #endif
 // </e> CDC200 (cdc200) [Driver_CDC200]
@@ -752,17 +777,17 @@
 
 #define RTE_UTIMER_CHANNEL6_FIXED_BUFFER            0
 #define RTE_UTIMER_CHANNEL6_BUF_TROUGH_N_CREST      4
-#define RTE_UTIMER_CHANNEL6_DRIVER_A                0
-#define RTE_UTIMER_CHANNEL6_DRIVER_B                0
+#define RTE_UTIMER_CHANNEL6_DRIVER_A                1
+#define RTE_UTIMER_CHANNEL6_DRIVER_B                1
 #define RTE_UTIMER_CHANNEL6_CMP_START_STATE         0
 #define RTE_UTIMER_CHANNEL6_CMP_STOP_STATE          0
-#define RTE_UTIMER_CHANNEL6_DRV_OP_AT_MATCH_COUNT   0
+#define RTE_UTIMER_CHANNEL6_DRV_OP_AT_MATCH_COUNT   3
 #define RTE_UTIMER_CHANNEL6_DRV_OP_AT_CYCLE_END     0
 #define RTE_UTIMER_CHANNEL6_EVENT_AT_CREST          1
 #define RTE_UTIMER_CHANNEL6_EVENT_AT_TROUGH         0
 #define RTE_UTIMER_CHANNEL6_BUFFERING_TYPE          1
 #define RTE_UTIMER_CHANNEL6_BUFFER_OPERATION        1
-#define RTE_UTIMER_CHANNEL6_BUFFERING_TYPE_A        2
+#define RTE_UTIMER_CHANNEL6_BUFFERING_TYPE_A        0
 #define RTE_UTIMER_CHANNEL6_BUFFERING_TYPE_B        0
 #define RTE_UTIMER_CHANNEL6_CAPTURE_A_IRQ_PRIORITY  0
 #define RTE_UTIMER_CHANNEL6_CAPTURE_B_IRQ_PRIORITY  0
@@ -889,7 +914,6 @@
 #define RTE_UTIMER_CHANNEL11_UNDER_FLOW_IRQ_PRIORITY 0
 #endif /*RTE_UTIMER*/
 // </e> UTIMER (Universal timer) [Driver_UTIMER]
-
 
 // </e> Analog configuration [vbat analog register2 and comparator register2]
 #define RTE_ANALOG_CONFIG          1

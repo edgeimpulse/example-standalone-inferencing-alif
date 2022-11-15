@@ -85,7 +85,11 @@ void* GlobalToLocal(void *in_addr);
   \fn          void PMU_delay_loop_us(unsigned int delay_us)
   \brief       Using PMU cycle counter for delay. User need to
                take care of disabling the preemption before
+<<<<<<< HEAD
+	       calling this PMU_delay_loop_us function. Maximum
+=======
                calling this PMU_delay_loop_us function. Maximum
+>>>>>>> working inferencing armclang
                delay supported (2^32/(SystemCoreClock/1000000))
                micro seconds.
   \param[in]   delay_us delay in micro seconds.

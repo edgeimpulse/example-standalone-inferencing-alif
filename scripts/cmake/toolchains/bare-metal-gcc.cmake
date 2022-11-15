@@ -47,15 +47,10 @@ endif()
 
 set(${CPU_COMPILE_DEF}              1)
 
-# Warning options
-add_compile_options(
-    -Wall
-    -Wextra
-    -Wvla
-    -Wno-psabi)
-
 # General purpose compile options:
 add_compile_options(
+    -Og
+    -g
     -funsigned-char
     -ffunction-sections
     -fdata-sections

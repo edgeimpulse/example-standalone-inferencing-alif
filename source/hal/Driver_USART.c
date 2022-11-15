@@ -684,15 +684,15 @@ static int32_t uart_enable_send_interrupt (uart_resources_t *uart,
 	uart_info_t *uart_info_ptr  = uart->info;
 	int32_t ret = ARM_DRIVER_OK;
 
-	/* check previous send is completed or not? */
-	if (uart_info_ptr->transfer.send_busy != 0U)
+	/* check previous TX is completed or not? */
+	if (uart_info_ptr->transfer.tx_busy != UART_STATUS_FREE)
 	{
 		/* return busy as previous send is not yet completed */
 		return ARM_DRIVER_ERROR_BUSY;
 	}
 
-	/* Set send busy flag to active */
-	uart_info_ptr->transfer.send_busy = 1U;
+	/* Set TX busy flag to active */
+	uart_info_ptr->transfer.tx_busy = UART_STATUS_BUSY;
 
 	/* fill the uart transfer structure as per user input */
 	uart_info_ptr->transfer.tx_buf = (uint8_t *)data;
@@ -725,14 +725,14 @@ static int32_t uart_enable_receive_interrupt (uart_resources_t *uart,
 	int32_t ret = ARM_DRIVER_OK;
 
 	/* check previous receive is completed or not? */
-	if (uart->info->rx_status.rx_busy == 1U)
+	if (uart->info->rx_status.rx_busy == UART_STATUS_BUSY)
 	{
 		/* return busy as previous receive is not yet completed */
 		return ARM_DRIVER_ERROR_BUSY;
 	}
 
 	/* set rx busy flag to active */
-	uart_info_ptr->rx_status.rx_busy = 1U;
+	uart_info_ptr->rx_status.rx_busy = UART_STATUS_BUSY;
 
 	/* clear rx status */
 	uart_info_ptr->rx_status.rx_break          = 0U;
@@ -825,8 +825,8 @@ static void uart_abort_tx (uart_resources_t *uart)
 	/* reset TX fifo */
 	uart_reset_txfifo(uart_reg_ptr);
 
-	/* clear Send active flag */
-	uart_info_ptr->transfer.send_busy = 0U;
+	/* clear TX busy flag */
+	uart_info_ptr->transfer.tx_busy = UART_STATUS_FREE;
 
 	/* Reset the tx_buffer */
 	uart_info_ptr->transfer.tx_total_num = 0U;
@@ -858,7 +858,7 @@ static void uart_abort_rx (uart_resources_t *uart)
 	uart_reset_rxfifo(uart_reg_ptr);
 
 	/* clear Receive busy flag */
-	uart_info_ptr->rx_status.rx_busy      = 0U;
+	uart_info_ptr->rx_status.rx_busy      = UART_STATUS_FREE;
 	uart_info_ptr->transfer.rx_total_num  = 0U;
 }
 
@@ -900,7 +900,6 @@ static void uart_disable_interrupt (uart_resources_t *uart)
 static void uart_irq_handler (uart_resources_t *uart)
 {
 	uint32_t uart_int_status = 0U;      /* uart interrupt status */
-	volatile uint32_t temp   = 0U;      /* read error status to clear interrupt */
 	uint32_t event           = 0U;      /* callback event */
 	uint32_t tx_fifo_available_cnt  = 0U;   /* TX fifo Available count. */
 	uint32_t rx_fifo_available_cnt  = 0U;   /* RX fifo Available count. */
@@ -917,7 +916,7 @@ static void uart_irq_handler (uart_resources_t *uart)
 	{
 		case UART_IIR_MODEM_STATUS: /* modem status */
 
-			temp = (volatile uint32_t)(uart_reg_ptr->msr);
+			(void)(uart_reg_ptr->msr);
 			/* yet not implemented. */
 			break;
 
@@ -956,8 +955,8 @@ static void uart_irq_handler (uart_resources_t *uart)
 				/* yes then disable the transmitter interrupt */
 				uart_disable_irq(uart, UART_DISABLE_TRANSMITTER_INT);
 
-				/* clear tx busy flag */
-				uart_info_ptr->transfer.send_busy = 0U;
+				/* clear TX busy flag */
+				uart_info_ptr->transfer.tx_busy = UART_STATUS_FREE;
 
 				/* mark event as send Complete */
 				event |= ARM_USART_EVENT_SEND_COMPLETE;
@@ -997,7 +996,7 @@ static void uart_irq_handler (uart_resources_t *uart)
 				uart_disable_irq(uart, UART_DISABLE_RECEIVER_INT);
 
 				/* clear rx busy flag */
-				uart_info_ptr->rx_status.rx_busy = 0U;
+				uart_info_ptr->rx_status.rx_busy = UART_STATUS_FREE;
 
 				/* mark event as receive complete */
 				event |= ARM_USART_EVENT_RECEIVE_COMPLETE;
@@ -1039,7 +1038,7 @@ static void uart_irq_handler (uart_resources_t *uart)
 
 		default:
 			/* read the usr uart status register */
-			temp = (volatile uint32_t)(uart_reg_ptr->usr);
+			(void)(uart_reg_ptr->usr);
 			break;
 	}
 
@@ -1474,7 +1473,7 @@ static int32_t uart_configure_control_reg (bool enable, uart_resources_t *uart)
 		}
 		else
 		{
-			return ARM_DRIVER_ERROR_PARAMETER;
+			return ARM_DRIVER_ERROR;
 		}
 
 		/* Enable selected UART module (instance). bits 0-7. (one bit for each instance.) */
@@ -1539,16 +1538,16 @@ static int32_t uart_initialize (uart_resources_t *uart)
 	uart_info_ptr->transfer.tx_total_num        = 0U;
 	uart_info_ptr->transfer.tx_curr_cnt         = 0U;
 
-	/* clear Send active flag */
-	uart_info_ptr->transfer.send_busy           = 0U;
+	/* clear TX busy flag */
+	uart_info_ptr->transfer.tx_busy             = UART_STATUS_FREE;
 
 	/* initialize the rx_buffer */
 	uart_info_ptr->transfer.rx_buf              = NULL;
 	uart_info_ptr->transfer.rx_total_num        = 0U;
 	uart_info_ptr->transfer.rx_curr_cnt         = 0U;
 
-	/* clear Receive active flag */
-	uart_info_ptr->rx_status.rx_busy            = 0U;
+	/* clear Receive busy flag */
+	uart_info_ptr->rx_status.rx_busy            = UART_STATUS_FREE;
 
 	/* Clear RX status */
 	uart_info_ptr->rx_status.rx_break           = 0U;
@@ -1607,8 +1606,8 @@ static int32_t uart_uninitialize (uart_resources_t *uart)
 	uart_info_ptr->transfer.tx_total_num        = 0U;
 	uart_info_ptr->transfer.tx_curr_cnt         = 0U;
 
-	/* clear Send active flag */
-	uart_info_ptr->transfer.send_busy           = 0U;
+	/* clear TX busy flag */
+	uart_info_ptr->transfer.tx_busy             = UART_STATUS_FREE;
 
 	/* initialize the rx_buffer */
 	uart_info_ptr->transfer.rx_buf              = NULL;
@@ -1616,7 +1615,7 @@ static int32_t uart_uninitialize (uart_resources_t *uart)
 	uart_info_ptr->transfer.rx_curr_cnt         = 0U;
 
 	/* clear Receive active flag */
-	uart_info_ptr->rx_status.rx_busy            = 0U;
+	uart_info_ptr->rx_status.rx_busy            = UART_STATUS_FREE;
 
 	/* Clear RX status */
 	uart_info_ptr->rx_status.rx_break           = 0U;
@@ -1713,9 +1712,6 @@ static int32_t ARM_USART_Initialize (ARM_USART_SignalEvent_t   cb_event,
 		return ARM_DRIVER_OK;
 	}
 
-	if (!cb_event)
-		return ARM_DRIVER_ERROR_PARAMETER;
-
 	/* set the user callback event. */
 	uart->info->cb_event = cb_event;
 
@@ -1794,9 +1790,9 @@ static int32_t ARM_USART_Send (const void       *data,
 		return ARM_DRIVER_ERROR_PARAMETER;
 	}
 
-        if(!( (uart->info->flags & UART_FLAG_POWERED) && (uart->info->flags & UART_FLAG_INITIALIZED) ) )
-                return ARM_DRIVER_ERROR ;
-        
+	if (!(uart->info->flags & UART_FLAG_POWERED))
+		return ARM_DRIVER_ERROR;
+
 	if ((uart->info->flags & UART_FLAG_TX_ENABLED) == 0U) {
 	    /* error: UART is not configured (mode not selected)
 	     * tx flag UART_FLAG_TX_ENABLED should be enabled first /ref ARM_USART_CONTROL_TX
@@ -1804,13 +1800,10 @@ static int32_t ARM_USART_Send (const void       *data,
 	    return ARM_DRIVER_ERROR;
 	}
 
-	if( uart->info->cb_event != NULL )
-	{
-		/* fill the user input details for uart send transfer structure
-		 * and enable the send interrupt.
-		 */
-		ret = uart_enable_send_interrupt(uart, data, num);  /* non-blocked */
-	}
+	/* fill the user input details for uart send transfer structure
+	 * and enable the send interrupt.
+	 */
+	ret = uart_enable_send_interrupt(uart, data, num);  /* non-blocked */
 
 	return ret;
 }
@@ -1837,20 +1830,17 @@ static int32_t ARM_USART_Receive (void             *data,
 		/* Invalid parameters */
 		return ARM_DRIVER_ERROR_PARAMETER;
 	}
-        
-        if(! ( (uart->info->flags & UART_FLAG_POWERED) && (uart->info->flags & UART_FLAG_INITIALIZED) ) )
-	        return ARM_DRIVER_ERROR;
+
+	if (!(uart->info->flags & UART_FLAG_POWERED))
+		return ARM_DRIVER_ERROR;
 
 	if ((uart->info->flags & UART_FLAG_RX_ENABLED) == 0U) {
 	    /* error: UART is not configured (mode not selected) */
 	    return ARM_DRIVER_ERROR;
 	}
 
-	if( uart->info->cb_event != NULL )
-	{
-		/* enable the receiver interrupt. */
-		ret = uart_enable_receive_interrupt(uart, data, num);  /* non-blocked */
-	}
+	/* enable the receiver interrupt. */
+	ret = uart_enable_receive_interrupt(uart, data, num);  /* non-blocked */
 
 	return ret;
 }
@@ -1925,15 +1915,14 @@ static int32_t ARM_USART_Control (uint32_t           control,
 {
 	int32_t ret = ARM_DRIVER_OK;
 
+	/* if not powered? then return error */
+	if(!(uart->info->flags & UART_FLAG_POWERED))
+		return ARM_DRIVER_ERROR;
+
 	switch (control & ARM_USART_CONTROL_Msk)
 	{
 		case ARM_USART_MODE_ASYNCHRONOUS:
 			/* uart asynchronous mode */
-			if ( (uart->info->flags & UART_FLAG_INITIALIZED) == 0U)
-			{
-				/* error: Driver is not initialized /ref ARM_USART_Initialize */
-				return ARM_DRIVER_ERROR;
-			}
 
 			/* set uart asynchronous mode parameters as per arg
 			 * set baudrate, data length, parity, stop bits,
@@ -1944,11 +1933,6 @@ static int32_t ARM_USART_Control (uint32_t           control,
 
 		case ARM_USART_CONTROL_TX:
 			/* uart enable/disable transmitter */
-			if ( (uart->info->flags & UART_FLAG_INITIALIZED) == 0U)
-			{
-				/* error: Driver is not initialized /ref ARM_USART_Initialize */
-				return ARM_DRIVER_ERROR;
-			}
 
 			if (arg) /* uart enable transmitter */
 			{
@@ -1984,11 +1968,6 @@ static int32_t ARM_USART_Control (uint32_t           control,
 
 		case ARM_USART_CONTROL_RX:
 			/* uart enable/disable receiver */
-			if ( (uart->info->flags & UART_FLAG_INITIALIZED) == 0U)
-			{
-				/* error: Driver is not initialized /ref ARM_USART_Initialize */
-				return ARM_DRIVER_ERROR;
-			}
 
 			if (arg) /* uart enable receiver */
 			{
@@ -2050,11 +2029,6 @@ static int32_t ARM_USART_Control (uint32_t           control,
 
 		case ARM_USART_CONTROL_BREAK:
 			/* set/clear break */
-			if ( (uart->info->flags & UART_FLAG_INITIALIZED) == 0U)
-			{
-				/* error: Driver is not initialized /ref ARM_USART_Initialize */
-				return ARM_DRIVER_ERROR;
-			}
 
 			if (arg)
 			{
@@ -2076,14 +2050,22 @@ static int32_t ARM_USART_Control (uint32_t           control,
 /**
  * @fn		ARM_USART_STATUS ARM_USART_GetStatus (uart_resources_t *uart)
  * @brief	CMSIS-Driver uart get status
- * @note	not implemented yet.
+ * @note	none.
  * @param	uart	: Pointer to uart resources structure
  * @retval	ARM_USART_STATUS
  */
 static ARM_USART_STATUS ARM_USART_GetStatus (uart_resources_t *uart)
 {
-	/* not implemented yet. */
-	ARM_USART_STATUS status = {0, 0, 0, 0, 0, 0, 0, 0};
+	/* -TX/RX busy flag is implemented.
+	 * -TX/RX errors are not implemented yet.
+	 */
+
+	ARM_USART_STATUS status =
+	{
+		.tx_busy = uart->info->transfer.tx_busy,
+		.rx_busy = uart->info->rx_status.rx_busy,
+	};
+
 	return status;
 }
 

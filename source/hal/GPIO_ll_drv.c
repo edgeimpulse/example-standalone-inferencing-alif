@@ -167,22 +167,79 @@ int32_t GPIO_ll_GetValue (GPIO_resources_t *GPIO, uint8_t pin_no, uint32_t *valu
     return ARM_DRIVER_OK;
 }
 
+/* GPIO EXPMST0 Configuration: Control GPIO de-bounce clock. */
+static int32_t GPIO_ll_expmst0_ctrl_debounce_clk (GPIO_resources_t *GPIO, bool enable)
+{
+    /* GPIO EXPMST0 Configuration */
+    __IOM uint32_t *reg_gpio_ctrl = (uint32_t *) CFGMST0_GPIO_CTRL;
+
+    uint32_t gpio_base = (uint32_t) GPIO->reg_base;
+
+    if(enable) /* enable EXPMST0 GPIO de-bounce clock. */
+    {
+        if(gpio_base == GPIO1_BASE)
+        {
+            *reg_gpio_ctrl |= (1 << 0);
+        }
+        else if(gpio_base == GPIO2_BASE)
+        {
+            *reg_gpio_ctrl |= (1 << 4);
+        }
+        else if(gpio_base == GPIO3_BASE)
+        {
+            *reg_gpio_ctrl |= (1 << 8);
+        }
+        else
+        {
+            return ARM_DRIVER_ERROR;
+        }
+    }
+    else /* disable EXPMST0 GPIO de-bounce clock. */
+    {
+        if(gpio_base == GPIO1_BASE)
+        {
+            *reg_gpio_ctrl &= ( ~ (1 << 0) );
+        }
+        else if(gpio_base == GPIO2_BASE)
+        {
+            *reg_gpio_ctrl &= ( ~ (1 << 4) );
+        }
+        else if(gpio_base == GPIO3_BASE)
+        {
+            *reg_gpio_ctrl &= ( ~ (1 << 8) );
+        }
+        else
+        {
+            return ARM_DRIVER_ERROR;
+        }
+    }
+
+    return ARM_DRIVER_OK;
+}
+
 int32_t GPIO_ll_Debounce_Config (GPIO_resources_t *GPIO, uint8_t pin_no, bool option) {
 
     GPIO_RegInfo *reg_ptr = (GPIO_RegInfo*) GPIO->reg_base;
+    int32_t ret = ARM_DRIVER_OK;
 
     if (pin_no >= GPIO_PORT_MAX_PIN_NUMBER)   {   return ARM_DRIVER_ERROR_PARAMETER;  }
 
+    ret = GPIO_ll_expmst0_ctrl_debounce_clk(GPIO, option);
+    if(ret != ARM_DRIVER_OK)
+    {
+        return ARM_DRIVER_ERROR;
+    }
+
     if (option)
     {
-        reg_ptr->gpio_debounce |= (1 << pin_no);       /**< Enable Denounce operation >*/
+        reg_ptr->gpio_debounce |= (1 << pin_no);       /**< Enable De-bounce operation >*/
     }
     else
     {
-        reg_ptr->gpio_debounce &= ~(1 << pin_no);      /**< Disable Denounce operation >*/
+        reg_ptr->gpio_debounce &= ~(1 << pin_no);      /**< Disable De-bounce operation >*/
     }
     return ARM_DRIVER_OK;
-    }
+}
 
 int32_t GPIO_ll_Read_Config_Value (GPIO_resources_t *GPIO, bool option, uint32_t *value) {
 

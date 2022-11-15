@@ -223,3 +223,4 @@ int i2c_master_ReadData (uint8_t addr, uint8_t *data, uint16_t len) {
 
 	return 0;
 }
+

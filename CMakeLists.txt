@@ -20,16 +20,17 @@
 # armclang support doesn't work work in previous releases
 cmake_minimum_required(VERSION 3.15.0)
 
+set(CMAKE_BUILD_TYPE Release)
 if (CMAKE_BUILD_TYPE STREQUAL Release)
-    message(STATUS "Building with -O3 has not been stable. 
+    message(STATUS "Building with -O3 has not been stable.
     -O2 is generally recommended, and will lead to a much smaller image as well.
     See https://wiki.gentoo.org/wiki/GCC_optimization#-O for explanation.
     Foring -02")
-    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE INTERNAL "")
+    set(CMAKE_BUILD_TYPE Release CACHE INTERNAL "")
 endif()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL Debug)
-    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE INTERNAL "")
+    set(CMAKE_BUILD_TYPE Release CACHE INTERNAL "")
 endif()
 
 message(STATUS "Build type is set to ${CMAKE_BUILD_TYPE}")
@@ -83,7 +84,7 @@ USER_OPTION(ETHOS_U_NPU_ENABLED "Select if Ethos-U55 is available for the platfo
     ON
     BOOL)
 
-USER_OPTION(TARGET_SUBSYSTEM 
+USER_OPTION(TARGET_SUBSYSTEM
     "Choose target, 'HP' (for M55 Core 0, High Performance), or 'HE' (for M55 Core 1, High Effiency)"
     "None"
     STRING)
@@ -189,13 +190,23 @@ if (ETHOS_U_NPU_ENABLED)
     include_directories("${EI_FOLDER}/edge-impulse-sdk/CMSIS/Core/Include")
 
     add_subdirectory("${ETHOS_U_NPU_DRIVER_SRC_PATH}" ${CMAKE_BINARY_DIR}/ethos-driver)
-    
+
     set(ETHOSU_INCLUDES ${ETHOS_U_NPU_DRIVER_SRC_PATH}/include)
 endif ()
+
+set(LVGL_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lvgl
+    )
+
+# LVGL sources
+file(GLOB_RECURSE SRC_LVGL
+    "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/lvgl/src/*.c"
+    )
 
 set(DEP_INCLUDE_DIRS
     ${ETHOSU_INCLUDES}
     ${CMSIS_HEADERS}
+    ${LVGL_HEADERS}
     )
 
 ## All TPIP includes
@@ -213,6 +224,7 @@ file(GLOB_RECURSE SRC_HAL
 
 # Include directories:
 set(APPLICATION_INCLUDE_DIRS
+    ${HAL_DIR}
     ${HAL_DIR}/include
     ${PLAT_INCLUDE_DIRS}
     )
@@ -228,11 +240,12 @@ set_target_properties(app PROPERTIES SOURCES "${C_FILES}")
 
 list(APPEND SRC_MAIN "${SRC_PATH}/ei_classifier_porting.cpp")
 
-target_sources(${TARGET_NAME} PUBLIC 
-    ${SRC_MAIN} 
+target_sources(${TARGET_NAME} PUBLIC
+    ${SRC_MAIN}
     ${PLAT_RETARGET_SOURCE}
     ${SRC_APPLICATION}
     ${SRC_HAL}
+    ${SRC_LVGL}
     ${UC_SRC}
     ${SRC_GEN}
 )
