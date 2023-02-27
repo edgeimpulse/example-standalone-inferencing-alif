@@ -16,7 +16,6 @@ resources_downloaded
 
 # Build files
 CMakeFiles
-build/*
 cmake-build-*/
 
 # Virtual environments

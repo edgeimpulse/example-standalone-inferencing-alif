@@ -1,5 +1,11 @@
 # Edge Impulse POC new drivers
 
+Currently using forked alif repos as submodules to match their build system identically at first, and track deviations 
+from the public release in terms of support for appkit. So update submodules:
+```
+git submodule update --init --recursive
+```
+
 build with docker:
 ```
 docker build -t alif-firmware .
