@@ -20,8 +20,26 @@
  * SOFTWARE.
  */
 
-#include "hal/hal.h"
-#include "hal/uart_stdout.h"
+#include <stdio.h>
+#include "hal.h"
+#include "hal_image.h"
+#include "log_macros.h"
+#include "ScreenLayout.hpp"
+
+#include "lvgl.h"
+#include "lv_port.h"
+#include "lv_paint_utils.h"
+
+
+#define LIMAGE_X        192
+#define LIMAGE_Y        192
+#define LV_ZOOM         (2 * 256)
+
+namespace {
+lv_style_t boxStyle;
+lv_color_t  lvgl_image[LIMAGE_Y][LIMAGE_X] __attribute__((section(".bss.lcd_image_buf")));                      // 448x448x4 = 802,856
+};
+
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
 
@@ -35,86 +53,42 @@ extern "C" void __stack_chk_fail(void) {
 void* __stack_chk_guard = (void*)0xaeaeaeae;
 #endif
 
-
 /* Project Includes */
-#include "Driver_PINMUX_AND_PINPAD.h"
-#include "Driver_GPIO.h" 
-
-#include "RTE_Device.h"
-#include "RTE_Components.h"
-
-#include "hal/bsp_core_log.h"
-
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "image_processing.h"
-
-uint8_t raw_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES + 0x460];
-uint8_t rgb_image[CIMAGE_X*CIMAGE_Y*RGB_BYTES];
-extern ARM_DRIVER_GPIO Driver_GPIO1;
-
-void SetupLEDs()
-{
-	// Green LED
-	Driver_GPIO1.Initialize(PIN_NUMBER_15,NULL);
-	Driver_GPIO1.PowerControl(PIN_NUMBER_15,  ARM_POWER_FULL);
-	Driver_GPIO1.SetDirection(PIN_NUMBER_15, GPIO_PIN_DIRECTION_OUTPUT);
-	PINMUX_Config (PORT_NUMBER_1, PIN_NUMBER_15, PINMUX_ALTERNATE_FUNCTION_0);
-	PINPAD_Config (PORT_NUMBER_1, PIN_NUMBER_15, (0x09 | PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_04_MILI_AMPS));
-	Driver_GPIO1.SetValue(PIN_NUMBER_15, GPIO_PIN_OUTPUT_STATE_LOW);
-
-	// Red LED
-	Driver_GPIO1.Initialize(PIN_NUMBER_14,NULL);
-	Driver_GPIO1.PowerControl(PIN_NUMBER_14,  ARM_POWER_FULL);
-	Driver_GPIO1.SetDirection(PIN_NUMBER_14, GPIO_PIN_DIRECTION_OUTPUT);
-	PINMUX_Config (PORT_NUMBER_1, PIN_NUMBER_14, PINMUX_ALTERNATE_FUNCTION_0);
-	PINPAD_Config (PORT_NUMBER_1, PIN_NUMBER_14, (0x09 | PAD_FUNCTION_OUTPUT_DRIVE_STRENGTH_04_MILI_AMPS));
-	Driver_GPIO1.SetValue(PIN_NUMBER_14, GPIO_PIN_OUTPUT_STATE_LOW);
-}
-
-extern "C" void ei_sleep_c(int32_t time_ms) { ei_sleep( time_ms ); }
-
 int main()
 {
-    // System init takes place in Reset function, see startup_M55_HP.c
-#if defined(ARM_NPU)
-    /* If Arm Ethos-U NPU is to be used, we initialize it here */
-    if (0 != arm_npu_init()) {
-        ei_printf("Failed to initialize NPU");
-    }
-#endif /* ARM_NPU */
+    hal_platform_init();
+    info("Initializing Camera...\r\n");
 
+    hal_image_init();
+    info("Initializing Camera OK\n");
 
-    UartStdOutInit();
+    // alif::app::ScreenLayoutInit(lvgl_image, sizeof lvgl_image, LIMAGE_X, LIMAGE_Y, LV_ZOOM);
 
-    // Setup Pin-Mux and Pad Control registers
-    SetupLEDs();
-    while(camera_init() !=0) {};
-	ei_printf("Camera initialized... \n");
+    printf_err("test\n");
+    while(1) {
+        //const uint8_t* currImage = hal_get_image_data(192, 192);
+        //if (!currImage) {
+        //    printf_err("hal_get_image_data failed");
+        //    return false;
+        //}
 
-    while (1)
-    {
-        while (camera_start(CAMERA_MODE_SNAPSHOT, raw_image) != ARM_DRIVER_OK);
-        camera_vsync(100);
-        // RGB conversion and frame resize
-        bayer_to_RGB(raw_image+0x460, rgb_image);
+        {
+            //ScopedLVGLLock lv_lock;
 
-        for( int i=0; i<999; i++ ) {
-            ei_printf("%hi,",rgb_image[i]);
+            /* Display this image on the LCD. */
+            // write_to_lvgl_buf(192, 192,
+            //                 currImage, &lvgl_image[0][0]);
+            // lv_obj_invalidate(alif::app::ScreenLayoutImageObject());
+
+            // if (!run_requested()) {
+            //    lv_led_off(alif::app::ScreenLayoutLEDObject());
+            //    return false;
+            // }
+
+            //lv_led_on(alif::app::ScreenLayoutLEDObject());
+
         }
-        ei_printf("\n\nEnd of stream\n");
     }
-}
 
-// remove unneeded bloat
-
-namespace __gnu_cxx
-{
-    void __verbose_terminate_handler()
-    {
-        for (;;)
-            ;
-    }
+    hal_platform_release();
 }

@@ -1,0 +1,3 @@
+[submodule "dependencies/alif_ml-embedded-evaluation-kit"]
+	path = dependencies/alif_ml-embedded-evaluation-kit
+	url = git@github.com:alifsemi/alif_ml-embedded-evaluation-kit.git

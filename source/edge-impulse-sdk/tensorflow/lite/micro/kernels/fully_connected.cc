@@ -1,4 +1,4 @@
-// Patched by Edge Impulse to include reference, CMSIS-NN, ARC and MVP kernels
+// Patched by Edge Impulse to include reference and hardware-accelerated kernels
 #include "../../../../classifier/ei_classifier_config.h"
 #if 0 == 1
 /* noop */
@@ -81,6 +81,12 @@ TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
       &(data->reference_op_data)));
 
   if (input->type == kTfLiteInt8) {
+    #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_I8
+    TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                    TfLiteTypeGetName(output->type), output->type);
+    return kTfLiteError;
+    #endif
+
     RuntimeShape filter_shape = GetTensorShape(filter);
     RuntimeShape output_shape = GetTensorShape(output);
 
@@ -111,6 +117,12 @@ TfLiteStatus EvalQuantizedInt8(TfLiteContext* context, TfLiteNode* node,
                                const TfLiteEvalTensor* filter,
                                const TfLiteEvalTensor* bias,
                                TfLiteEvalTensor* output) {
+  #if EI_TFLITE_DISABLE_FULLY_CONNECTED_OUT_I8
+  TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                  TfLiteTypeGetName(output->type), output->type);
+  return kTfLiteError;
+  #endif
+
   const RuntimeShape output_shape = tflite::micro::GetTensorShape(output);
   TFLITE_DCHECK_EQ(output_shape.DimensionsCount(), 2);
   const int batches = output_shape.Dims(0);
@@ -196,6 +208,12 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   // Checks in Prepare ensure input, output and filter types are all the same.
   switch (input->type) {
     case kTfLiteFloat32: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_F32
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       tflite::reference_ops::FullyConnected(
           FullyConnectedParamsFloat(params->activation),
           tflite::micro::GetTensorShape(input),
@@ -209,10 +227,22 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
       break;
     }
     case kTfLiteInt8: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_I8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       return EvalQuantizedInt8(context, node, data, input, filter, bias,
                                output);
     }
     case kTfLiteUInt8: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_U8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       tflite::reference_ops::FullyConnected(
           FullyConnectedParamsQuantized(data.reference_op_data),
           tflite::micro::GetTensorShape(input),
@@ -424,6 +454,12 @@ TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
       IsMliApplicable(context, input, filter, bias, params);
 
   if (input->type == kTfLiteInt8 && data->is_mli_applicable) {
+    #if EI_TFLITE_DISABLE_FULLY_CONNECTED_OUT_I8
+    TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                    TfLiteTypeGetName(output->type), output->type);
+    return kTfLiteError;
+    #endif
+
     data->mli_in = static_cast<mli_tensor*>(
         context->AllocatePersistentBuffer(context, sizeof(mli_tensor)));
     data->mli_weights = static_cast<mli_tensor*>(
@@ -613,9 +649,21 @@ TfLiteStatus EvalQuantized(TfLiteContext* context, TfLiteNode* node,
       tflite::micro::GetTensorData<output_data_type>(output))
   switch (output->type) {
     case kTfLiteUInt8:
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_OUT_U8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(output->type), output->type);
+      return kTfLiteError;
+      #endif
+
       TF_LITE_FULLY_CONNECTED(uint8_t);
       break;
     case kTfLiteInt16:
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_OUT_I16
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(output->type), output->type);
+      return kTfLiteError;
+      #endif
+
       TF_LITE_FULLY_CONNECTED(int16_t);
       break;
     default:
@@ -683,9 +731,23 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   // Checks in Prepare ensure input, output and filter types are all the same.
   switch (input->type) {
     case kTfLiteFloat32:
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_F32
+      context->ReportError(context,
+                            "Filter data type %s currently not supported.",
+                            TfLiteTypeGetName(filter->type));
+      return kTfLiteError;
+      #endif
+
       return EvalFloat(context, node, params->activation, input, filter, bias,
                        output);
     case kTfLiteInt8:
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_I8
+      context->ReportError(context,
+                            "Filter data type %s currently not supported.",
+                            TfLiteTypeGetName(filter->type));
+      return kTfLiteError;
+      #endif
+
       if (data.is_mli_applicable) {
         return EvalMliQuantizedInt8(context, node, params, data, input, filter,
                                     bias, output);
@@ -695,6 +757,13 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
       }
 
     case kTfLiteUInt8:
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_U8
+      context->ReportError(context,
+                            "Filter data type %s currently not supported.",
+                            TfLiteTypeGetName(filter->type));
+      return kTfLiteError;
+      #endif
+
       return EvalQuantized(context, node, data, input, filter, bias, output);
 
     default:
@@ -860,7 +929,7 @@ TfLiteStatus EvalQuantizedInt8_MVP(TfLiteContext* context, TfLiteNode* node,
   sli_mvp_ml_fully_connected_s8_params_t *params = const_cast<sli_mvp_ml_fully_connected_s8_params_t*>(&data.op_params);
   params->input  = tflite::micro::GetTensorData<int8_t>(input);
   params->output = tflite::micro::GetTensorData<int8_t>(output);
-  
+
   sl_status_t result = sli_mvp_ml_fully_connected_s8(params);
   if (result == SL_STATUS_OK) {
     return kTfLiteOk;
@@ -1006,9 +1075,21 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
 
   switch (input->type) {
     case kTfLiteFloat32:
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_F32
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       return EvalFloat(context, node, params->activation, input, filter, bias,
                        output);
     case kTfLiteInt8:
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_I8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       return EvalQuantizedInt8(context, node, data, input, filter, bias,
                                output);
 
@@ -1077,7 +1158,6 @@ TfLiteRegistration Register_FULLY_CONNECTED_INT8() {
 }  // namespace tflite
 
 #elif EI_CLASSIFIER_TFLITE_ENABLE_ESP_NN == 1
-
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -1093,19 +1173,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow/lite/micro/kernels/fully_connected.h"
+#include "edge-impulse-sdk/tensorflow/lite/c/builtin_op_data.h"
+#include "edge-impulse-sdk/tensorflow/lite/c/common.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/common.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/quantization_util.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/reference/fully_connected.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/tensor_ctypes.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/kernel_util.h"
+#include "edge-impulse-sdk/tensorflow/lite/micro/kernels/fully_connected.h"
+#include "edge-impulse-sdk/tensorflow/lite/micro/kernels/kernel_util.h"
 
-#include "tensorflow/lite/c/builtin_op_data.h"
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/kernels/internal/common.h"
-#include "tensorflow/lite/kernels/internal/quantization_util.h"
-#include "tensorflow/lite/kernels/internal/reference/fully_connected.h"
-#include "tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h"
-#include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
-#include "tensorflow/lite/kernels/kernel_util.h"
-#include "tensorflow/lite/micro/kernels/kernel_util.h"
-
-#include <esp_nn.h>
+#include "edge-impulse-sdk/porting/espressif/ESP-NN/include/esp_nn.h"
 #include <esp_timer.h>
 
 long long fc_total_time = 0;
@@ -1168,6 +1247,11 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   // Checks in Prepare ensure input, output and filter types are all the same.
   switch (input->type) {
     case kTfLiteFloat32: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_F32
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
       tflite::reference_ops::FullyConnected(
           FullyConnectedParamsFloat(params->activation),
           tflite::micro::GetTensorShape(input),
@@ -1182,6 +1266,11 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
     }
 
     case kTfLiteInt8: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_I8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
       const int32_t* bias_data =
           nullptr != bias ? tflite::micro::GetTensorData<int32_t>(bias)
                           : nullptr;
@@ -1213,6 +1302,11 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
     }
 
     case kTfLiteUInt8: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_U8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
       tflite::reference_ops::FullyConnected(
           FullyConnectedParamsQuantized(data),
           tflite::micro::GetTensorShape(input),
@@ -1225,7 +1319,7 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
           tflite::micro::GetTensorData<uint8_t>(output));
       break;
     }
-    
+
     default: {
       TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
                          TfLiteTypeGetName(input->type), input->type);
@@ -1250,7 +1344,6 @@ TfLiteRegistration Register_FULLY_CONNECTED() {
 }
 
 }  // namespace tflite
-
 #else
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
@@ -1336,6 +1429,12 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
   // Checks in Prepare ensure input, output and filter types are all the same.
   switch (input->type) {
     case kTfLiteFloat32: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_F32
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       tflite::reference_ops::FullyConnected(
           FullyConnectedParamsFloat(params->activation),
           tflite::micro::GetTensorShape(input),
@@ -1350,6 +1449,12 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
     }
 
     case kTfLiteInt8: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_I8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       tflite::reference_integer_ops::FullyConnected(
           FullyConnectedParamsQuantized(data),
           tflite::micro::GetTensorShape(input),
@@ -1364,6 +1469,12 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
     }
 
     case kTfLiteUInt8: {
+      #if EI_TFLITE_DISABLE_FULLY_CONNECTED_IN_U8
+      TF_LITE_KERNEL_LOG(context, "Type %s (%d) not supported.",
+                      TfLiteTypeGetName(input->type), input->type);
+      return kTfLiteError;
+      #endif
+
       tflite::reference_ops::FullyConnected(
           FullyConnectedParamsQuantized(data),
           tflite::micro::GetTensorShape(input),
