@@ -65,10 +65,6 @@ USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. S
     OFF
     BOOL)
 
-USER_OPTION(LINKER_SCRIPT_NAME "Path to linker script to use"
-    ../../../../../../../ensemble
-    STRING)
-
 USER_OPTION(GLCD_UI "Use ARM GLCD UI?"
     OFF
     BOOL)
