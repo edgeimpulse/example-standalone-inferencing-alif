@@ -1,4 +1,0 @@
-[submodule "dependencies/alif_ml-embedded-evaluation-kit"]
-	path = dependencies/alif_ml-embedded-evaluation-kit
-	url = git@github.com:Dasch0/alif_ml-embedded-evaluation-kit.git
-
