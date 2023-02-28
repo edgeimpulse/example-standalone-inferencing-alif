@@ -97,16 +97,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+
 # Add ethos, ensemble, and CMSIS library dependencies through alif repo CMakeLists
-add_subdirectory(${ALIF_REPO_DIR}/source/hal ${CMAKE_BINARY_DIR}/source/hal EXCLUDE_FROM_ALL)
-
 add_subdirectory(${ALIF_REPO_DIR}/source/math ${CMAKE_BINARY_DIR}/source/math EXCLUDE_FROM_ALL)
-
-# Add the APIs for Alif LCD UI
-add_subdirectory(${ALIF_REPO_DIR}/source/application/api/common ${CMAKE_BINARY_DIR}/api/common EXCLUDE_FROM_ALL)
-add_subdirectory(
-    ${ALIF_REPO_DIR}/source/application/api/use_case/alif_ui  # Source path
-    ${CMAKE_BINARY_DIR}/api/use_case/alif_ui)  # Binary path
+add_subdirectory(${ALIF_REPO_DIR}/source/hal ${CMAKE_BINARY_DIR}/source/hal EXCLUDE_FROM_ALL)
 
 # Add Edge Impulse SDK dependencies
 
@@ -137,7 +131,7 @@ set_source_files_properties(${SRC_MAIN}
     PROPERTIES COMPILE_DEFINITIONS
     "PRJ_VER_STR=\"${PROJECT_VERSION}\";PRJ_DES_STR=\"${PROJECT_DESCRIPTION}\"")
 
-target_link_libraries(${TARGET_NAME} PUBLIC log arm_math hal common_api alif_ui_api)
+target_link_libraries(${TARGET_NAME} PUBLIC log arm_math hal)
 
 # Postbuild steps generate map, axf, binaries
 # TODO: SEUTILS config

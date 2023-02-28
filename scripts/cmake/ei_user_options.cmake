@@ -53,11 +53,23 @@ USER_OPTION(TARGET_SUBSYSTEM "Specify platform target subsystem: RTSS-HP, RTSS-H
     RTSS-HP
     STRING)
 
+USER_OPTION(TARGET_BOARD "Specify board target : AppKit_Alpha1, AppKit_Alpha2, or DevKit"
+    AppKit_Alpha1
+    STRING)
+
 USER_OPTION(ETHOS_U_NPU_ENABLED "If Arm Ethos-U NPU is enabled in the target system."
     ON
     BOOL)
 
 USER_OPTION(CPU_PROFILE_ENABLED "Output CPU performance profiling information. Should be used only for MPS3 board."
+    OFF
+    BOOL)
+
+USER_OPTION(LINKER_SCRIPT_NAME "Path to linker script to use"
+    ../../../../../../../ensemble
+    STRING)
+
+USER_OPTION(GLCD_UI "Use ARM GLCD UI?"
     OFF
     BOOL)
 

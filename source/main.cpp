@@ -24,21 +24,6 @@
 #include "hal.h"
 #include "hal_image.h"
 #include "log_macros.h"
-#include "ScreenLayout.hpp"
-
-#include "lvgl.h"
-#include "lv_port.h"
-#include "lv_paint_utils.h"
-
-
-#define LIMAGE_X        192
-#define LIMAGE_Y        192
-#define LV_ZOOM         (2 * 256)
-
-namespace {
-lv_style_t boxStyle;
-lv_color_t  lvgl_image[LIMAGE_Y][LIMAGE_X] __attribute__((section(".bss.lcd_image_buf")));                      // 448x448x4 = 802,856
-};
 
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 #include "edge-impulse-sdk/dsp/ei_utils.h"
@@ -56,38 +41,16 @@ void* __stack_chk_guard = (void*)0xaeaeaeae;
 /* Project Includes */
 int main()
 {
+    info("Initializing Platform...\r\n");
     hal_platform_init();
+    info("Initializing Platform OK\r\n");
     info("Initializing Camera...\r\n");
+    //hal_image_init();
+    info("Initializing Camera OK\r\n");
 
-    hal_image_init();
-    info("Initializing Camera OK\n");
-
-    // alif::app::ScreenLayoutInit(lvgl_image, sizeof lvgl_image, LIMAGE_X, LIMAGE_Y, LV_ZOOM);
-
-    printf_err("test\n");
     while(1) {
-        //const uint8_t* currImage = hal_get_image_data(192, 192);
-        //if (!currImage) {
-        //    printf_err("hal_get_image_data failed");
-        //    return false;
-        //}
-
-        {
-            //ScopedLVGLLock lv_lock;
-
-            /* Display this image on the LCD. */
-            // write_to_lvgl_buf(192, 192,
-            //                 currImage, &lvgl_image[0][0]);
-            // lv_obj_invalidate(alif::app::ScreenLayoutImageObject());
-
-            // if (!run_requested()) {
-            //    lv_led_off(alif::app::ScreenLayoutLEDObject());
-            //    return false;
-            // }
-
-            //lv_led_on(alif::app::ScreenLayoutLEDObject());
-
-        }
+        info("Initializing Camera OK\r\n");
+        printf("print test\r\n");
     }
 
     hal_platform_release();
