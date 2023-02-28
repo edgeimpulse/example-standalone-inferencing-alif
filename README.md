@@ -1,7 +1,7 @@
 # Edge Impulse POC new drivers
 
-Currently using forked alif repos as submodules to match their build system identically at first, and track deviations 
-from the public release in terms of support for appkit. So update submodules:
+Currently pointing to alif repo as submodules to match their build system identically, tracking deviations 
+from the public release in terms of support for appkit. To build, update submodules:
 ```
 git submodule update --init --recursive
 ```
@@ -20,15 +20,15 @@ then use SEUTIL tools to program:
 cd /path/to/your/alif-seutils-dir
 sudo truncate --size %16 build/images/mram.bin
 
+./app-gen-toc -f build/config/ei-app-gcc.json
+./app-write-mram
 ```
 
 What works:
 - EI SDK
 - UART/VCOM
 - LCD via lvgl
-
-What doesn't work:
-- Camera (on david's board)
-
-What hasn't been tested:
 - Microphone
+
+What doesn't work so far:
+- Camera
