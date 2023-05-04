@@ -20,16 +20,24 @@
  * SOFTWARE.
  */
 
-#include "hal/hal.h"
-#include "hal/uart_stdout.h"
+#include "hal.h"
+#include "delay.h"
+#include "model-parameters/model_metadata.h"
 #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
-#include "edge-impulse-sdk/dsp/ei_utils.h"
+#include "hal.h"
+#include "edge-impulse-sdk/dsp/numpy.hpp"
 
 #include <cstdio>
+#include "log_macros.h"
+
+extern "C" void ei_sleep_c(int32_t time_ms) { ei_sleep( time_ms ); }
+extern "C" int Init_SysTick(void);
+
+extern "C" unsigned char UartGetc(void);
+extern "C" int arm_ethosu_npu_init(void);
 
 static const float raw_features[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE] = {
     // copy raw features here (for example from the 'Live classification' page)
-    // see TBD
 };
 
 #if !NDEBUG
@@ -43,58 +51,60 @@ void* __stack_chk_guard = (void*)0xaeaeaeae;
 int main()
 {
     // System init takes place in Reset function, see irqs.c
+    init_trigger_rx();
+    hal_platform_init();
+    info("ei init begins\r\n");
+    printf("printf test.\r\n");
+    ei_printf("ei_printf test.\r\n");
 
-    #if defined(ARM_NPU)
+    #if ARM_NPU
+    arm_ethosu_npu_init();
+    ei_printf("ARM ethos init\r\n");
+    #endif
 
-    /* If Arm Ethos-U NPU is to be used, we initialise it here */
-    if (0 != arm_npu_init()) {
-        ei_printf("Failed to initialize NPU");
-    }
+    sleep_or_wait_msec(10);
 
-    #endif /* ARM_NPU */
+    while (1) {
+	    signal_t signal;
+            ei_impulse_result_t result = { 0 };
+	    numpy::signal_from_buffer(&raw_features[0], ARRAY_LENGTH(raw_features), &signal);
 
-    UartStdOutInit();
+	    EI_IMPULSE_ERROR res = run_classifier(&signal, &result, true);
+	    ei_printf("run_classifier returned: %d (DSP %lld us., Classification %lld us., Anomaly %d ms.)\n", res,
+		result.timing.dsp_us, result.timing.classification_us, result.timing.anomaly);
 
-    ei_impulse_result_t result;
-
-    signal_t signal;
-    numpy::signal_from_buffer(&raw_features[0], ARRAY_LENGTH(raw_features), &signal);
-
-    EI_IMPULSE_ERROR res = run_classifier(&signal, &result, false);
-    ei_printf("run_classifier returned: %d (DSP %lld us., Classification %lld us., Anomaly %d ms.)\n", res,
-        result.timing.dsp_us, result.timing.classification_us, result.timing.anomaly);
-
-    ei_printf("Begin output\n");
+	    ei_printf("Begin output\n");
 
 #if EI_CLASSIFIER_OBJECT_DETECTION == 1
-    for (size_t ix = 0; ix < EI_CLASSIFIER_OBJECT_DETECTION_COUNT; ix++) {
-        auto bb = result.bounding_boxes[ix]; 
-        if (bb.value == 0) {
-            continue;
-        }
+	    for (size_t ix = 0; ix < EI_CLASSIFIER_OBJECT_DETECTION_COUNT; ix++) {
+		auto bb = result.bounding_boxes[ix]; 
+		if (bb.value == 0) {
+		    continue;
+		}
 
-        ei_printf("%s (%f) [ x: %u, y: %u, width: %u, height: %u ]\n", bb.label, bb.value, bb.x, bb.y, bb.width, bb.height);
-    }
+		ei_printf("%s (%f) [ x: %u, y: %u, width: %u, height: %u ]\n", bb.label, bb.value, bb.x, bb.y, bb.width, bb.height);
+	    }
 #else
-    // print the predictions
-    ei_printf("[");
-    for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-        ei_printf("%.5f", result.classification[ix].value);
+	    // print the predictions
+	    ei_printf("[");
+	    for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
+		ei_printf("%.5f", result.classification[ix].value);
 #if EI_CLASSIFIER_HAS_ANOMALY == 1
-        ei_printf(", ");
+		ei_printf(", ");
 #else
-        if (ix != EI_CLASSIFIER_LABEL_COUNT - 1) {
-            ei_printf(", ");
-        }
+		if (ix != EI_CLASSIFIER_LABEL_COUNT - 1) {
+		    ei_printf(", ");
+		}
 #endif
-    }
+	    }
 #if EI_CLASSIFIER_HAS_ANOMALY == 1
-    ei_printf("%.3f", result.anomaly);
+	    ei_printf("%.3f", result.anomaly);
 #endif
-    ei_printf("]\n");
+	    ei_printf("]\n");
 #endif
 
-    ei_printf("End output\n");
+	    ei_printf("End output\n");
+    }
 }
 
 // remove unneeded bloat

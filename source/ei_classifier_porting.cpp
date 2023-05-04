@@ -26,17 +26,21 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "hal/cmsis.h"
+#include "hal.h"
 
 #ifndef EI_CORE_CLOCK_HZ
-    #ifdef EI_CONFIG_ETHOS_U55_256
-        #define EI_CORE_CLOCK_HZ 400000000 //default to M55_0 core
-    #else
-        #define EI_CORE_CLOCK_HZ 160000000
-    #endif
+#ifdef EI_CONFIG_ETHOS_U55_256
+#define EI_CORE_CLOCK_HZ 400000000 //default to M55_0 core
+#else
+#define EI_CORE_CLOCK_HZ 160000000
+#endif
 #endif
 
-__attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
+/* Extern function prototypes ---------------------------------------------- */
+extern "C" uint64_t Get_SysTick_Cycle_Count(void);
+extern "C" unsigned char UartGetcNoBlock(void);
+
+EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
 {
     return EI_IMPULSE_OK;
 }
@@ -44,13 +48,14 @@ __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled()
 /**
  * Cancelable sleep, can be triggered with signal from other thread
  */
-__attribute__((weak)) EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
+EI_IMPULSE_ERROR ei_sleep(int32_t time_ms)
 {
-    auto start = ei_read_timer_ms();
-    if(time_ms<0) { 
-        return EI_IMPULSE_OK; 
-    }
-    while(ei_read_timer_ms() - start < static_cast<uint32_t>(time_ms));
+    if(time_ms<0) { return EI_IMPULSE_OK; }
+
+    uint64_t time = ei_read_timer_ms();
+    // cast so that we get correct wrap around behavior
+    while( ei_read_timer_ms() - time < (uint64_t) time_ms )
+        ;
     return EI_IMPULSE_OK;
 }
 
@@ -61,33 +66,47 @@ uint64_t ei_read_timer_us()
 
 uint64_t ei_read_timer_ms()
 {
-    return ei_read_timer_us()/1000; 
+    return ei_read_timer_us() / 1000;
 }
 
-__attribute__((weak)) void ei_printf(const char *format, ...)
+void ei_printf(const char *format, ...)
 {
     va_list myargs;
     va_start(myargs, format);
     vprintf(format, myargs);
     va_end(myargs);
+    fflush(stdout);
 }
 
-__attribute__((weak)) void ei_printf_float(float f)
+void ei_printf_float(float f)
 {
     ei_printf("%f", f);
 }
 
-__attribute__((weak)) void *ei_malloc(size_t size)
+void ei_putchar(char c) 
+{ 
+    putchar(c); 
+    fflush(stdout);
+}
+
+char ei_getchar(void)
+{
+    auto c = UartGetcNoBlock();
+    if (c == 0xFF ) { return 0; } //weird ei convention
+    else { return c; ei_printf("ch: %c\r\n", c);}
+}
+
+void *ei_malloc(size_t size)
 {
     return malloc(size);
 }
 
-__attribute__((weak)) void *ei_calloc(size_t nitems, size_t size)
+void *ei_calloc(size_t nitems, size_t size)
 {
     return calloc(nitems, size);
 }
 
-__attribute__((weak)) void ei_free(void *ptr)
+void ei_free(void *ptr)
 {
     free(ptr);
 }
@@ -95,7 +114,7 @@ __attribute__((weak)) void ei_free(void *ptr)
 #if defined(__cplusplus) && EI_C_LINKAGE == 1
 extern "C"
 #endif
-    __attribute__((weak)) void
+    void
     DebugLog(const char *s)
 {
     ei_printf("%s", s);
