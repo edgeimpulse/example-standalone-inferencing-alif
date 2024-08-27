@@ -1,6 +1,9 @@
 # Edge Impulse Example: stand-alone inferencing (Alif)
 
-This builds and runs an exported impulse locally on your machine. 
+This builds and runs an exported impulse locally on your machine.
+
+> [!WARNING]
+> This repository is outdated. For running impulses standalone on Alif Ensemble, use this [project](https://github.com/edgeimpulse/example-standalone-inferencing-alif-csolution).
 
 ## Prerequisites
 1. Create an edge impulse account at [edgeimpulse.com](https://www.edgeimpulse.com/)
